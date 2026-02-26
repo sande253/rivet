@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Saree Intelligence Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --crimson: #0c811f;
+      --gold: #C9952A;
+      --gold-light: #E8C060;
+      --ivory: #FAF6EE;
+      --ink: #1A1008;
+      --clay: #8B5E3C;
+      --sage: #4A5240;
+      --paper: #F2EBD9;
+      --shadow: rgba(26,16,8,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--ivory);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Decorative border pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(90deg, var(--gold) 0, var(--gold) 1px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(0deg, var(--gold) 0, var(--gold) 1px, transparent 1px, transparent 40px);
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .header {
+      position: relative;
+      z-index: 1;
+      padding: 48px 40px 32px;
+      border-bottom: 1px solid rgba(201,149,42,0.3);
+      background: linear-gradient(180deg, rgba(139,26,26,0.04) 0%, transparent 100%);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .logo-area h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      font-weight: 300;
+      letter-spacing: -1px;
+      color: var(--crimson);
+      line-height: 1;
+    }
+
+    .logo-area h1 em {
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    .logo-area p {
+      font-size: 11px;
+      color: var(--clay);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .market-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .market-badge span {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--clay);
+    }
+
+    .market-badge strong {
+      font-size: 28px;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    /* Upload Panel */
+    .upload-panel {
+      position: sticky;
+      top: 24px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(201,149,42,0.4) 0%, transparent 100%);
+    }
+
+    .upload-zone {
+      border: 1.5px dashed rgba(201,149,42,0.5);
+      border-radius: 4px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(242,235,217,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-zone::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(201,149,42,0.15);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--gold);
+      background: rgba(201,149,42,0.06);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+      opacity: 0.6;
+    }
+
+    .upload-zone h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .upload-zone p {
+      font-size: 11px;
+      color: var(--clay);
+      letter-spacing: 0.5px;
+    }
+
+    #fileInput { display: none; }
+
+    .preview-container {
+      margin-top: 16px;
+      border: 1px solid rgba(201,149,42,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .preview-container img {
+      width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      background: var(--paper);
+      display: block;
+    }
+
+    .preview-label {
+      padding: 8px 12px;
+      background: var(--paper);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--clay);
+      border-top: 1px solid rgba(201,149,42,0.2);
+    }
+
+    .analyze-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--crimson);
+      color: var(--ivory);
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .analyze-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    }
+
+    .analyze-btn:hover {
+      background: #6B1414;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(139,26,26,0.3);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .loading-bar {
+      display: none;
+      margin-top: 12px;
+      height: 2px;
+      background: rgba(201,149,42,0.2);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .loading-bar.active { display: block; }
+
+    .loading-bar::after {
+      content: '';
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--crimson), var(--gold));
+      background-size: 200% 100%;
+      animation: loadingSlide 1.5s linear infinite;
+    }
+
+    @keyframes loadingSlide {
+      0% { background-position: 200% 0; width: 0%; }
+      50% { width: 70%; }
+      100% { background-position: -200% 0; width: 100%; }
+    }
+
+    /* Results Panel */
+    .results-panel {
+      min-height: 400px;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      color: var(--clay);
+      opacity: 0.5;
+    }
+
+    .empty-state .empty-icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-state p { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+
+    .results-container { display: none; }
+    .results-container.visible { display: block; animation: fadeUp 0.5s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Classification Banner */
+    .classification-banner {
+      padding: 24px 28px;
+      border-radius: 4px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .classification-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 200px; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08));
+    }
+
+    .classification-banner.launch {
+      background: linear-gradient(135deg, #1A3A1A 0%, #2D5A2D 100%);
+      border: 1px solid rgba(100,200,100,0.3);
+    }
+
+    .classification-banner.modify {
+      background: linear-gradient(135deg, #3A2800 0%, #6B4A00 100%);
+      border: 1px solid rgba(201,149,42,0.4);
+    }
+
+    .classification-banner.dnp {
+      background: linear-gradient(135deg, #3A0808 0%, #6B1414 100%);
+      border: 1px solid rgba(200,60,60,0.3);
+    }
+
+    .classification-text .verdict {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: white;
+      line-height: 1;
+    }
+
+    .classification-text .verdict-sub {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 6px;
+      opacity: 0.7;
+      color: white;
+    }
+
+    .score-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .score-circle .score-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: white;
+      line-height: 1;
+    }
+
+    .score-circle .score-denom {
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Score Breakdown */
+    .card {
+      background: var(--paper);
+      border: 1px solid rgba(201,149,42,0.2);
+      border-radius: 4px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 16px;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .score-row:last-child { margin-bottom: 0; }
+
+    .score-label {
+      font-size: 11px;
+      color: var(--ink);
+      width: 180px;
+      flex-shrink: 0;
+    }
+
+    .score-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: rgba(139,26,26,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--crimson), var(--gold));
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    .score-val {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink);
+      width: 36px;
+      text-align: right;
+    }
+
+    /* Info Cards */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .info-card {
+      background: var(--paper);
+      border: 1px solid rgba(201,149,42,0.2);
+      border-radius: 4px;
+      padding: 16px 20px;
+    }
+
+    .info-card-label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 8px;
+    }
+
+    .info-card-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      color: var(--ink);
+      font-weight: 400;
+    }
+
+    .description-card {
+      background: var(--paper);
+      border: 1px solid rgba(201,149,42,0.2);
+      border-radius: 4px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .description-card p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--ink);
+      font-weight: 300;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      padding: 4px 12px;
+      background: rgba(139,26,26,0.08);
+      border: 1px solid rgba(139,26,26,0.15);
+      border-radius: 2px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--crimson);
+      text-transform: uppercase;
+    }
+
+    .recs-list {
+      list-style: none;
+    }
+
+    .recs-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(201,149,42,0.1);
+      font-size: 12px;
+      color: var(--ink);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .recs-list li:last-child { border-bottom: none; }
+
+    .recs-list li::before {
+      content: '→';
+      color: var(--gold);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .insight-box {
+      background: linear-gradient(135deg, rgba(139,26,26,0.05) 0%, rgba(201,149,42,0.05) 100%);
+      border-left: 3px solid var(--gold);
+      padding: 16px 20px;
+      border-radius: 0 4px 4px 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    /* Error state */
+    .error-msg {
+      background: rgba(139,26,26,0.08);
+      border: 1px solid rgba(139,26,26,0.2);
+      border-radius: 4px;
+      padding: 16px 20px;
+      color: var(--crimson);
+      font-size: 12px;
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+        padding: 24px 20px;
+      }
+      .upload-panel { position: static; }
+      .header-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-area">
+      <h1>Rivet <em>Intelligence</em> Studio</h1>
+      <p>AI-powered product viability analyzer</p>
+    </div>
+
+  </div>
+</header>
+
+<main class="main">
+  <!-- Left Panel -->
+  <div class="upload-panel">
+    <div class="section-label">Upload Sketch</div>
+
+    <div class="upload-zone" id="uploadZone">
+      <h3>Drop your design here</h3>
+      <p>Upload a sketch, photograph, or design mockup</p>
+      <p style="margin-top:6px; opacity:0.7;">PNG · JPG · WEBP · GIF</p>
+    </div>
+
+    <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.webp" />
+
+    <div class="preview-container" id="previewContainer">
+      <img id="previewImg" src="" alt="Preview" />
+      <div class="preview-label">Design Preview</div>
+    </div>
+
+    <button class="analyze-btn" id="analyzeBtn" disabled>
+      Analyze Product Viability
+    </button>
+
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="results-panel">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🪡</div>
+      <p>Upload a sketch to begin analysis</p>
+    </div>
+
+    <div class="results-container" id="resultsContainer">
+
+      <!-- Classification Banner -->
+      <div class="classification-banner" id="classificationBanner">
+        <div class="classification-text">
+          <div class="verdict" id="verdictText"></div>
+          <div class="verdict-sub" id="verdictSub"></div>
+        </div>
+        <div class="score-circle">
+          <div class="score-num" id="scoreNum"></div>
+          <div class="score-denom">/ 100</div>
+        </div>
+      </div>
+
+      <!-- Style & Description -->
+      <div class="section-label">Design Analysis</div>
+      <div class="description-card">
+        <p id="designDesc"></p>
+        <div class="tag-list" id="featureTags"></div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">Detected Style</div>
+          <div class="info-card-value" id="detectedStyle"></div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Market Segment</div>
+          <div class="info-card-value" id="marketSegment"></div>
+        </div>
+      </div>
+
+      <!-- Score Breakdown -->
+      <div class="section-label">Score Breakdown</div>
+      <div class="card">
+        <div class="score-row">
+          <div class="score-label">Market Demand</div>
+          <div class="score-bar-wrap"><div class="score-bar-fill" id="bar-demand"></div></div>
+          <div class="score-val" id="val-demand"></div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Design Uniqueness</div>
+          <div class="score-bar-wrap"><div class="score-bar-fill" id="bar-unique"></div></div>
+          <div class="score-val" id="val-unique"></div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Price Competitiveness</div>
+          <div class="score-bar-wrap"><div class="score-bar-fill" id="bar-price"></div></div>
+          <div class="score-val" id="val-price"></div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Material Appeal</div>
+          <div class="score-bar-wrap"><div class="score-bar-fill" id="bar-material"></div></div>
+          <div class="score-val" id="val-material"></div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Trend Alignment</div>
+          <div class="score-bar-wrap"><div class="score-bar-fill" id="bar-trend"></div></div>
+          <div class="score-val" id="val-trend"></div>
+        </div>
+      </div>
+
+      <!-- Market Insight -->
+      <div class="section-label">Market Insight</div>
+      <div class="insight-box" id="marketInsight"></div>
+
+      <!-- Recommendations -->
+      <div class="section-label" style="margin-top: 20px;">Recommendations</div>
+      <div class="card">
+        <ul class="recs-list" id="recsList"></ul>
+      </div>
+
+      <!-- Reasoning -->
+      <div class="section-label">Classification Reasoning</div>
+      <div class="card">
+        <p style="font-size: 13px; line-height: 1.7; color: var(--ink);" id="reasoning"></p>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  const previewContainer = document.getElementById('previewContainer');
+  const previewImg = document.getElementById('previewImg');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const loadingBar = document.getElementById('loadingBar');
+  const errorMsg = document.getElementById('errorMsg');
+  const emptyState = document.getElementById('emptyState');
+  const resultsContainer = document.getElementById('resultsContainer');
+
+  let selectedFile = null;
+
+  // Fetch market summary
+  fetch('/market-summary').then(r => r.json()).then(data => {
+    document.getElementById('productCount').textContent = data.total_products || 578;
+  }).catch(() => {});
+
+  // Upload zone click
+  uploadZone.addEventListener('click', () => fileInput.click());
+
+  // Drag & Drop
+  uploadZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+  });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  function handleFile(file) {
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImg.src = e.target.result;
+      previewContainer.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    analyzeBtn.disabled = false;
+    errorMsg.style.display = 'none';
+  }
+
+  analyzeBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+
+    analyzeBtn.disabled = true;
+    analyzeBtn.textContent = 'Analyzing...';
+    loadingBar.classList.add('active');
+    errorMsg.style.display = 'none';
+    resultsContainer.classList.remove('visible');
+
+    const formData = new FormData();
+    formData.append('sketch', selectedFile);
+
+    try {
+      const res = await fetch('/analyze', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Analysis failed');
+      }
+
+      renderResults(data);
+    } catch (err) {
+      errorMsg.textContent = '⚠ ' + err.message;
+      errorMsg.style.display = 'block';
+    } finally {
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = 'Analyze Product Viability';
+      loadingBar.classList.remove('active');
+    }
+  });
+
+  function renderResults(data) {
+    emptyState.style.display = 'none';
+
+    // Classification banner
+    const banner = document.getElementById('classificationBanner');
+    const cls = data.classification;
+    banner.className = 'classification-banner';
+    if (cls === 'LAUNCH') {
+      banner.classList.add('launch');
+      document.getElementById('verdictText').textContent = '✅ LAUNCH';
+      document.getElementById('verdictSub').textContent = 'Strong market fit — proceed to production';
+    } else if (cls === 'MODIFY') {
+      banner.classList.add('modify');
+      document.getElementById('verdictText').textContent = '⚠ MODIFY';
+      document.getElementById('verdictSub').textContent = 'Promising — needs adjustments before launch';
+    } else {
+      banner.classList.add('dnp');
+      document.getElementById('verdictText').textContent = '❌ DO NOT PRODUCE';
+      document.getElementById('verdictSub').textContent = 'Poor market fit — high risk';
+    }
+
+    document.getElementById('scoreNum').textContent = data.total_score;
+
+    // Design info
+    document.getElementById('designDesc').textContent = data.design_description;
+    document.getElementById('detectedStyle').textContent = data.detected_style || '—';
+
+    // Determine market segment from score
+    const score = data.total_score;
+    document.getElementById('marketSegment').textContent =
+      score >= 75 ? 'Premium / Wedding' : score >= 50 ? 'Mid-range / Festive' : 'Commodity';
+
+    // Features tags
+    const tagList = document.getElementById('featureTags');
+    tagList.innerHTML = '';
+    (data.detected_features || []).forEach(f => {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = f;
+      tagList.appendChild(tag);
+    });
+
+    // Score bars
+    const scores = data.scores || {};
+    setScore('demand', scores.market_demand, 20);
+    setScore('unique', scores.design_uniqueness, 20);
+    setScore('price', scores.price_competitiveness, 20);
+    setScore('material', scores.material_appeal, 20);
+    setScore('trend', scores.trend_alignment, 20);
+
+    // Market insight
+    document.getElementById('marketInsight').textContent = data.market_insights || '';
+
+    // Recommendations
+    const recsList = document.getElementById('recsList');
+    recsList.innerHTML = '';
+    (data.recommendations || []).forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r;
+      recsList.appendChild(li);
+    });
+
+    // Reasoning
+    document.getElementById('reasoning').textContent = data.classification_reasoning || '';
+
+    resultsContainer.classList.add('visible');
+
+    // Animate bars after a tick
+    setTimeout(() => {
+      animateBars(scores);
+    }, 100);
+  }
+
+  function setScore(key, val, max) {
+    document.getElementById(`val-${key}`).textContent = `${val || 0}/${max}`;
+  }
+
+  function animateBars(scores) {
+    const map = {
+      demand: scores.market_demand,
+      unique: scores.design_uniqueness,
+      price: scores.price_competitiveness,
+      material: scores.material_appeal,
+      trend: scores.trend_alignment,
+    };
+    Object.entries(map).forEach(([k, v]) => {
+      const bar = document.getElementById(`bar-${k}`);
+      if (bar) bar.style.width = `${((v || 0) / 20) * 100}%`;
+    });
+  }
+</script>
+</body>
+</html>
