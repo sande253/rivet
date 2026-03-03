@@ -74,8 +74,13 @@ def _init_extensions(app: Flask) -> None:
 def _create_tables(app: Flask) -> None:
     with app.app_context():
         from .models import user  # noqa: F401 — registers model with SQLAlchemy
-        db.create_all()
-        log.debug("Database tables verified / created.")
+        try:
+            db.create_all()
+            log.debug("Database tables verified / created.")
+        except Exception as e:
+            # Tables may already exist (race condition with multiple workers)
+            # or database may be read-only. Log and continue.
+            log.warning(f"Table creation skipped: {e}")
 
 
 def _ensure_directories(app: Flask) -> None:
