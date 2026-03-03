@@ -71,10 +71,16 @@ resource "aws_iam_role_policy_attachment" "ec2_cloudwatch" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-# Attach Secrets Manager read policy
+# Attach Secrets Manager read policy (Anthropic key)
 resource "aws_iam_role_policy_attachment" "ec2_secrets" {
   role       = aws_iam_role.ec2.name
   policy_arn = var.read_secret_policy_arn
+}
+
+# Attach Secrets Manager read policy (database credentials)
+resource "aws_iam_role_policy_attachment" "ec2_db_secret" {
+  role       = aws_iam_role.ec2.name
+  policy_arn = var.read_db_secret_policy_arn
 }
 
 # Attach SSM read policy
@@ -87,6 +93,12 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm" {
 resource "aws_iam_role_policy_attachment" "ec2_bedrock" {
   role       = aws_iam_role.ec2.name
   policy_arn = var.bedrock_invoke_policy_arn
+}
+
+# Attach SSM Session Manager policy for remote access
+resource "aws_iam_role_policy_attachment" "ec2_ssm_core" {
+  role       = aws_iam_role.ec2.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # S3 access policy

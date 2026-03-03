@@ -41,9 +41,9 @@ fi
 
 # ── Install CloudWatch Agent ──────────────────────────────────────────────────
 echo "Installing CloudWatch Agent..."
-wget -q https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
-rm -f ./amazon-cloudwatch-agent.rpm
+curl -s -o /tmp/amazon-cloudwatch-agent.rpm https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U /tmp/amazon-cloudwatch-agent.rpm
+rm -f /tmp/amazon-cloudwatch-agent.rpm
 
 # Configure CloudWatch Agent
 cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'EOF'
@@ -58,30 +58,19 @@ cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'EOF'
           "cpu_time_guest"
         ],
         "metrics_collection_interval": 60,
-        "resources": {
-          "
-
-*": "*"
-        },
         "totalcpu": false
       },
       "disk": {
         "measurement": [
           {"name": "used_percent", "rename": "DISK_USED", "unit": "Percent"}
         ],
-        "metrics_collection_interval": 60,
-        "resources": {
-          "*": "*"
-        }
+        "metrics_collection_interval": 60
       },
       "diskio": {
         "measurement": [
           "io_time"
         ],
-        "metrics_collection_interval": 60,
-        "resources": {
-          "*": "*"
-        }
+        "metrics_collection_interval": 60
       },
       "mem": {
         "measurement": [
@@ -141,21 +130,25 @@ docker pull ${ecr_repository_url}:${image_tag}
 
 echo "✓ Docker image pulled successfully"
 
-# ── Get IAM Role Credentials ──────────────────────────────────────────────────
+# ── Get IAM Role Credentials (IMDSv2) ────────────────────────────────────────
 echo "Retrieving IAM role credentials..."
 
-# Get IAM role name from instance metadata
-ROLE_NAME=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+# Fetch IMDSv2 token first (required since http_tokens = "required")
+IMDS_TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+    -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-# Get temporary credentials from IAM role
-CREDENTIALS=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$ROLE_NAME)
+# Get IAM role name and temporary credentials
+ROLE_NAME=$(curl -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" \
+    http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+CREDENTIALS=$(curl -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" \
+    http://169.254.169.254/latest/meta-data/iam/security-credentials/$ROLE_NAME)
 
 # Extract credentials using Python (more reliable than grep)
 AWS_ACCESS_KEY_ID=$(echo "$CREDENTIALS" | python3 -c "import sys, json; print(json.load(sys.stdin)['AccessKeyId'])")
 AWS_SECRET_ACCESS_KEY=$(echo "$CREDENTIALS" | python3 -c "import sys, json; print(json.load(sys.stdin)['SecretAccessKey'])")
 AWS_SESSION_TOKEN=$(echo "$CREDENTIALS" | python3 -c "import sys, json; print(json.load(sys.stdin)['Token'])")
 
-echo "✓ Retrieved IAM role credentials"
+echo "Retrieved IAM role credentials"
 
 # ── Get Database Credentials (if using RDS) ───────────────────────────────────
 if [ -n "${db_secret_arn}" ]; then
@@ -204,7 +197,7 @@ echo "Starting Docker container..."
 docker run -d \
     --name rivet-backend \
     --restart unless-stopped \
-    -p ${container_port}:8080 \
+    -p ${container_port}:8000 \
     -e FLASK_ENV=production \
     -e ENVIRONMENT=${environment} \
     -e AWS_REGION=${aws_region} \
