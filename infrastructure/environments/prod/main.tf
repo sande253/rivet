@@ -69,7 +69,7 @@ module "database" {
 
   vpc_id                = module.networking.vpc_id
   database_subnet_ids   = module.networking.database_subnet_ids
-  ec2_security_group_id = module.ec2.security_group_id
+  ec2_security_group_id = ""  # Will be added after EC2 module creates SG
 
   instance_class        = var.db_instance_class
   allocated_storage     = var.db_allocated_storage
@@ -109,7 +109,7 @@ module "bedrock" {
   aws_region   = var.aws_region
 
   app_log_group_name    = "/ec2/${local.project_name}-${local.environment}"
-  create_metric_filters = true
+  create_metric_filters = false  # Enable after first deployment
   log_retention_days    = var.bedrock_log_retention_days
   enable_alarms         = var.enable_bedrock_alarms
   latency_threshold_ms  = var.genai_latency_threshold_ms
@@ -229,18 +229,24 @@ resource "aws_lb_target_group" "app" {
   }
 }
 
-# HTTP Listener - Redirect to HTTPS
+# HTTP Listener - Forward to target group if no domain, otherwise redirect to HTTPS
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    type = var.domain_name != "" ? "redirect" : "forward"
+    
+    target_group_arn = var.domain_name != "" ? null : aws_lb_target_group.app.arn
+    
+    dynamic "redirect" {
+      for_each = var.domain_name != "" ? [1] : []
+      content {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
     }
   }
 }
