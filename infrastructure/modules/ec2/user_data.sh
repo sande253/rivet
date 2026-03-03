@@ -73,9 +73,18 @@ fi
 # ── Run Docker Container ──────────────────────────────────────────────────────
 echo "Starting Docker container..."
 
-# Get AWS credentials from instance metadata for container
-AWS_CONTAINER_CREDENTIALS_RELATIVE_URI=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
-AWS_DEFAULT_REGION=${aws_region}
+# Get IAM role name from instance metadata
+ROLE_NAME=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+
+# Get temporary credentials from IAM role
+CREDENTIALS=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$ROLE_NAME)
+
+# Extract credentials
+AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | grep -oP '(?<="AccessKeyId" : ")[^"]*')
+AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | grep -oP '(?<="SecretAccessKey" : ")[^"]*')
+AWS_SESSION_TOKEN=$(echo $CREDENTIALS | grep -oP '(?<="Token" : ")[^"]*')
+
+echo "✓ Retrieved IAM role credentials for container"
 
 docker run -d \
     --name rivet-backend \
@@ -85,6 +94,9 @@ docker run -d \
     -e ENVIRONMENT=${environment} \
     -e AWS_REGION=${aws_region} \
     -e AWS_DEFAULT_REGION=${aws_region} \
+    -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+    -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+    -e AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN" \
     -e S3_BUCKET=${upload_bucket_name} \
     -e USE_BEDROCK="${use_bedrock}" \
     $ANTHROPIC_ENV \
@@ -96,7 +108,6 @@ docker run -d \
     -e GENAI_CACHE_TTL=300 \
     -e GENAI_FAILURE_THRESHOLD=5 \
     -e GENAI_CIRCUIT_TIMEOUT=300 \
-    --network host \
     --log-driver=awslogs \
     --log-opt awslogs-region=${aws_region} \
     --log-opt awslogs-group=/ec2/rivet-${environment} \
