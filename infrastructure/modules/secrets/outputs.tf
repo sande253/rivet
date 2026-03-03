@@ -37,3 +37,13 @@ output "bedrock_image_model_parameter_name" {
   description = "SSM parameter name for Bedrock image model ID."
   value       = aws_ssm_parameter.bedrock_image_model_id.name
 }
+
+output "db_secret_arn" {
+  description = "ARN of the database credentials secret (empty if no database)"
+  value       = length(aws_secretsmanager_secret.database) > 0 ? aws_secretsmanager_secret.database[0].arn : ""
+}
+
+output "db_secret_name" {
+  description = "Name of the database credentials secret (empty if no database)"
+  value       = length(aws_secretsmanager_secret.database) > 0 ? aws_secretsmanager_secret.database[0].name : ""
+}

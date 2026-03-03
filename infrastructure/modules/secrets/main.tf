@@ -124,3 +124,54 @@ resource "aws_iam_policy" "read_ssm_parameters" {
     ]
   })
 }
+
+# ── AWS Secrets Manager — Database credentials ────────────────────────────────
+resource "aws_secretsmanager_secret" "database" {
+  count = var.db_host != "" ? 1 : 0
+  
+  name        = "${local.name_prefix}/database-credentials"
+  description = "Database connection credentials for RDS PostgreSQL"
+
+  recovery_window_in_days = 7
+
+  tags = {
+    Name        = "${local.name_prefix}-db-credentials"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "database" {
+  count = var.db_host != "" ? 1 : 0
+  
+  secret_id = aws_secretsmanager_secret.database[0].id
+  secret_string = jsonencode({
+    host     = var.db_host
+    port     = var.db_port
+    dbname   = var.db_name
+    username = var.db_username
+    password = var.db_password
+  })
+}
+
+# ── IAM policy — allows EC2 to read database secret ───────────────────────────
+resource "aws_iam_policy" "read_database_secret" {
+  count = var.db_host != "" ? 1 : 0
+  
+  name        = "${local.name_prefix}-read-database-secret"
+  description = "Grants read access to the database credentials secret."
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+        ]
+        Resource = aws_secretsmanager_secret.database[0].arn
+      }
+    ]
+  })
+}

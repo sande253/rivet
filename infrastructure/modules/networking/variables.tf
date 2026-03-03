@@ -15,18 +15,36 @@ variable "vpc_cidr" {
 }
 
 variable "public_subnet_cidrs" {
-  description = "Two CIDR blocks for public subnets (one per AZ). Host the ALB."
+  description = "CIDR blocks for public subnets (one per AZ). Host the ALB."
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
 variable "private_subnet_cidrs" {
-  description = "Two CIDR blocks for private subnets (one per AZ). Host ECS tasks."
+  description = "CIDR blocks for private subnets (one per AZ). Host EC2 instances."
   type        = list(string)
-  default     = ["10.0.10.0/24", "10.0.11.0/24"]
+  default     = ["10.0.11.0/24", "10.0.12.0/24"]
+}
+
+variable "database_subnet_cidrs" {
+  description = "CIDR blocks for database subnets (one per AZ). Host RDS."
+  type        = list(string)
+  default     = ["10.0.21.0/24", "10.0.22.0/24"]
 }
 
 variable "availability_zones" {
-  description = "Two AZs to spread resources across."
+  description = "Availability zones to spread resources across."
   type        = list(string)
+}
+
+variable "enable_nat_gateway" {
+  description = "Enable NAT Gateway for private subnets"
+  type        = bool
+  default     = true
+}
+
+variable "single_nat_gateway" {
+  description = "Use a single NAT Gateway (cost savings) vs one per AZ (HA)"
+  type        = bool
+  default     = true
 }

@@ -41,3 +41,34 @@ variable "bedrock_image_model_id" {
   type        = string
   default     = "amazon.titan-image-generator-v2:0"
 }
+
+variable "db_host" {
+  description = "Database host (RDS endpoint)"
+  type        = string
+  default     = ""
+}
+
+variable "db_port" {
+  description = "Database port"
+  type        = number
+  default     = 5432
+}
+
+variable "db_name" {
+  description = "Database name"
+  type        = string
+  default     = ""
+}
+
+variable "db_username" {
+  description = "Database username"
+  type        = string
+  default     = ""
+}
+
+variable "db_password" {
+  description = "Database password"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

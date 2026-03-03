@@ -1,53 +1,41 @@
-# Multi-stage production Dockerfile for Rivet
-# Uses Gunicorn with Uvicorn workers for ASGI support
+# Production Dockerfile for Rivet Backend
+# Uses Python 3.13, non-root user, Gunicorn with optimized settings
 
-# ── Stage 1: Builder ──────────────────────────────────────────────────────────
-FROM python:3.11-slim as builder
-
-WORKDIR /build
-
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt \
-    && pip install --no-cache-dir --user gunicorn uvicorn[standard]
-
-# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
-# Install runtime dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    sqlite3 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user first
-RUN adduser --disabled-password --gecos "" appuser
+# Install uv for faster dependency management (optional but recommended)
+RUN pip install --no-cache-dir uv
 
-# Copy Python packages from builder to appuser's home
-COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
-ENV PATH=/home/appuser/.local/bin:$PATH
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source
-COPY --chown=appuser:appuser src/       ./src/
-COPY --chown=appuser:appuser static/    ./static/
-COPY --chown=appuser:appuser templates/ ./templates/
+COPY src/       ./src/
+COPY static/    ./static/
+COPY templates/ ./templates/
 
-# Create required directories
-RUN mkdir -p static/uploads instance && chown -R appuser:appuser static/uploads instance
+# Create necessary directories
+RUN mkdir -p static/uploads instance
 
-# Create non-root user was already done above
+# Create non-root user for security
+RUN adduser --disabled-password --gecos "" --uid 1000 appuser \
+    && chown -R appuser:appuser /app
+
 # Switch to non-root user
 USER appuser
 
-# Expose port
-EXPOSE 8000
+# Expose port 8080 (production standard)
+EXPOSE 8080
 
 # Environment defaults
 ENV FLASK_ENV=production \
@@ -56,19 +44,20 @@ ENV FLASK_ENV=production \
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8000/ || exit 1
+    CMD curl -f http://localhost:8080/ || exit 1
 
-# Run with Gunicorn for WSGI (Flask)
-# --workers: 2 for t3.small (2 vCPU), scale to (2 x CPU cores) + 1 for production
-# --worker-class: sync for WSGI applications like Flask
-# --timeout: 120s for AI operations
-# --keep-alive: 5s for connection reuse
+# Production command with Gunicorn
+# Workers: 2 for t3.small (2 vCPU), increase for larger instances
+# Timeout: 120s for AI operations
+# Keep-alive: 5s for connection reuse
 CMD ["gunicorn", \
-     "--bind", "0.0.0.0:8000", \
+     "--bind", "0.0.0.0:8080", \
      "--workers", "2", \
      "--worker-class", "sync", \
      "--timeout", "120", \
      "--keep-alive", "5", \
+     "--max-requests", "1000", \
+     "--max-requests-jitter", "100", \
      "--access-logfile", "-", \
      "--error-logfile", "-", \
      "--log-level", "info", \
