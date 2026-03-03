@@ -153,33 +153,36 @@ class MessagesAPI:
     def _convert_model_id(self, model: str) -> str:
         """Convert Anthropic model ID to Bedrock format.
         
-        Uses cross-region inference profiles for better availability.
+        Uses foundation models directly (simpler, no cross-region complexity).
         
         Examples:
-            claude-opus-4-6 → us.anthropic.claude-3-5-sonnet-20241022-v2:0
-            claude-sonnet-4-6 → us.anthropic.claude-3-5-sonnet-20241022-v2:0
-            claude-haiku-4-5-20251001 → us.anthropic.claude-3-5-haiku-20241022-v1:0
+            claude-opus-4-6 → anthropic.claude-3-5-sonnet-20241022-v2:0
+            claude-sonnet-4-6 → anthropic.claude-3-5-sonnet-20241022-v2:0
+            claude-haiku-4-5-20251001 → anthropic.claude-3-5-haiku-20241022-v1:0
         """
         # If already in Bedrock format, return as-is
-        if model.startswith("anthropic.") or model.startswith("us.anthropic."):
+        if model.startswith("anthropic."):
             return model
         
-        # Map common model names to Bedrock inference profile IDs
-        # Using cross-region inference profiles (us.) for better availability
+        # Strip us. prefix if present (use foundation models instead)
+        if model.startswith("us.anthropic."):
+            return model.replace("us.anthropic.", "anthropic.")
+        
+        # Map common model names to Bedrock foundation model IDs
         model_map = {
-            "claude-opus-4-6": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",  # Opus not available, use Sonnet
-            "claude-sonnet-4-6": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-            "claude-3-5-sonnet-20241022": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-            "claude-haiku-4-5-20251001": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
-            "claude-3-5-haiku-20241022": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
+            "claude-opus-4-6": "anthropic.claude-3-5-sonnet-20241022-v2:0",  # Opus not available, use Sonnet
+            "claude-sonnet-4-6": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+            "claude-3-5-sonnet-20241022": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+            "claude-haiku-4-5-20251001": "anthropic.claude-3-5-haiku-20241022-v1:0",
+            "claude-3-5-haiku-20241022": "anthropic.claude-3-5-haiku-20241022-v1:0",
         }
         
         if model in model_map:
             return model_map[model]
         
-        # Default fallback to Sonnet 3.5 inference profile
-        log.warning("Unknown model ID '%s', using Sonnet 3.5 inference profile", model)
-        return "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
+        # Default fallback to Sonnet 3.5 foundation model
+        log.warning("Unknown model ID '%s', using Sonnet 3.5 foundation model", model)
+        return "anthropic.claude-3-5-sonnet-20241022-v2:0"
 
 
 
