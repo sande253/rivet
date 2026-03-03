@@ -59,7 +59,25 @@ jobs:
           ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          # Check if there's already an instance refresh in progress
+          EXISTING_STATUS=$(aws autoscaling describe-instance-refreshes \
+            --auto-scaling-group-name $ASG_NAME \
+            --query 'InstanceRefreshes[0].Status' \
+            --output text 2>/dev/null || echo "None")
+          
+          if [ "$EXISTING_STATUS" = "InProgress" ] || [ "$EXISTING_STATUS" = "Pending" ]; then
+            echo "⚠️  Instance refresh already in progress"
+            echo "Status: $EXISTING_STATUS"
+            echo ""
+            echo "The previous deployment is still running."
+            echo "This is normal - the new image will be used when the current refresh completes."
+            echo ""
+            echo "Current refresh will continue with the latest image from ECR."
+            exit 0
+          fi
+          
           # Start instance refresh for zero-downtime deployment
+          echo "Starting instance refresh for zero-downtime deployment..."
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name $ASG_NAME \
             --preferences '{
@@ -69,7 +87,7 @@ jobs:
               "CheckpointDelay": 300
             }'
           
-          echo "Instance refresh started for ASG: $ASG_NAME"
+          echo "✓ Instance refresh started for ASG: $ASG_NAME"
           echo "New instances will pull image: $IMAGE_TAG"
 
       - name: Monitor deployment status
