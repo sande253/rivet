@@ -1,0 +1,32 @@
+version: "3.9"
+
+# Production-ready Docker Compose configuration
+# Use this for testing production configuration locally
+# 
+# Start with: docker-compose -f docker-compose.prod.yml up
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Production settings
+      FLASK_ENV: production
+      FLASK_DEBUG: "0"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # Persist SQLite database and uploads across container restarts
+      - ./instance:/app/instance
+      - ./static/uploads:/app/static/uploads
+    # Gunicorn production server (from Dockerfile CMD)
+    # No override = uses Dockerfile CMD automatically
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

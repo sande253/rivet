@@ -1,0 +1,135 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: rivet-dev
+  CONTAINER_NAME: rivet-backend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd application
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Get Auto Scaling Group name
+        id: get-asg
+        run: |
+          ASG_NAME=$(aws autoscaling describe-auto-scaling-groups \
+            --query "AutoScalingGroups[?Tags[?Key=='Project' && Value=='rivet'] && Tags[?Key=='Environment' && Value=='dev']].AutoScalingGroupName" \
+            --output text)
+          echo "asg_name=$ASG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Trigger instance refresh
+        env:
+          ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Start instance refresh for zero-downtime deployment
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name $ASG_NAME \
+            --preferences '{
+              "MinHealthyPercentage": 90,
+              "InstanceWarmup": 300,
+              "CheckpointPercentages": [50, 100],
+              "CheckpointDelay": 300
+            }'
+          
+          echo "Instance refresh started for ASG: $ASG_NAME"
+          echo "New instances will pull image: $IMAGE_TAG"
+
+      - name: Wait for deployment to complete
+        env:
+          ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
+        run: |
+          echo "Waiting for instance refresh to complete..."
+          for i in {1..60}; do
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name $ASG_NAME \
+              --query 'InstanceRefreshes[0].Status' \
+              --output text)
+            
+            echo "Refresh status: $STATUS (check $i/60)"
+            
+            if [ "$STATUS" = "Successful" ]; then
+              echo "✓ Deployment completed successfully"
+              exit 0
+            elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ]; then
+              echo "✗ Deployment failed with status: $STATUS"
+              exit 1
+            fi
+            
+            sleep 30
+          done
+          
+          echo "⚠ Deployment timeout - check AWS console for status"
+          exit 1
+
+      - name: Verify deployment
+        run: |
+          # Get ALB DNS name
+          ALB_DNS=$(aws elbv2 describe-load-balancers \
+            --query "LoadBalancers[?Tags[?Key=='Project' && Value=='rivet']].DNSName" \
+            --output text)
+          
+          echo "Testing endpoint: http://$ALB_DNS"
+          
+          # Wait for ALB to route to new instances
+          sleep 60
+          
+          # Health check
+          for i in {1..10}; do
+            if curl -f -s "http://$ALB_DNS/" > /dev/null; then
+              echo "✓ Application is responding"
+              exit 0
+            fi
+            echo "Waiting for application... ($i/10)"
+            sleep 10
+          done
+          
+          echo "⚠ Application health check timeout"
+          exit 1
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          echo "🚀 Deployment Summary"
+          echo "===================="
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Deployed by: ${{ github.actor }}"

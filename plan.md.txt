@@ -1,0 +1,233 @@
+You’re building Rivet as an AI that uses AI to analyze products, improve itself, and help operators steer it — an agentic loop on top of the deterministic core you already have. Below is a concrete blueprint tailored to your current codebase (FastAPI + Bedrock + CSV), plus specific gaps and next steps.
+
+ 
+
+---
+
+ 
+
+### Where you are now (baseline)
+
+- Deterministic engine (`app/analysis.py`) produces scores/classification with transparent heuristics.
+
+- Optional GenAI suggestions via Bedrock (`app/genai.py`) append short tips in `/analyze`.
+
+- Modular Terraform with Bedrock IAM permissions; Docker uses `uv`; CI runs ruff/black/pytest and Docker/Terraform checks.
+
+ 
+
+This is “AI‑assisted”. To reach “AI in AI / AI for AI”, add self‑evaluation, auto‑tuning, routing, and ops loops.
+
+ 
+
+---
+
+ 
+
+### Target architecture (agentic, light-weight, CSV‑friendly)
+
+1) Draft → Critic → Optimizer loop
+
+- Drafting agent (existing): turns context into concise tips.
+
+- Critic agent (new): grades Draft output against a rubric (clarity, actionability, on‑brand, ≤N words), returns a numeric score and suggested edits.
+
+- Optimizer agent (new, offline or gated): proposes safe, small adjustments to `categories.csv` baselines or recommends A/B price bands. Produces a change proposal patch (not applied automatically) for operator approval in Admin UI.
+
+ 
+
+2) Policy router (cost/latency/quality)
+
+- Define a simple routing policy: short/low‑stakes → Haiku/Titan; high‑stakes/export → Sonnet. Fallbacks on error. Expose via env:
+
+  - `BEDROCK_DRAFT_MODEL_ID`, `BEDROCK_CRITIC_MODEL_ID` (and optional `BEDROCK_VISION_MODEL_ID`).
+
+ 
+
+3) Grounded prompting (RAG‑lite on CSV)
+
+- Inject real baselines (avg_price, demand/trend, competition) and last N similar products from `products.csv` into the prompt. No new DB: nearest‑neighbor by simple token overlap or cosine on a tiny local embedding CSV (optional) to keep it portable.
+
+ 
+
+4) Safety + guardrails
+
+- Pre/post filters for profanity/PII/off‑brand claims; optionally use Bedrock Guardrails. On violation → redact or fall back to deterministic‑only.
+
+ 
+
+5) Telemetry, caching, and circuit breaker
+
+- Log model, latency, token‑ish byte count, status, and rubric score to CloudWatch.
+
+- Cache tips by normalized key `(desc_norm, price, cat, subcat)` to cut cost for repeats.
+
+- Circuit breaker: disable GenAI for X minutes after Y consecutive failures/timeouts.
+
+ 
+
+6) Operator loop (“AI for Operators”)
+
+- Admin UI: “AI Proposals” tab shows suggested CSV baseline edits with diffs and confidence. One‑click accept → writes to `data/categories.csv`.
+
+- Explain‑why: show critic rubric and which baselines/keywords drove tips.
+
+ 
+
+7) Optionals
+
+- Vision assist: send thumbnail bytes to a multimodal model to infer fabric/palette and loop back into heuristics.
+
+- Streaming UX: SSE streaming of AI tips to reduce perceived latency on `/analyze`.
+
+ 
+
+---
+
+ 
+
+### Concrete implementation plan (minimal, incremental)
+
+1) Multi‑model wiring in `app/genai.py`
+
+- Add envs: `BEDROCK_DRAFT_MODEL_ID`, `BEDROCK_CRITIC_MODEL_ID`.
+
+- Implement `critique(text, rubric)->{score:0–100, edits:[…]}` using the critic model.
+
+- Retry once with the critic’s edits if score < threshold (e.g., 75).
+
+ 
+
+2) Grounding util
+
+- New helper `build_context(description, price, category, subcategory)` that returns:
+
+  - Baseline record (from `categories.csv`), price band, and up to 5 similar products (by simple token overlap or optional embedding CSV).
+
+- Feed this to both Draft and Critic prompts.
+
+ 
+
+3) Caching + telemetry
+
+- Add a tiny in‑memory cache (keyed by normalized inputs). Log to CloudWatch via `logging` or `boto3` embedded metrics.
+
+ 
+
+4) Safety filter
+
+- Pre‑flight: if description triggers blocked terms → skip GenAI path and note why.
+
+- Post‑flight: strip URLs/emails/phone numbers; truncate long lines.
+
+ 
+
+5) Admin “AI Proposals”
+
+- New CSV `data/ai_proposals.csv` with columns: `id,timestamp,type,patch_json,summary,confidence,status`.
+
+- New routes: list proposals, approve/decline; approve applies a safe write to `categories.csv` with a backup.
+
+ 
+
+6) Tests
+
+- Unit tests for prompt builder, rubric parser, cache key normalization, and CSV proposal application (no network; mock Bedrock).
+
+ 
+
+7) Terraform/ops
+
+- SSM parameters for model IDs and admin token; ASG user‑data exports them to the container.
+
+- Optional: CloudWatch metrics/alarms for GenAI latency/error budget.
+
+ 
+
+---
+
+ 
+
+### Model choices (Bedrock)
+
+- Draft: Anthropic Claude 3.5 Haiku (speed/cost) or Sonnet (highest quality).
+
+- Critic: Anthropic Claude 3.5 Sonnet (better rubric alignment) — short outputs so cost is low.
+
+- Vision (optional): Claude 3.5 Sonnet with Vision or Amazon Titan Multimodal.
+
+ 
+
+---
+
+ 
+
+### Gaps and weaknesses found (actionable)
+
+- Alt UIs were requested to be light‑only; some variants still include a theme toggle and dark overrides (e.g., `ui_alt/static/js/main.js` toggles dark mode). Remove them in the variants you plan to keep light‑only.
+
+- GenAI insights aren’t persisted; consider adding AI fields to `analysis_results.csv` (e.g., `genai_tips`, `genai_model`, `genai_latency_ms`, `genai_score`) to enable analytics.
+
+- No routing policy or multi‑model envs — currently a single `BEDROCK_MODEL_ID`.
+
+- No safety/guardrails layer and no streaming UX.
+
+- Observability is minimal: no token/latency metrics, no error budget, no circuit breaker.
+
+- Tests don’t cover GenAI prompts/flows; add mocks and rubric parsing tests.
+
+- Minor tech debt: deprecation warnings (Starlette WSGI, Pydantic validators) — plan to upgrade paths and v2 field validators.
+
+ 
+
+---
+
+ 
+
+### “AI in AI” user journey (after above is added)
+
+1) User submits product → deterministic scores computed.
+
+2) Draft agent generates tips grounded in baselines + similar items.
+
+3) Critic agent grades and nudges a revision if needed.
+
+4) Safety filter sanitizes output.
+
+5) UI shows tips + “Why these?” with rubric and grounding data.
+
+6) Offline: Optimizer agent proposes baseline tweaks; operator approves in Admin.
+
+7) Telemetry + cache keep latency/cost in check; CI has mocked prompt tests.
+
+ 
+
+---
+
+ 
+
+### What I need from you to proceed
+
+- Confirm model policy:
+
+  - Draft: Haiku or Sonnet?
+
+  - Critic: Sonnet? (recommended)
+
+  - Vision now or later?
+
+- Approve the data change to persist AI fields in `analysis_results.csv`.
+
+- Confirm you want the Admin “AI Proposals” tab for baseline tuning.
+
+ 
+
+If you confirm, I’ll implement the Draft→Critic loop, grounding helper, safe filters, caching/telemetry, and the Admin proposals flow next, keeping everything CSV‑first and Bedrock‑ready.
+
+7) Optionals
+
+- Vision assist: send thumbnail bytes to a multimodal model to infer fabric/palette and loop back into heuristics.
+
+- Streaming UX: SSE streaming of AI tips to reduce perceived latency on `/analyze`.
+
+

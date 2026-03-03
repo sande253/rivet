@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars — never commit that file.
+# Use a specific git SHA for image_tag in prod (never "latest").
+#
+# Sensitive values should be injected via:
+#   export TF_VAR_anthropic_api_key="sk-ant-..."
+
+aws_region         = "ap-south-1"
+availability_zones = ["ap-south-1a", "ap-south-1b"]
+
+# image_tag must be a specific, immutable tag (e.g. a git commit SHA)
+image_tag     = "abc1234"
+desired_count = 2

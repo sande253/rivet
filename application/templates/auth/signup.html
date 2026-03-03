@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Create Account — Rivet</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:          #0A1F17;
+  --forest:       #1B5247;
+  --forest-deep:  #0D2E22;
+  --forest-mid:   #256B56;
+  --saffron:      #C8992A;
+  --saffron-dim:  #8B6D1E;
+  --cream:        #F3EFE3;
+  --cream-warm:   #EDE7D5;
+  --border:       rgba(27,82,71,0.18);
+  --red:          #7A1E1E;
+  --red-bg:       rgba(122,30,30,0.08);
+  --green-bg:     rgba(27,82,71,0.1);
+  --text-muted:   #7A9E8E;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
+body { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; background: var(--cream); }
+
+/* ─── Lang toggle ─── */
+.lang-toggle {
+  position: fixed; top: 20px; right: 24px; z-index: 200;
+  display: flex; background: rgba(13,46,34,0.88);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px; padding: 3px; gap: 2px;
+  backdrop-filter: blur(8px); box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.lang-btn {
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  color: rgba(236,230,208,0.6); cursor: pointer; border: none; background: transparent;
+  transition: all .18s; font-family: 'Outfit', sans-serif; letter-spacing: 0.3px;
+}
+.lang-btn.active { background: rgba(236,230,208,0.18); color: #ECE6D0; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.lang-btn:not(.active):hover { color: #ECE6D0; background: rgba(255,255,255,0.08); }
+
+/* ─── Left Panel ─── */
+.panel-left {
+  position: relative; background: var(--forest-deep);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 52px 56px; overflow: hidden;
+}
+.panel-left::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(61,155,126,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 85% 15%, rgba(200,153,42,0.08) 0%, transparent 55%);
+  pointer-events: none;
+}
+.panel-left::after {
+  content: ''; position: absolute; bottom: -120px; right: -120px;
+  width: 400px; height: 400px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 0 0 40px rgba(255,255,255,0.02), 0 0 0 80px rgba(255,255,255,0.015);
+  pointer-events: none;
+}
+.left-brand { position: relative; display: flex; align-items: center; gap: 12px; animation: fadeDown 0.7s ease both; }
+.brand-icon { width: 44px; height: 44px; border-radius: 11px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.brand-icon svg { width: 22px; height: 22px; }
+.brand-logo { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: #EDE7D5; letter-spacing: 2px; text-transform: uppercase; }
+.left-content { position: relative; animation: fadeUp 0.8s 0.2s ease both; }
+.left-tagline { font-family: 'Cormorant Garamond', serif; font-size: clamp(34px,4vw,50px); font-weight: 300; line-height: 1.15; color: #EDE7D5; margin-bottom: 24px; letter-spacing: -0.5px; }
+.left-tagline em { font-style: italic; color: var(--saffron); }
+.left-desc { font-size: 14px; font-weight: 300; color: rgba(237,231,213,0.5); line-height: 1.7; max-width: 320px; letter-spacing: 0.2px; }
+.feature-list { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
+.feature-item { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 300; color: rgba(237,231,213,0.6); letter-spacing: 0.1px; }
+.feature-dot { width: 20px; height: 20px; border-radius: 50%; background: rgba(200,153,42,0.15); border: 1px solid rgba(200,153,42,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.feature-dot svg { width: 10px; height: 10px; }
+.left-footer { position: relative; animation: fadeUp 0.8s 0.35s ease both; }
+.divider-line { width: 48px; height: 1px; background: rgba(200,153,42,0.4); margin-bottom: 20px; }
+.step-indicator { display: flex; align-items: center; gap: 8px; }
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(237,231,213,0.2); }
+.step-dot.active { background: var(--saffron); box-shadow: 0 0 0 3px rgba(200,153,42,0.2); }
+.step-label { font-size: 12px; font-weight: 400; color: rgba(237,231,213,0.4); letter-spacing: 0.5px; margin-left: 4px; }
+
+/* ─── Right Panel ─── */
+.panel-right { background: var(--cream); display: flex; align-items: center; justify-content: center; padding: 48px 40px; position: relative; }
+.panel-right::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(27,82,71,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(27,82,71,0.04) 1px, transparent 1px); background-size: 32px 32px; pointer-events: none; }
+.auth-box { position: relative; width: 100%; max-width: 400px; animation: fadeUp 0.7s 0.1s ease both; }
+.auth-heading { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; color: var(--forest-deep); margin-bottom: 6px; letter-spacing: -0.5px; }
+.auth-heading em { font-style: italic; color: var(--forest-mid); }
+.auth-sub { font-size: 13px; font-weight: 300; color: var(--text-muted); margin-bottom: 32px; letter-spacing: 0.2px; }
+
+/* ─── Flash ─── */
+.flash-list { list-style: none; margin-bottom: 24px; }
+.flash-item { padding: 12px 16px; border-radius: 10px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; border: 1px solid transparent; }
+.flash-item svg { flex-shrink: 0; margin-top: 1px; }
+.flash-danger  { background: var(--red-bg);  color: var(--red);    border-color: rgba(122,30,30,0.15); }
+.flash-success { background: var(--green-bg); color: var(--forest); border-color: rgba(27,82,71,0.15); }
+.flash-warning { background: rgba(200,153,42,0.08); color: var(--saffron-dim); border-color: rgba(200,153,42,0.15); }
+.flash-info    { background: rgba(26,58,92,0.06); color: #1A3A5C; border-color: rgba(26,58,92,0.12); }
+
+/* ─── Form ─── */
+.field { margin-bottom: 18px; }
+.field-label { display: block; font-size: 11px; font-weight: 600; color: var(--forest); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.field-wrap { position: relative; }
+.field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; transition: color 0.2s; }
+.field-icon svg { display: block; }
+.field-wrap:focus-within .field-icon { color: var(--forest-mid); }
+.field-input { width: 100%; background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 14px 13px 42px; font-size: 14px; font-weight: 400; color: var(--ink); font-family: 'Outfit', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+.field-input::placeholder { color: rgba(122,158,142,0.6); }
+.field-input:focus { border-color: var(--forest-mid); box-shadow: 0 0 0 4px rgba(27,82,71,0.09); }
+.field-input.error   { border-color: var(--red);        box-shadow: 0 0 0 4px rgba(122,30,30,0.07); }
+.field-input.success { border-color: var(--forest-mid); }
+.pwd-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px; display: flex; align-items: center; transition: color 0.2s; }
+.pwd-toggle:hover { color: var(--forest); }
+
+/* ─── Strength meter ─── */
+.strength-wrap { margin-top: 8px; }
+.strength-bar { display: flex; gap: 4px; margin-bottom: 5px; }
+.strength-seg { flex: 1; height: 3px; border-radius: 2px; background: rgba(27,82,71,0.1); transition: background 0.3s; }
+.strength-seg.filled-weak   { background: #B54242; }
+.strength-seg.filled-fair   { background: var(--saffron); }
+.strength-seg.filled-strong { background: var(--forest-mid); }
+.strength-label { font-size: 11px; color: var(--text-muted); transition: color 0.3s; }
+
+/* ─── Match hint ─── */
+.match-hint { display: flex; align-items: center; gap: 5px; font-size: 11px; margin-top: 6px; opacity: 0; transition: opacity 0.2s; }
+.match-hint.visible { opacity: 1; }
+.match-hint.ok  { color: var(--forest-mid); }
+.match-hint.bad { color: var(--red); }
+.match-hint svg { width: 12px; height: 12px; }
+
+/* ─── Button ─── */
+.btn-submit { width: 100%; padding: 14px; background: var(--forest-deep); color: var(--cream-warm); border: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Outfit', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s, background 0.2s; box-shadow: 0 4px 20px rgba(13,46,34,0.25); margin-top: 8px; }
+.btn-submit::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%); transform: translateX(-100%); transition: transform 0.5s ease; }
+.btn-submit:hover { background: var(--forest); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(13,46,34,0.3); }
+.btn-submit:hover::before { transform: translateX(100%); }
+.btn-submit:active { transform: translateY(0); box-shadow: 0 3px 12px rgba(13,46,34,0.2); }
+
+/* ─── Footer ─── */
+.auth-footer { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-muted); }
+.auth-footer a { color: var(--forest); font-weight: 600; text-decoration: none; transition: color 0.2s; }
+.auth-footer a:hover { color: var(--forest-mid); text-decoration: underline; }
+.terms-note { font-size: 11px; color: rgba(122,158,142,0.7); text-align: center; margin-top: 14px; line-height: 1.6; }
+.terms-note a { color: var(--forest); text-decoration: underline; text-underline-offset: 2px; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 0; }
+.divider-bar { flex: 1; height: 1px; background: var(--border); }
+.divider-text { font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; }
+
+/* ─── Animations ─── */
+@keyframes fadeDown { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
+
+/* ─── Mobile ─── */
+@media (max-width: 768px) {
+  body { grid-template-columns: 1fr; }
+  .panel-left { display: none; }
+  .panel-right { padding: 32px 24px; }
+  .lang-toggle { top: 14px; right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Language Toggle ── -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" id="lang-te" onclick="setLang('te')">తె</button>
+</div>
+
+<!-- ── Left Panel ── -->
+<div class="panel-left">
+  <div class="left-brand">
+    <div class="brand-icon">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Rivet Logo" class="brand-logo" />
+    </div>
+    <span class="brand-name">Rivet</span>
+  </div>
+
+  <div class="left-content">
+    <p class="left-tagline" id="tagline">
+      Built for those who<br/>make things <em>by hand.</em>
+    </p>
+    <p class="left-desc" data-en="Everything your craft business needs — from raw material costs to finished product margins." data-te="మీ చేతివృత్తుల వ్యాపారానికి అవసరమైన ప్రతిదీ — ముడి సరుకు ఖర్చుల నుండి పూర్తి ఉత్పత్తి మార్జిన్‌ల వరకు.">
+      Everything your craft business needs — from raw material costs to finished product margins.
+    </p>
+    <ul class="feature-list">
+      <li class="feature-item">
+        <span class="feature-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2 2 4-4" stroke="#C8992A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span data-en="AI-powered product costing" data-te="AI-ఆధారిత ఉత్పత్తి వ్యయ నిర్ణయం">AI-powered product costing</span>
+      </li>
+      <li class="feature-item">
+        <span class="feature-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2 2 4-4" stroke="#C8992A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span data-en="Supplier &amp; inventory tracking" data-te="సరఫరాదారు మరియు జాబితా ట్రాకింగ్">Supplier &amp; inventory tracking</span>
+      </li>
+      <li class="feature-item">
+        <span class="feature-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2 2 4-4" stroke="#C8992A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span data-en="Profit margin intelligence" data-te="లాభ మార్జిన్ మేధస్సు">Profit margin intelligence</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="left-footer">
+    <div class="divider-line"></div>
+    <div class="step-indicator">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <span class="step-label" data-en="Step 1 of 3 — Create your account" data-te="దశ 1 of 3 — మీ ఖాతా తయారు చేయండి">Step 1 of 3 — Create your account</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Right Panel ── -->
+<div class="panel-right">
+  <div class="auth-box">
+
+    <h2 class="auth-heading" id="heading">Join <em>Rivet.</em></h2>
+    <p class="auth-sub" data-en="Start analysing products with AI-powered insights" data-te="AI-ఆధారిత అంతర్దృష్టులతో ఉత్పత్తులను విశ్లేషించడం ప్రారంభించండి">Start analysing products with AI-powered insights</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-list">
+          {% for category, message in messages %}
+            <li class="flash-item flash-{{ category }}">
+              {% if category == 'danger' %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r="0.75" fill="currentColor"/></svg>
+              {% elif category == 'success' %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {% elif category == 'warning' %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.25" r="0.75" fill="currentColor"/></svg>
+              {% else %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>{% endif %}
+              {{ message }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.signup') }}" novalidate id="signupForm">
+
+      <!-- Email -->
+      <div class="field">
+        <label class="field-label" for="email" data-en="Email address" data-te="ఇమెయిల్ చిరునామా">Email address</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 5.5l6.5 4 6.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <input type="email" id="email" name="email" class="field-input" placeholder="you@studio.in" value="{{ request.form.get('email', '') }}" required autocomplete="email" autofocus/>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <label class="field-label" for="password" data-en="Password" data-te="పాస్‌వర్డ్">Password</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/></svg></span>
+          <input type="password" id="password" name="password" class="field-input" placeholder="••••••••" required autocomplete="new-password" minlength="8"/>
+          <button type="button" class="pwd-toggle" id="togglePwd1" aria-label="Toggle password visibility">
+            <svg id="eyeIcon1" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </button>
+        </div>
+        <div class="strength-wrap">
+          <div class="strength-bar">
+            <div class="strength-seg" id="s1"></div>
+            <div class="strength-seg" id="s2"></div>
+            <div class="strength-seg" id="s3"></div>
+            <div class="strength-seg" id="s4"></div>
+          </div>
+          <span class="strength-label" id="strengthLabel" data-en-default="Minimum 8 characters" data-te-default="కనిష్ఠ 8 అక్షరాలు">Minimum 8 characters</span>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="field">
+        <label class="field-label" for="confirm_password" data-en="Confirm password" data-te="పాస్‌వర్డ్ నిర్ధారించండి">Confirm password</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/></svg></span>
+          <input type="password" id="confirm_password" name="confirm_password" class="field-input" placeholder="••••••••" required autocomplete="new-password"/>
+          <button type="button" class="pwd-toggle" id="togglePwd2" aria-label="Toggle confirm password visibility">
+            <svg id="eyeIcon2" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </button>
+        </div>
+        <div class="match-hint" id="matchHint">
+          <svg id="matchIcon" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2 2 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="matchText">Passwords match</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" data-en="Create account" data-te="ఖాతా తయారు చేయండి">Create account</button>
+    </form>
+
+    <div class="divider">
+      <div class="divider-bar"></div>
+      <span class="divider-text" data-en="or" data-te="లేదా">or</span>
+      <div class="divider-bar"></div>
+    </div>
+
+    <div class="auth-footer">
+      <span data-en="Already have an account? " data-te="ఇప్పటికే ఖాతా ఉందా? ">Already have an account? </span><a href="{{ url_for('auth.login') }}" data-en="Sign in" data-te="సైన్ ఇన్ చేయండి">Sign in</a>
+    </div>
+
+    <p class="terms-note">
+      <span data-en="By creating an account you agree to Rivet's" data-te="ఖాతా తయారు చేయడం ద్వారా మీరు రివెట్ యొక్కదానికి అంగీకరిస్తున్నారు">By creating an account you agree to Rivet's</span>
+      <a href="#" data-en="Terms of Service" data-te="సేవా నిబంధనలు">Terms of Service</a>
+      <span data-en=" and " data-te=" మరియు "> and </span>
+      <a href="#" data-en="Privacy Policy." data-te="గోప్యతా విధానం.">Privacy Policy.</a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+var currentLang = 'en';
+
+/* ─── Translatable strength/match strings ─── */
+var strengthStrings = {
+  en: { default: 'Minimum 8 characters', weak: 'Weak', fair: 'Fair', good: 'Good', strong: 'Strong',
+        match: 'Passwords match', noMatch: 'Passwords do not match' },
+  te: { default: 'కనిష్ఠ 8 అక్షరాలు', weak: 'బలహీనమైన', fair: 'సరైన', good: 'మంచిది', strong: 'బలమైన',
+        match: 'పాస్‌వర్డ్‌లు సరిపోలాయి', noMatch: 'పాస్‌వర్డ్‌లు సరిపోలలేదు' }
+};
+
+/* ─── Tagline & heading maps ─── */
+var taglineMap = {
+  en: 'Built for those who<br/>make things <em>by hand.</em>',
+  te: 'చేతితో తయారు చేసేవారి<br/>కోసం <em>నిర్మించబడింది.</em>'
+};
+var headingMap = {
+  en: 'Join <em>Rivet.</em>',
+  te: 'రివెట్‌లో <em>చేరండి.</em>'
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-te').classList.toggle('active', lang === 'te');
+  document.getElementById('tagline').innerHTML = taglineMap[lang];
+  document.getElementById('heading').innerHTML = headingMap[lang];
+  document.querySelectorAll('[data-en]').forEach(function(el) {
+    var txt = el.getAttribute('data-' + lang);
+    if (!txt) return;
+    if (txt.includes('<') || txt.includes('>')) { el.innerHTML = txt; }
+    else { el.textContent = txt; }
+  });
+  // Update dynamic strength label
+  var sl = document.getElementById('strengthLabel');
+  if (sl.dataset.dynamic) {
+    sl.textContent = strengthStrings[lang][sl.dataset.dynamic] || strengthStrings[lang].default;
+  } else {
+    sl.textContent = strengthStrings[lang].default;
+  }
+  // Update match hint text
+  var mh = document.getElementById('matchHint');
+  if (mh.classList.contains('visible')) {
+    var isOk = mh.classList.contains('ok');
+    document.getElementById('matchText').textContent = isOk ? strengthStrings[lang].match : strengthStrings[lang].noMatch;
+  }
+}
+
+/* ─── Password toggles ─── */
+var eyeOpen = '<path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>';
+var eyeOff  = '<path d="M2 2l12 12M6.5 6.6A2 2 0 0010 10M1 8s2.5-5 7-5c1.1 0 2.1.2 3 .6M15 8s-1 2.3-3.5 3.8M9.9 13.8A6.6 6.6 0 018 14c-4.5 0-7-6-7-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>';
+
+function makeToggle(btnId, inputId, iconId) {
+  document.getElementById(btnId).addEventListener('click', function() {
+    var inp = document.getElementById(inputId);
+    var show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    document.getElementById(iconId).innerHTML = show ? eyeOff : eyeOpen;
+  });
+}
+makeToggle('togglePwd1', 'password',         'eyeIcon1');
+makeToggle('togglePwd2', 'confirm_password', 'eyeIcon2');
+
+/* ─── Password strength ─── */
+var pwdInput      = document.getElementById('password');
+var segs          = ['s1','s2','s3','s4'].map(function(id){ return document.getElementById(id); });
+var strengthLabel = document.getElementById('strengthLabel');
+var strengthKeys  = ['','weak','fair','good','strong'];
+var strengthCls   = ['','filled-weak','filled-fair','filled-strong','filled-strong'];
+
+function getStrength(pw) {
+  var score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw) || /[^A-Za-z0-9]/.test(pw)) score++;
+  return score;
+}
+
+pwdInput.addEventListener('input', function() {
+  var score = pwdInput.value ? getStrength(pwdInput.value) : 0;
+  segs.forEach(function(s, i) {
+    s.className = 'strength-seg' + (i < score ? ' ' + strengthCls[score] : '');
+  });
+  var key = score ? strengthKeys[score] : 'default';
+  strengthLabel.dataset.dynamic = score ? key : '';
+  strengthLabel.textContent = strengthStrings[currentLang][key] || strengthStrings[currentLang].default;
+  checkMatch();
+});
+
+/* ─── Password match ─── */
+var confirmInput = document.getElementById('confirm_password');
+var matchHint    = document.getElementById('matchHint');
+var matchIcon    = document.getElementById('matchIcon');
+var matchText    = document.getElementById('matchText');
+var checkMark    = '<path d="M2.5 6l2 2 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+var crossMark    = '<path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>';
+
+function checkMatch() {
+  var pw  = pwdInput.value;
+  var cpw = confirmInput.value;
+  if (!cpw) { matchHint.classList.remove('visible'); return; }
+  matchHint.classList.add('visible');
+  var s = strengthStrings[currentLang];
+  if (pw === cpw) {
+    matchHint.className = 'match-hint visible ok';
+    matchIcon.innerHTML = checkMark;
+    matchText.textContent = s.match;
+    confirmInput.classList.remove('error'); confirmInput.classList.add('success');
+  } else {
+    matchHint.className = 'match-hint visible bad';
+    matchIcon.innerHTML = crossMark;
+    matchText.textContent = s.noMatch;
+    confirmInput.classList.remove('success'); confirmInput.classList.add('error');
+  }
+}
+confirmInput.addEventListener('input', checkMatch);
+
+/* ─── SHA-256 removed ─── */
+// Passwords are sent over HTTPS and hashed server-side with bcrypt.
+// Client-side hashing adds no security and breaks proper validation.
+
+/* ─── Submit guard for password match validation ─── */
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+  if (pwdInput.value !== confirmInput.value) {
+    e.preventDefault();
+    checkMatch(); 
+    confirmInput.focus();
+    return false;
+  }
+  // Form submits normally with plain text password over HTTPS
+});
+</script>
+
+</body>
+</html>

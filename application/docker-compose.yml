@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override for local development (use Flask dev server)
+      FLASK_ENV: development
+      FLASK_DEBUG: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # Hot-reload: mount source directories so changes apply without rebuild
+      - ./src:/app/src
+      - ./templates:/app/templates
+      - ./static:/app/static
+      # Persist SQLite database on host machine
+      - ./instance:/app/instance
+    # Use Flask dev server locally for faster debugging
+    # For production testing, comment out and use Dockerfile CMD instead
+    command: >
+      flask --app src.wsgi:app run
+      --host 0.0.0.0 --port 8000 --debug
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

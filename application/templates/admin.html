@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rivet Admin — AI Proposals</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<style>
+:root {
+  --ink:         #0A1F17;
+  --ink-mid:     #1E4035;
+  --ink-lt:      #6B9E8C;
+  --indigo:      #1B5247;
+  --indigo-dark: #0D2E22;
+  --indigo-mid:  #256B56;
+  --indigo-light:#E4EFEB;
+  --saffron:     #9E7A1A;
+  --saffron-lt:  #F3EDDA;
+  --cream:       #F0EDE2;
+  --cream-dark:  #E8E4D8;
+  --white:       #FFFFFF;
+  --border:      #C8D9D2;
+  --green:       #1B5247;
+  --green-bg:    #E0EDE7;
+  --orange:      #7A4A00;
+  --orange-bg:   #F3EDDA;
+  --red:         #8B2020;
+  --red-bg:      #F4E4E4;
+  --nav-h:       64px;
+  --radius:      12px;
+  --shadow:      0 1px 12px rgba(10,31,23,0.07);
+  --shadow-md:   0 4px 24px rgba(10,31,23,0.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h);
+  background: linear-gradient(135deg, #0d2e22 0%, #1b5247 60%, #256b56 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 24px rgba(10,31,23,0.45);
+  z-index: 200; display: flex; align-items: center; padding: 0 28px; gap: 16px;
+}
+.brand-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: #ECE6D0; letter-spacing: -0.5px; }
+.admin-badge { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  background: rgba(200,153,42,0.2); color: #ECE6D0; border: 1px solid rgba(200,153,42,0.4);
+  padding: 3px 10px; border-radius: 20px; }
+.back-link { margin-left: auto; color: rgba(236,230,208,0.7); font-size: 13px; font-weight: 500;
+  text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .18s; }
+.back-link:hover { color: #ECE6D0; }
+
+.page-wrap { padding-top: calc(var(--nav-h) + 32px); max-width: 960px; margin: 0 auto; padding-left: 24px; padding-right: 24px; padding-bottom: 60px; }
+.page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); margin-bottom: 6px; }
+.page-sub { font-size: 14px; color: var(--ink-lt); margin-bottom: 28px; }
+
+.actions-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--indigo);
+  color: #fff; font-size: 13px; font-weight: 600; padding: 10px 20px; border-radius: 8px;
+  border: none; cursor: pointer; transition: all .18s; font-family: 'DM Sans', sans-serif; }
+.btn-primary:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.status-msg { font-size: 12.5px; color: var(--ink-lt); }
+
+.proposal-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; margin-bottom: 14px; box-shadow: var(--shadow);
+  transition: box-shadow .2s;
+}
+.proposal-card:hover { box-shadow: var(--shadow-md); }
+.proposal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.proposal-summary { font-size: 14px; font-weight: 600; color: var(--ink); flex: 1; }
+.proposal-meta { font-size: 11.5px; color: var(--ink-lt); margin-top: 3px; }
+.proposal-badge { font-size: 10.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.badge-pending  { background: var(--saffron-lt); color: var(--orange); }
+.badge-approved { background: var(--green-bg); color: var(--green); }
+.badge-declined { background: var(--red-bg); color: var(--red); }
+
+.proposal-patch {
+  font-size: 11.5px; color: var(--ink-mid); background: var(--cream-dark);
+  border-radius: 6px; padding: 8px 12px; font-family: monospace;
+  margin-bottom: 12px; word-break: break-all;
+}
+.proposal-actions { display: flex; gap: 8px; }
+.btn-approve { background: var(--green-bg); color: var(--green); border: 1px solid rgba(27,82,71,.2);
+  font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 6px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 5px; transition: all .15s; }
+.btn-approve:hover { background: var(--green); color: #fff; }
+.btn-decline { background: var(--red-bg); color: var(--red); border: 1px solid rgba(139,32,32,.15);
+  font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 6px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 5px; transition: all .15s; }
+.btn-decline:hover { background: var(--red); color: #fff; }
+.btn-approve:disabled, .btn-decline:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.confidence-bar { height: 4px; background: var(--cream-dark); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.confidence-fill { height: 100%; background: var(--indigo); border-radius: 2px; transition: width .5s; }
+
+.empty-state { text-align: center; padding: 60px 24px; color: var(--ink-lt); }
+.empty-state .material-icons-round { font-size: 48px; display: block; margin-bottom: 12px; opacity: .4; }
+
+.toast-area { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--indigo-dark); color: #ECE6D0; font-size: 13px; padding: 12px 20px;
+  border-radius: 8px; box-shadow: var(--shadow-md); animation: slideIn .2s ease; max-width: 320px; }
+.toast.error { background: var(--red); }
+@keyframes slideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="topnav">
+  <span class="brand-name">Rivet</span>
+  <span class="admin-badge">Admin</span>
+  <a href="/dashboard" class="back-link">
+    <span class="material-icons-round" style="font-size:16px;">arrow_back</span>
+    Back to Dashboard
+  </a>
+</nav>
+
+<!-- Content -->
+<div class="page-wrap" style="padding-top:calc(64px + 32px);">
+  <div class="page-title">AI Proposals</div>
+  <div class="page-sub">Review and approve optimizer-generated baseline edits. Changes are not applied automatically.</div>
+
+  <div class="actions-bar">
+    <button class="btn-primary" id="generateBtn" onclick="generateProposals()">
+      <span class="material-icons-round" style="font-size:16px;">auto_fix_high</span>
+      Run Optimizer
+    </button>
+    <button class="btn-primary" onclick="loadProposals()" style="background:var(--indigo-mid);">
+      <span class="material-icons-round" style="font-size:16px;">refresh</span>
+      Refresh
+    </button>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <div id="proposalsList"></div>
+</div>
+
+<div class="toast-area" id="toastArea"></div>
+
+<script>
+function toast(msg, isError) {
+  var t = document.createElement('div');
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.textContent = msg;
+  document.getElementById('toastArea').appendChild(t);
+  setTimeout(function() { t.remove(); }, 3500);
+}
+
+function badgeClass(status) {
+  if (status === 'approved') return 'badge-approved';
+  if (status === 'declined') return 'badge-declined';
+  return 'badge-pending';
+}
+
+function loadProposals() {
+  document.getElementById('statusMsg').textContent = 'Loading…';
+  fetch('/admin/proposals')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      document.getElementById('statusMsg').textContent = data.count + ' proposal(s)';
+      renderProposals(data.proposals || []);
+    })
+    .catch(function(e) {
+      document.getElementById('statusMsg').textContent = 'Failed to load';
+      toast('Failed to load proposals: ' + e.message, true);
+    });
+}
+
+function renderProposals(proposals) {
+  var el = document.getElementById('proposalsList');
+  if (!proposals.length) {
+    el.innerHTML = '<div class="empty-state"><span class="material-icons-round">lightbulb</span><div>No proposals yet. Click <strong>Run Optimizer</strong> to generate suggestions.</div></div>';
+    return;
+  }
+  el.innerHTML = '';
+  proposals.forEach(function(p) {
+    var conf = parseFloat(p.confidence) || 0;
+    var isPending = p.status === 'pending';
+    var card = document.createElement('div');
+    card.className = 'proposal-card';
+    card.id = 'card-' + p.id;
+    card.innerHTML =
+      '<div class="proposal-header">' +
+        '<div>' +
+          '<div class="proposal-summary">' + escHtml(p.summary || '(no summary)') + '</div>' +
+          '<div class="proposal-meta">' +
+            'ID: ' + escHtml(p.id) + ' &nbsp;·&nbsp; ' +
+            escHtml(p.type || '') + ' &nbsp;·&nbsp; ' +
+            escHtml(p.timestamp ? p.timestamp.slice(0,16).replace('T',' ') : '') +
+          '</div>' +
+        '</div>' +
+        '<span class="proposal-badge ' + badgeClass(p.status) + '">' + escHtml(p.status) + '</span>' +
+      '</div>' +
+      '<div class="proposal-patch">' + escHtml(p.patch_json || '') + '</div>' +
+      '<div class="confidence-bar"><div class="confidence-fill" style="width:' + Math.round(conf * 100) + '%"></div></div>' +
+      '<div style="font-size:11px;color:var(--ink-lt);margin:4px 0 12px;">Confidence: ' + Math.round(conf * 100) + '%</div>' +
+      (isPending ?
+        '<div class="proposal-actions">' +
+          '<button class="btn-approve" onclick="approve(\'' + p.id + '\')">' +
+            '<span class="material-icons-round" style="font-size:14px;">check_circle</span> Approve' +
+          '</button>' +
+          '<button class="btn-decline" onclick="decline(\'' + p.id + '\')">' +
+            '<span class="material-icons-round" style="font-size:14px;">cancel</span> Decline' +
+          '</button>' +
+        '</div>'
+      : '');
+    el.appendChild(card);
+  });
+}
+
+function approve(id) {
+  var btn = document.querySelector('#card-' + id + ' .btn-approve');
+  if (btn) btn.disabled = true;
+  fetch('/admin/proposals/' + id + '/approve', { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) { toast(data.error, true); return; }
+      toast('Proposal approved and patch applied.');
+      loadProposals();
+    })
+    .catch(function(e) { toast('Approve failed: ' + e.message, true); });
+}
+
+function decline(id) {
+  var btn = document.querySelector('#card-' + id + ' .btn-decline');
+  if (btn) btn.disabled = true;
+  fetch('/admin/proposals/' + id + '/decline', { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) { toast(data.error, true); return; }
+      toast('Proposal declined.');
+      loadProposals();
+    })
+    .catch(function(e) { toast('Decline failed: ' + e.message, true); });
+}
+
+function generateProposals() {
+  var btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-border spinner-border-sm" style="width:14px;height:14px;"></div>&nbsp;Generating…';
+  document.getElementById('statusMsg').textContent = 'Running optimizer…';
+  fetch('/admin/proposals/generate', { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) { toast(data.error, true); return; }
+      toast('Generated ' + data.generated + ' new proposal(s).');
+      loadProposals();
+    })
+    .catch(function(e) { toast('Generation failed: ' + e.message, true); })
+    .finally(function() {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">auto_fix_high</span> Run Optimizer';
+    });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadProposals();
+</script>
+</body>
+</html>

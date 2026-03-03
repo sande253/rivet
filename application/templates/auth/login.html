@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login — Rivet</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:          #0A1F17;
+  --forest:       #1B5247;
+  --forest-deep:  #0D2E22;
+  --forest-mid:   #256B56;
+  --saffron:      #C8992A;
+  --saffron-dim:  #8B6D1E;
+  --cream:        #F3EFE3;
+  --cream-warm:   #EDE7D5;
+  --border:       rgba(27,82,71,0.18);
+  --red:          #7A1E1E;
+  --red-bg:       rgba(122,30,30,0.08);
+  --green-bg:     rgba(27,82,71,0.1);
+  --text-muted:   #7A9E8E;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
+body { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; background: var(--cream); }
+
+/* ─── Lang toggle ─── */
+.lang-toggle {
+  position: fixed; top: 20px; right: 24px; z-index: 200;
+  display: flex; background: rgba(13,46,34,0.88);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px; padding: 3px; gap: 2px;
+  backdrop-filter: blur(8px); box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.lang-btn {
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  color: rgba(236,230,208,0.6); cursor: pointer; border: none; background: transparent;
+  transition: all .18s; font-family: 'Outfit', sans-serif; letter-spacing: 0.3px;
+}
+.lang-btn.active { background: rgba(236,230,208,0.18); color: #ECE6D0; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.lang-btn:not(.active):hover { color: #ECE6D0; background: rgba(255,255,255,0.08); }
+
+/* ─── Left Panel ─── */
+.panel-left {
+  position: relative; background: var(--forest-deep);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 52px 56px; overflow: hidden;
+}
+.panel-left::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(61,155,126,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 85% 15%, rgba(200,153,42,0.08) 0%, transparent 55%);
+  pointer-events: none;
+}
+.panel-left::after {
+  content: ''; position: absolute; bottom: -120px; right: -120px;
+  width: 400px; height: 400px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 0 0 40px rgba(255,255,255,0.02), 0 0 0 80px rgba(255,255,255,0.015);
+  pointer-events: none;
+}
+.left-brand { position: relative; display: flex; align-items: center; gap: 12px; animation: fadeDown 0.7s ease both; }
+.brand-icon {
+  width: 44px; height: 44px; border-radius: 11px;
+  border: none; background: transparent;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.brand-icon svg { width: 22px; height: 22px; }
+.brand-logo { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: #EDE7D5; letter-spacing: 2px; text-transform: uppercase; }
+.left-content { position: relative; animation: fadeUp 0.8s 0.2s ease both; }
+.left-tagline { font-family: 'Cormorant Garamond', serif; font-size: clamp(34px,4vw,50px); font-weight: 300; line-height: 1.15; color: #EDE7D5; margin-bottom: 24px; letter-spacing: -0.5px; }
+.left-tagline em { font-style: italic; color: var(--saffron); }
+.left-desc { font-size: 14px; font-weight: 300; color: rgba(237,231,213,0.5); line-height: 1.7; max-width: 320px; letter-spacing: 0.2px; }
+.left-footer { position: relative; animation: fadeUp 0.8s 0.35s ease both; }
+.divider-line { width: 48px; height: 1px; background: rgba(200,153,42,0.4); margin-bottom: 20px; }
+.testimonial { border-left: 2px solid rgba(200,153,42,0.4); padding-left: 18px; }
+.testimonial-quote { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: rgba(237,231,213,0.65); line-height: 1.6; margin-bottom: 12px; }
+.testimonial-author { font-size: 12px; font-weight: 500; color: var(--saffron); letter-spacing: 1.2px; text-transform: uppercase; }
+
+/* ─── Right Panel ─── */
+.panel-right {
+  background: var(--cream); display: flex; align-items: center; justify-content: center;
+  padding: 48px 40px; position: relative;
+}
+.panel-right::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(27,82,71,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(27,82,71,0.04) 1px, transparent 1px);
+  background-size: 32px 32px; pointer-events: none;
+}
+.auth-box { position: relative; width: 100%; max-width: 400px; animation: fadeUp 0.7s 0.1s ease both; }
+.auth-heading { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; color: var(--forest-deep); margin-bottom: 6px; letter-spacing: -0.5px; }
+.auth-heading em { font-style: italic; color: var(--forest-mid); }
+.auth-sub { font-size: 13px; font-weight: 300; color: var(--text-muted); margin-bottom: 36px; letter-spacing: 0.2px; }
+
+/* ─── Flash ─── */
+.flash-list { list-style: none; margin-bottom: 24px; }
+.flash-item { padding: 12px 16px; border-radius: 10px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; border: 1px solid transparent; }
+.flash-item svg { flex-shrink: 0; margin-top: 1px; }
+.flash-danger  { background: var(--red-bg);  color: var(--red);    border-color: rgba(122,30,30,0.15); }
+.flash-success { background: var(--green-bg); color: var(--forest); border-color: rgba(27,82,71,0.15); }
+.flash-warning { background: rgba(200,153,42,0.08); color: var(--saffron-dim); border-color: rgba(200,153,42,0.15); }
+.flash-info    { background: rgba(26,58,92,0.06); color: #1A3A5C; border-color: rgba(26,58,92,0.12); }
+
+/* ─── Form ─── */
+.field { margin-bottom: 20px; }
+.field-label { display: block; font-size: 11px; font-weight: 600; color: var(--forest); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.field-wrap { position: relative; }
+.field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; transition: color 0.2s; }
+.field-icon svg { display: block; }
+.field-wrap:focus-within .field-icon { color: var(--forest-mid); }
+.field-input { width: 100%; background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 14px 13px 42px; font-size: 14px; font-weight: 400; color: var(--ink); font-family: 'Outfit', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+.field-input::placeholder { color: rgba(122,158,142,0.6); }
+.field-input:focus { border-color: var(--forest-mid); box-shadow: 0 0 0 4px rgba(27,82,71,0.09); }
+.pwd-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px; display: flex; align-items: center; transition: color 0.2s; }
+.pwd-toggle:hover { color: var(--forest); }
+
+/* ─── Form meta ─── */
+.form-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+.remember-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.remember-row input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 5px; background: #fff; cursor: pointer; transition: all 0.15s; position: relative; flex-shrink: 0; }
+.remember-row input[type="checkbox"]:checked { background: var(--forest); border-color: var(--forest); }
+.remember-row input[type="checkbox"]:checked::after { content: ''; position: absolute; top: 2px; left: 5px; width: 4px; height: 8px; border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg); }
+.remember-label { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+.forgot-link { font-size: 13px; font-weight: 500; color: var(--forest); text-decoration: none; transition: color 0.2s; }
+.forgot-link:hover { color: var(--forest-mid); text-decoration: underline; }
+
+/* ─── Button ─── */
+.btn-submit { width: 100%; padding: 14px; background: var(--forest-deep); color: var(--cream-warm); border: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Outfit', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s, background 0.2s; box-shadow: 0 4px 20px rgba(13,46,34,0.25); }
+.btn-submit::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%); transform: translateX(-100%); transition: transform 0.5s ease; }
+.btn-submit:hover { background: var(--forest); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(13,46,34,0.3); }
+.btn-submit:hover::before { transform: translateX(100%); }
+.btn-submit:active { transform: translateY(0); box-shadow: 0 3px 12px rgba(13,46,34,0.2); }
+
+/* ─── Footer / divider ─── */
+.auth-footer { text-align: center; margin-top: 28px; font-size: 13px; color: var(--text-muted); }
+.auth-footer a { color: var(--forest); font-weight: 600; text-decoration: none; transition: color 0.2s; }
+.auth-footer a:hover { color: var(--forest-mid); text-decoration: underline; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 28px 0; }
+.divider-bar { flex: 1; height: 1px; background: var(--border); }
+.divider-text { font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; }
+
+/* ─── Animations ─── */
+@keyframes fadeDown { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
+
+/* ─── Mobile ─── */
+@media (max-width: 768px) {
+  body { grid-template-columns: 1fr; }
+  .panel-left { display: none; }
+  .panel-right { padding: 32px 24px; }
+  .lang-toggle { top: 14px; right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Language Toggle ── -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" id="lang-te" onclick="setLang('te')">తె</button>
+</div>
+
+<!-- ── Left Panel ── -->
+<div class="panel-left">
+  <div class="left-brand">
+    <div class="brand-icon">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Rivet Logo" class="brand-logo" />
+    </div>
+    <span class="brand-name">Rivet</span>
+  </div>
+
+  <div class="left-content">
+    <p class="left-tagline" id="tagline">
+      Product intelligence<br/>for the <em>discerning</em><br/>artisan.
+    </p>
+    <p class="left-desc" data-en="Track inventory, supplier costs, and product margins — all in one workspace built for craft businesses." data-te="జాబితా, సరఫరాదారు ఖర్చులు, మరియు ఉత్పత్తి మార్జిన్‌లను ట్రాక్ చేయండి — చేతివృత్తుల వ్యాపారాల కోసం నిర్మించబడిన వర్క్‌స్పేస్‌లో.">
+      Track inventory, supplier costs, and product margins — all in one workspace built for craft businesses.
+    </p>
+  </div>
+
+  <div class="left-footer">
+    <div class="divider-line"></div>
+    <div class="testimonial">
+      <p class="testimonial-quote" data-en='"Finally a tool that respects the complexity of handmade work."' data-te='"చివరకు చేతితో చేసిన పనిని గౌరవించే సాధనం."'>
+        "Finally a tool that respects the complexity of handmade work."
+      </p>
+      <p class="testimonial-author">Priya M. — Leather Goods Studio, Jaipur</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Right Panel ── -->
+<div class="panel-right">
+  <div class="auth-box">
+
+    <h2 class="auth-heading" id="heading">Welcome <em>back.</em></h2>
+    <p class="auth-sub" data-en="Sign in to your Rivet workspace" data-te="మీ రివెట్ వర్క్‌స్పేస్‌లోకి సైన్ ఇన్ చేయండి">Sign in to your Rivet workspace</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-list">
+          {% for category, message in messages %}
+            <li class="flash-item flash-{{ category }}">
+              {% if category == 'danger' %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r="0.75" fill="currentColor"/></svg>
+              {% elif category == 'success' %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {% elif category == 'warning' %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.25" r="0.75" fill="currentColor"/></svg>
+              {% else %}<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>{% endif %}
+              {{ message }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+
+      <div class="field">
+        <label class="field-label" for="email" data-en="Email address" data-te="ఇమెయిల్ చిరునామా">Email address</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 5.5l6.5 4 6.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <input type="email" id="email" name="email" class="field-input" placeholder="you@studio.in" value="{{ request.form.get('email', '') }}" required autocomplete="email" autofocus/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password" data-en="Password" data-te="పాస్‌వర్డ్">Password</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/></svg></span>
+          <input type="password" id="password" name="password" class="field-input" placeholder="••••••••" required autocomplete="current-password"/>
+          <button type="button" class="pwd-toggle" id="togglePwd" aria-label="Toggle password visibility">
+            <svg id="eyeIcon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-meta">
+        <label class="remember-row">
+          <input type="checkbox" id="remember" name="remember"/>
+          <span class="remember-label" data-en="Remember me for 30 days" data-te="30 రోజులు గుర్తుంచుకో">Remember me for 30 days</span>
+        </label>
+        <a href="#" class="forgot-link" data-en="Forgot password?" data-te="పాస్‌వర్డ్ మర్చిపోయారా?">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-submit" data-en="Sign in" data-te="సైన్ ఇన్ చేయండి">Sign in</button>
+    </form>
+
+    <div class="divider">
+      <div class="divider-bar"></div>
+      <span class="divider-text" data-en="or" data-te="లేదా">or</span>
+      <div class="divider-bar"></div>
+    </div>
+
+    <div class="auth-footer">
+      <span data-en="New to Rivet? " data-te="రివెట్‌కు కొత్తగా వచ్చారా? ">New to Rivet? </span><a href="{{ url_for('auth.signup') }}" data-en="Create a free account" data-te="ఉచిత ఖాతా తయారు చేయండి">Create a free account</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-te').classList.toggle('active', lang === 'te');
+
+  // Tagline — has em tag, handle separately
+  var taglineMap = {
+    en: 'Product intelligence<br/>for the <em>discerning</em><br/>artisan.',
+    te: 'చేతివృత్తుల వారికి<br/><em>తెలివైన</em><br/>ఉత్పత్తి మేధస్సు.'
+  };
+  document.getElementById('tagline').innerHTML = taglineMap[lang];
+
+  // Heading — has em tag
+  var headingMap = {
+    en: 'Welcome <em>back.</em>',
+    te: 'తిరిగి <em>స్వాగతం.</em>'
+  };
+  document.getElementById('heading').innerHTML = headingMap[lang];
+
+  // All data-en / data-te elements
+  document.querySelectorAll('[data-en]').forEach(function(el) {
+    var txt = el.getAttribute('data-' + lang);
+    if (!txt) return;
+    if (txt.includes('<') || txt.includes('>')) { el.innerHTML = txt; }
+    else { el.textContent = txt; }
+  });
+}
+
+// Password toggle
+const toggle   = document.getElementById('togglePwd');
+const pwdInput = document.getElementById('password');
+const eyeIcon  = document.getElementById('eyeIcon');
+const eyeOpen  = '<path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>';
+const eyeOff   = '<path d="M2 2l12 12M6.5 6.6A2 2 0 0010 10M1 8s2.5-5 7-5c1.1 0 2.1.2 3 .6M15 8s-1 2.3-3.5 3.8M9.9 13.8A6.6 6.6 0 018 14c-4.5 0-7-6-7-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>';
+
+toggle.addEventListener('click', function() {
+  const show = pwdInput.type === 'password';
+  pwdInput.type = show ? 'text' : 'password';
+  eyeIcon.innerHTML = show ? eyeOff : eyeOpen;
+});
+
+// Password is sent over HTTPS and hashed server-side with bcrypt.
+// No client-side hashing needed - it adds no security and breaks validation.
+</script>
+
+</body>
+</html>

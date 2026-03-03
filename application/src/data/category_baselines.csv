@@ -1,0 +1,5 @@
+category,avg_price,median_price,min_price,max_price,top_material,demand_level,notes
+saree,880,565,95,15000,kanjivaram,high,578 products analysed; avg revised upward reflecting premium silk segment inflation Q1-Q2
+lehenga,5921,4999,799,45000,net,high,69 products analysed
+salwar_suit,1510,1099,399,8999,silk,medium,104 products analysed; min_price floor raised after removal of sub-400 listings; avg adjusted accordingly
+kurti,745,595,199,3999,rayon,high,99 products analysed; demand upgraded based on rising order frequency; avg nudged up reflecting polyester-blend premium shift
