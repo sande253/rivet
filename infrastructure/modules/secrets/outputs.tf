@@ -38,12 +38,17 @@ output "bedrock_image_model_parameter_name" {
   value       = aws_ssm_parameter.bedrock_image_model_id.name
 }
 
+output "read_db_secret_policy_arn" {
+  description = "ARN of the IAM policy that allows reading the database credentials secret."
+  value       = aws_iam_policy.read_database_secret.arn
+}
+
 output "db_secret_arn" {
-  description = "ARN of the database credentials secret (empty if no database)"
-  value       = length(aws_secretsmanager_secret.database) > 0 ? aws_secretsmanager_secret.database[0].arn : ""
+  description = "ARN of the database credentials secret"
+  value       = aws_secretsmanager_secret.database.arn
 }
 
 output "db_secret_name" {
-  description = "Name of the database credentials secret (empty if no database)"
-  value       = length(aws_secretsmanager_secret.database) > 0 ? aws_secretsmanager_secret.database[0].name : ""
+  description = "Name of the database credentials secret"
+  value       = aws_secretsmanager_secret.database.name
 }

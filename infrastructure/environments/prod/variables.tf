@@ -4,6 +4,13 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_account_id" {
+  description = "AWS account ID (required for inference profile ARNs)"
+  type        = string
+  default     = "976792586595"
+}
+
+
 # ── Networking ────────────────────────────────────────────────────────────────
 variable "vpc_cidr" {
   description = "CIDR block for VPC"

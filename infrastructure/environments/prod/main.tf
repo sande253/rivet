@@ -105,9 +105,10 @@ module "secrets" {
 module "bedrock" {
   source = "../../modules/bedrock"
 
-  project_name = local.project_name
-  environment  = local.environment
-  aws_region   = var.aws_region
+  project_name   = local.project_name
+  environment    = local.environment
+  aws_region     = var.aws_region
+  aws_account_id = var.aws_account_id
 
   app_log_group_name    = "/ec2/${local.project_name}-${local.environment}"
   create_metric_filters = false  # Enable after first deployment

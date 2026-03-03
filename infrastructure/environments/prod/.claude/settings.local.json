@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(aws ecr:*)",
+      "Bash(aws autoscaling:*)",
+      "Bash(aws elbv2:*)",
+      "Bash(aws logs:*)",
+      "Bash(MSYS_NO_PATHCONV=1 aws logs:*)",
+      "Bash(aws ssm:*)",
+      "Bash(aws ec2:*)",
+      "Bash(PYTHONIOENCODING=utf-8 aws ec2:*)",
+      "Bash(set PYTHONIOENCODING=utf-8:*)",
+      "Bash(cmd:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(terraform apply:*)"
+    ]
+  }
+}

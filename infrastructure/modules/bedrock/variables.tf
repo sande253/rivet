@@ -47,3 +47,8 @@ variable "error_threshold_count" {
   type        = number
   default     = 10
 }
+
+variable "aws_account_id" {
+  description = "AWS account ID (required for inference profile ARNs)."
+  type        = string
+}

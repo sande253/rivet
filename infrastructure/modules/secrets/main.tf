@@ -19,7 +19,7 @@ resource "aws_secretsmanager_secret" "anthropic_api_key" {
 
 resource "aws_secretsmanager_secret_version" "anthropic_api_key" {
   secret_id     = aws_secretsmanager_secret.anthropic_api_key.id
-  secret_string = var.anthropic_api_key
+  secret_string = var.anthropic_api_key != "" ? var.anthropic_api_key : "placeholder-key-not-used-with-bedrock"
 }
 
 # ── SSM Parameters for GenAI model configuration ──────────────────────────────
@@ -127,8 +127,6 @@ resource "aws_iam_policy" "read_ssm_parameters" {
 
 # ── AWS Secrets Manager — Database credentials ────────────────────────────────
 resource "aws_secretsmanager_secret" "database" {
-  count = var.db_host != "" ? 1 : 0
-  
   name        = "${local.name_prefix}/database-credentials"
   description = "Database connection credentials for RDS PostgreSQL"
 
@@ -142,9 +140,7 @@ resource "aws_secretsmanager_secret" "database" {
 }
 
 resource "aws_secretsmanager_secret_version" "database" {
-  count = var.db_host != "" ? 1 : 0
-  
-  secret_id = aws_secretsmanager_secret.database[0].id
+  secret_id = aws_secretsmanager_secret.database.id
   secret_string = jsonencode({
     host     = var.db_host
     port     = var.db_port
@@ -156,8 +152,6 @@ resource "aws_secretsmanager_secret_version" "database" {
 
 # ── IAM policy — allows EC2 to read database secret ───────────────────────────
 resource "aws_iam_policy" "read_database_secret" {
-  count = var.db_host != "" ? 1 : 0
-  
   name        = "${local.name_prefix}-read-database-secret"
   description = "Grants read access to the database credentials secret."
 
@@ -170,7 +164,7 @@ resource "aws_iam_policy" "read_database_secret" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret",
         ]
-        Resource = aws_secretsmanager_secret.database[0].arn
+        Resource = aws_secretsmanager_secret.database.arn
       }
     ]
   })

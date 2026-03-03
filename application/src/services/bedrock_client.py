@@ -153,30 +153,34 @@ class MessagesAPI:
     def _convert_model_id(self, model: str) -> str:
         """Convert Anthropic model ID to Bedrock format.
         
+        Uses cross-region inference profiles for better availability.
+        
         Examples:
-            claude-opus-4-6 → anthropic.claude-3-opus-20240229-v1:0
-            claude-sonnet-4-6 → anthropic.claude-3-5-sonnet-20241022-v2:0
-            claude-haiku-4-5-20251001 → anthropic.claude-3-5-haiku-20241022-v1:0
+            claude-opus-4-6 → us.anthropic.claude-3-5-sonnet-20241022-v2:0
+            claude-sonnet-4-6 → us.anthropic.claude-3-5-sonnet-20241022-v2:0
+            claude-haiku-4-5-20251001 → us.anthropic.claude-3-5-haiku-20241022-v1:0
         """
         # If already in Bedrock format, return as-is
-        if model.startswith("anthropic."):
+        if model.startswith("anthropic.") or model.startswith("us.anthropic."):
             return model
         
-        # Map common model names to Bedrock IDs
+        # Map common model names to Bedrock inference profile IDs
+        # Using cross-region inference profiles (us.) for better availability
         model_map = {
-            "claude-opus-4-6": "anthropic.claude-3-opus-20240229-v1:0",
-            "claude-sonnet-4-6": "anthropic.claude-3-5-sonnet-20241022-v2:0",
-            "claude-3-5-sonnet-20241022": "anthropic.claude-3-5-sonnet-20241022-v2:0",
-            "claude-haiku-4-5-20251001": "anthropic.claude-3-5-haiku-20241022-v1:0",
-            "claude-3-5-haiku-20241022": "anthropic.claude-3-5-haiku-20241022-v1:0",
+            "claude-opus-4-6": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",  # Opus not available, use Sonnet
+            "claude-sonnet-4-6": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+            "claude-3-5-sonnet-20241022": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+            "claude-haiku-4-5-20251001": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
+            "claude-3-5-haiku-20241022": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
         }
         
         if model in model_map:
             return model_map[model]
         
-        # Default fallback
-        log.warning("Unknown model ID '%s', using Sonnet 3.5", model)
-        return "anthropic.claude-3-5-sonnet-20241022-v2:0"
+        # Default fallback to Sonnet 3.5 inference profile
+        log.warning("Unknown model ID '%s', using Sonnet 3.5 inference profile", model)
+        return "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
+
 
 
 class MessageResponse:

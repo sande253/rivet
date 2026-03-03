@@ -59,6 +59,11 @@ variable "read_secret_policy_arn" {
   type        = string
 }
 
+variable "read_db_secret_policy_arn" {
+  description = "IAM policy ARN for reading the database credentials secret"
+  type        = string
+}
+
 variable "read_ssm_policy_arn" {
   description = "IAM policy ARN for reading SSM parameters"
   type        = string

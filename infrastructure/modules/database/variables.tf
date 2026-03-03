@@ -21,6 +21,7 @@ variable "database_subnet_ids" {
 variable "ec2_security_group_id" {
   description = "EC2 security group ID (to allow access from EC2)"
   type        = string
+  default     = ""
 }
 
 variable "instance_class" {

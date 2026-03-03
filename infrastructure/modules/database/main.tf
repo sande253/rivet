@@ -27,13 +27,28 @@ resource "aws_security_group" "rds" {
   description = "Security group for RDS PostgreSQL"
   vpc_id      = var.vpc_id
 
-  # Allow PostgreSQL access from EC2 instances only
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [var.ec2_security_group_id]
-    description     = "PostgreSQL from EC2 instances"
+  # Allow PostgreSQL access from EC2 instances (if EC2 SG provided)
+  dynamic "ingress" {
+    for_each = var.ec2_security_group_id != "" ? [1] : []
+    content {
+      from_port       = 5432
+      to_port         = 5432
+      protocol        = "tcp"
+      security_groups = [var.ec2_security_group_id]
+      description     = "PostgreSQL from EC2 instances"
+    }
+  }
+
+  # Temporary: Allow from private subnets (will be replaced with EC2 SG)
+  dynamic "ingress" {
+    for_each = var.ec2_security_group_id == "" ? [1] : []
+    content {
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = ["10.0.11.0/24", "10.0.12.0/24"]  # Private subnets
+      description = "PostgreSQL from private subnets (temporary)"
+    }
   }
 
   egress {
@@ -55,7 +70,7 @@ resource "aws_security_group" "rds" {
 resource "aws_db_instance" "main" {
   identifier     = "${local.name_prefix}-db"
   engine         = "postgres"
-  engine_version = "16.1"
+  engine_version = "16.6"  # Latest PostgreSQL 16 version
 
   instance_class    = var.instance_class
   allocated_storage = var.allocated_storage

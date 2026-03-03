@@ -30,13 +30,16 @@ resource "aws_iam_policy" "bedrock_invoke" {
           "bedrock:InvokeModelWithResponseStream",
         ]
         Resource = [
-          # Anthropic Claude models
+          # Anthropic Claude models (foundation models)
           "arn:aws:bedrock:${var.aws_region}::foundation-model/anthropic.claude-3-5-haiku-*",
           "arn:aws:bedrock:${var.aws_region}::foundation-model/anthropic.claude-3-5-sonnet-*",
           "arn:aws:bedrock:${var.aws_region}::foundation-model/anthropic.claude-3-opus-*",
           "arn:aws:bedrock:${var.aws_region}::foundation-model/anthropic.claude-*",
-          # Amazon Titan models
+          # Amazon Titan models (foundation models)
           "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-*",
+          # Cross-region inference profiles (required for us.anthropic.* model IDs)
+          "arn:aws:bedrock:${var.aws_region}:${var.aws_account_id}:inference-profile/us.anthropic.claude-*",
+          "arn:aws:bedrock:${var.aws_region}:${var.aws_account_id}:inference-profile/anthropic.claude-*",
         ]
       },
       {

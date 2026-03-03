@@ -45,7 +45,7 @@ variable "bedrock_image_model_id" {
 variable "db_host" {
   description = "Database host (RDS endpoint)"
   type        = string
-  default     = ""
+  default     = "placeholder"
 }
 
 variable "db_port" {
@@ -57,18 +57,18 @@ variable "db_port" {
 variable "db_name" {
   description = "Database name"
   type        = string
-  default     = ""
+  default     = "rivet"
 }
 
 variable "db_username" {
   description = "Database username"
   type        = string
-  default     = ""
+  default     = "rivetadmin"
 }
 
 variable "db_password" {
   description = "Database password"
   type        = string
-  default     = ""
+  default     = "placeholder"
   sensitive   = true
 }

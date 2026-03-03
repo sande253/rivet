@@ -197,7 +197,7 @@ echo "Starting Docker container..."
 docker run -d \
     --name rivet-backend \
     --restart unless-stopped \
-    -p ${container_port}:8000 \
+    -p ${container_port}:8080 \
     -e FLASK_ENV=production \
     -e ENVIRONMENT=${environment} \
     -e AWS_REGION=${aws_region} \
@@ -205,6 +205,7 @@ docker run -d \
     -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
     -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
     -e AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN" \
+    -e AWS_EC2_METADATA_DISABLED=true \
     -e S3_BUCKET=${upload_bucket_name} \
     -e USE_BEDROCK="${use_bedrock}" \
     $ANTHROPIC_ENV \
