@@ -73,6 +73,10 @@ fi
 # ── Run Docker Container ──────────────────────────────────────────────────────
 echo "Starting Docker container..."
 
+# Get AWS credentials from instance metadata for container
+AWS_CONTAINER_CREDENTIALS_RELATIVE_URI=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+AWS_DEFAULT_REGION=${aws_region}
+
 docker run -d \
     --name rivet-backend \
     --restart unless-stopped \
@@ -80,6 +84,7 @@ docker run -d \
     -e FLASK_ENV=development \
     -e ENVIRONMENT=${environment} \
     -e AWS_REGION=${aws_region} \
+    -e AWS_DEFAULT_REGION=${aws_region} \
     -e S3_BUCKET=${upload_bucket_name} \
     -e USE_BEDROCK="${use_bedrock}" \
     $ANTHROPIC_ENV \
@@ -91,13 +96,14 @@ docker run -d \
     -e GENAI_CACHE_TTL=300 \
     -e GENAI_FAILURE_THRESHOLD=5 \
     -e GENAI_CIRCUIT_TIMEOUT=300 \
+    --network host \
     --log-driver=awslogs \
     --log-opt awslogs-region=${aws_region} \
     --log-opt awslogs-group=/ec2/rivet-${environment} \
     --log-opt awslogs-create-group=true \
     ${ecr_repository_url}:${image_tag}
 
-echo "✓ Docker container started"
+echo "✓ Docker container started with host network access for IAM role credentials"
 
 # ── Verify Container is Running ───────────────────────────────────────────────
 sleep 10
