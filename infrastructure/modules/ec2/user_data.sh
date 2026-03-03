@@ -75,16 +75,18 @@ echo "Starting Docker container..."
 
 # Get IAM role name from instance metadata
 ROLE_NAME=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+echo "IAM Role: $ROLE_NAME"
 
 # Get temporary credentials from IAM role
 CREDENTIALS=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$ROLE_NAME)
 
-# Extract credentials
-AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | grep -oP '(?<="AccessKeyId" : ")[^"]*')
-AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | grep -oP '(?<="SecretAccessKey" : ")[^"]*')
-AWS_SESSION_TOKEN=$(echo $CREDENTIALS | grep -oP '(?<="Token" : ")[^"]*')
+# Extract credentials using Python (available on Amazon Linux)
+AWS_ACCESS_KEY_ID=$(echo "$CREDENTIALS" | python3 -c "import sys, json; print(json.load(sys.stdin)['AccessKeyId'])")
+AWS_SECRET_ACCESS_KEY=$(echo "$CREDENTIALS" | python3 -c "import sys, json; print(json.load(sys.stdin)['SecretAccessKey'])")
+AWS_SESSION_TOKEN=$(echo "$CREDENTIALS" | python3 -c "import sys, json; print(json.load(sys.stdin)['Token'])")
 
 echo "✓ Retrieved IAM role credentials for container"
+echo "Access Key ID: ${AWS_ACCESS_KEY_ID:0:20}..."
 
 docker run -d \
     --name rivet-backend \
