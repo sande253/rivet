@@ -228,9 +228,8 @@ resource "aws_launch_template" "app" {
     name = aws_iam_instance_profile.ec2.name
   }
 
-  vpc_security_group_ids = [aws_security_group.ec2.id]
-
   # NO PUBLIC IP - instances are in private subnets
+  # Security groups must be in network_interfaces block, not vpc_security_group_ids
   network_interfaces {
     associate_public_ip_address = false
     delete_on_termination       = true
@@ -378,21 +377,6 @@ resource "aws_autoscaling_policy" "cpu_target" {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
     target_value = 60.0
-  }
-}
-
-# Target tracking scaling policy - ALB request count
-resource "aws_autoscaling_policy" "request_count_target" {
-  name                   = "${local.name_prefix}-request-count-target"
-  autoscaling_group_name = aws_autoscaling_group.app.name
-  policy_type            = "TargetTrackingScaling"
-
-  target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label         = "${split("/", var.target_group_arn)[1]}/${split("/", var.target_group_arn)[2]}/${split("/", var.target_group_arn)[3]}/targetgroup/${split("/", var.target_group_arn)[1]}/${split("/", var.target_group_arn)[2]}"
-    }
-    target_value = 1000.0
   }
 }
 
