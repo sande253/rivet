@@ -94,7 +94,8 @@ module "secrets" {
   bedrock_image_model_id = var.bedrock_image_model_id
   
   # Store database credentials
-  db_host     = module.database.endpoint
+  db_host     = module.database.address
+  db_port     = module.database.port
   db_name     = var.db_name
   db_username = var.db_username
   db_password = module.database.password
@@ -286,9 +287,10 @@ module "ec2" {
   image_tag          = var.image_tag
 
   # Secrets
-  anthropic_secret_arn   = module.secrets.secret_arn
-  read_secret_policy_arn = module.secrets.read_secret_policy_arn
-  read_ssm_policy_arn    = module.secrets.read_ssm_policy_arn
+  anthropic_secret_arn      = module.secrets.secret_arn
+  read_secret_policy_arn    = module.secrets.read_secret_policy_arn
+  read_db_secret_policy_arn = module.secrets.read_db_secret_policy_arn
+  read_ssm_policy_arn       = module.secrets.read_ssm_policy_arn
 
   # Storage
   upload_bucket_name = module.storage.upload_bucket_name
