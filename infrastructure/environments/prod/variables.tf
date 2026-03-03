@@ -133,7 +133,7 @@ variable "desired_capacity" {
 variable "use_bedrock" {
   description = "Use AWS Bedrock instead of Anthropic API"
   type        = bool
-  default     = true
+  default     = false  # Use Anthropic API directly - simpler and more reliable
 }
 
 variable "anthropic_api_key" {
@@ -146,19 +146,19 @@ variable "anthropic_api_key" {
 variable "draft_model_id" {
   description = "Model ID for draft generation"
   type        = string
-  default     = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  default     = "claude-3-5-sonnet-20241022"
 }
 
 variable "critic_model_id" {
   description = "Model ID for critic"
   type        = string
-  default     = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  default     = "claude-3-5-sonnet-20241022"
 }
 
 variable "vision_model_id" {
   description = "Model ID for vision analysis"
   type        = string
-  default     = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  default     = "claude-3-5-sonnet-20241022"
 }
 
 variable "bedrock_image_model_id" {
