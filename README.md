@@ -250,7 +250,7 @@ c:\rivet_proto\
 - **Real Market Data**: 1000+ product CSVs for grounded analysis
 - **Production Infrastructure**: Full Terraform + Docker setup (not typical for hackathons)
 - **Resilience Patterns**: Circuit breaker, caching, safety filters
-- **Bilingual Support**: English + Telugu UI
+- **Bilingual Support**: English + Telugu UI + **Hindi( in future)**
 
 ---
 
@@ -274,12 +274,6 @@ c:\rivet_proto\
 
 ---
 
-## 🤝 Contributing
-
-This is a hackathon project. For improvements, please open issues or PRs.
-
----
-
 ## 📄 License
 
 MIT License — See LICENSE file for details.
@@ -288,16 +282,9 @@ MIT License — See LICENSE file for details.
 
 ## 👨‍💻 Team
 
-Built for the **Anthropic Claude Hackathon** (March 2026)
+Built for the **AI for Bharat Hackathon** (March 2026)
 
 **Stack**: Flask, PostgreSQL, Claude API, AWS Bedrock, Terraform, Docker
 
 ---
 
-## 💬 Questions?
-
-- Check [PRODUCTION.md](application/PRODUCTION.md) for deployment details
-- See [pytest.ini](application/pytest.ini) for test configuration
-- Review `.env.example` for all configurable options
-
-**Good luck with your launch!** 🚀
