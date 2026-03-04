@@ -145,27 +145,25 @@ def _bedrock_client():
 
 
 def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
-    """Call Bedrock IMAGE_VARIATION. Returns raw PNG bytes."""
-    with open(sketch_path, "rb") as f:
-        sketch_b64 = base64.standard_b64encode(f.read()).decode()
-
+    """Call Bedrock TEXT_IMAGE to generate realistic mockup. Returns raw PNG bytes."""
+    # Use TEXT_IMAGE instead of IMAGE_VARIATION to generate completely new realistic images
     body = {
-        "taskType": "IMAGE_VARIATION",
-        "imageVariationParams": {
+        "taskType": "TEXT_IMAGE",
+        "textToImageParams": {
             "text": prompt,
             "negativeText": (
                 "blurry, cartoon, sketch, drawing, line art, pencil drawing, "
                 "low quality, watermark, cropped, deformed, out of frame, "
-                "unrealistic, flat colors, amateur, pixelated"
+                "unrealistic, flat colors, amateur, pixelated, illustration, "
+                "anime, painting, digital art"
             ),
-            "images": [sketch_b64],
-            "similarityStrength": 0.4,  # Lower value = more creative/realistic interpretation
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
             "width": 768,  # Higher resolution for better quality
             "height": 1024,  # Portrait orientation for fashion
             "cfgScale": 10.0,  # Higher value = stronger prompt adherence
+            "seed": 42,  # Consistent results
         },
     }
 
