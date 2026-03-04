@@ -54,11 +54,13 @@ def _build_prompt(category: str, description: str) -> str:
     extra = f", {description}" if description else ""
     return (
         f"Professional fashion product photography: {base}{extra}. "
-        "Worn by model, full body shot, studio lighting with soft shadows, "
-        "clean white background, ultra-realistic fabric texture with visible weave, "
-        "natural draping and folds, high resolution commercial photography, "
-        "professional color grading, sharp details, photorealistic rendering, "
-        "magazine quality fashion shoot."
+        "Worn by a model in a studio setting, full body shot, "
+        "professional studio lighting with soft shadows creating depth, "
+        "clean white background, ultra-realistic fabric texture with visible weave and sheen, "
+        "natural draping and folds showing fabric weight, "
+        "high resolution commercial photography, professional color grading, "
+        "sharp details, photorealistic rendering, magazine quality fashion editorial, "
+        "model facing camera, elegant pose, professional styling"
     )
 
 
@@ -152,30 +154,26 @@ def _bedrock_client():
 
 
 def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
-    """Call Bedrock IMAGE_VARIATION to generate realistic mockup from sketch. Returns raw PNG bytes."""
-    with open(sketch_path, "rb") as f:
-        sketch_b64 = base64.standard_b64encode(f.read()).decode("utf-8")
-
-    # IMAGE_VARIATION with low similarityStrength: uses sketch structure as reference
-    # but diverges enough to render photorealistically (0.2=min, 1.0=identical)
+    """Call Bedrock TEXT_IMAGE to generate realistic mockup. Returns raw PNG bytes."""
+    # Use TEXT_IMAGE to generate photorealistic product photos from description
+    # The sketch is analyzed by Claude first, and that analysis is used in the prompt
     body = {
-        "taskType": "IMAGE_VARIATION",
-        "imageVariationParams": {
-            "images": [sketch_b64],
+        "taskType": "TEXT_IMAGE",
+        "textToImageParams": {
             "text": prompt,
             "negativeText": (
                 "blurry, cartoon, sketch, drawing, line art, pencil drawing, "
                 "low quality, watermark, cropped, deformed, out of frame, "
                 "unrealistic, flat colors, amateur, pixelated, illustration, "
-                "anime, painting, digital art"
+                "anime, painting, digital art, mannequin, headless, faceless"
             ),
-            "similarityStrength": 0.3,  # 0.2–0.4 = creative divergence, photorealistic output
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
-            "width": 768,
-            "height": 1024,
-            "cfgScale": 10.0,
+            "width": 768,  # Higher resolution for better quality
+            "height": 1024,  # Portrait orientation for fashion
+            "cfgScale": 10.0,  # Higher value = stronger prompt adherence
+            "seed": 42,  # Consistent results
         },
     }
 
