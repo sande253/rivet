@@ -125,8 +125,9 @@ aws ecr get-login-password --region ${aws_region} | \
 echo "✓ ECR authentication successful"
 
 # ── Pull Docker Image ─────────────────────────────────────────────────────────
-echo "Pulling Docker image: ${ecr_repository_url}:${image_tag}"
-docker pull ${ecr_repository_url}:${image_tag}
+IMAGE_URI="${ecr_repository_url}:${image_tag}"
+echo "Pulling Docker image: $IMAGE_URI"
+docker pull "$IMAGE_URI"
 
 echo "✓ Docker image pulled successfully"
 
@@ -233,7 +234,7 @@ docker run -d \
     --log-opt awslogs-group=${log_group_name} \
     --log-opt awslogs-create-group=true \
     --log-opt awslogs-stream=container-{instance_id} \
-    ${ecr_repository_url}:${image_tag}
+    "$IMAGE_URI"
 
 echo "✓ Docker container started"
 
