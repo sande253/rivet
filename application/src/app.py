@@ -39,6 +39,11 @@ def create_app(config_name: str = None) -> Flask:
     from .routes import register_blueprints
     register_blueprints(app)
 
+    # Health check endpoint for ALB
+    @app.route("/health")
+    def health():
+        return {"status": "healthy"}, 200
+
     log.info("Rivet app started [env=%s]", config_name)
     return app
 
