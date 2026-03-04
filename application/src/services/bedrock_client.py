@@ -310,39 +310,40 @@ class MessagesAPI:
     def _convert_model_id(self, model: str) -> str:
         """Convert model ID to Bedrock format.
 
-        Uses Claude 3 Haiku which has vision capabilities and is approved.
+        Uses Amazon Nova Pro which has vision capabilities and needs no approval.
         """
         # Explicit mapping takes priority
         model_map = {
-            # All models → Claude 3 Haiku (vision-capable, approved, active)
-            "claude-opus-4-6": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-sonnet-4-6": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-3-5-sonnet-20241022": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-haiku-4-5-20251001": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-3-5-haiku-20241022": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-3-haiku-20240307": "anthropic.claude-3-haiku-20240307-v1:0",
-            # Bedrock-format Anthropic IDs → Claude 3 Haiku
-            "anthropic.claude-3-5-sonnet-20241022-v2:0": "anthropic.claude-3-haiku-20240307-v1:0",
-            "anthropic.claude-3-5-haiku-20241022-v1:0": "anthropic.claude-3-haiku-20240307-v1:0",
+            # All models → Amazon Nova Pro (vision-capable, no approval needed)
+            "claude-opus-4-6": "amazon.nova-pro-v1:0",
+            "claude-sonnet-4-6": "amazon.nova-pro-v1:0",
+            "claude-3-5-sonnet-20241022": "amazon.nova-pro-v1:0",
+            "claude-haiku-4-5-20251001": "amazon.nova-pro-v1:0",
+            "claude-3-5-haiku-20241022": "amazon.nova-pro-v1:0",
+            "claude-3-haiku-20240307": "amazon.nova-pro-v1:0",
+            # Bedrock-format Anthropic IDs → Amazon Nova Pro
+            "anthropic.claude-3-5-sonnet-20241022-v2:0": "amazon.nova-pro-v1:0",
+            "anthropic.claude-3-5-haiku-20241022-v1:0": "amazon.nova-pro-v1:0",
+            "anthropic.claude-3-haiku-20240307-v1:0": "amazon.nova-pro-v1:0",
         }
         if model in model_map:
             return model_map[model]
 
-        # Already a Claude model ID — use as-is
-        if model.startswith("anthropic.claude"):
+        # Already an Amazon model ID — use as-is
+        if model.startswith("amazon."):
             return model
 
         # Strip cross-region prefix
         if model.startswith("us.anthropic."):
             stripped = model.replace("us.anthropic.", "anthropic.")
-            return model_map.get(stripped, "anthropic.claude-3-haiku-20240307-v1:0")
+            return model_map.get(stripped, "amazon.nova-pro-v1:0")
 
-        # Any remaining anthropic.* IDs → Claude 3 Haiku
+        # Any remaining anthropic.* IDs → Amazon Nova Pro
         if model.startswith("anthropic."):
-            return "anthropic.claude-3-haiku-20240307-v1:0"
+            return "amazon.nova-pro-v1:0"
 
-        log.warning("Unknown model ID '%s', defaulting to Claude 3 Haiku", model)
-        return "anthropic.claude-3-haiku-20240307-v1:0"
+        log.warning("Unknown model ID '%s', defaulting to Amazon Nova Pro", model)
+        return "amazon.nova-pro-v1:0"
 
 
 
