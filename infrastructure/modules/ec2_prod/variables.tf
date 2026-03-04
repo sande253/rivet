@@ -48,6 +48,11 @@ variable "anthropic_secret_arn" {
   type        = string
 }
 
+variable "secret_key_arn" {
+  description = "Flask SECRET_KEY secret ARN"
+  type        = string
+}
+
 variable "db_secret_arn" {
   description = "Database credentials secret ARN"
   type        = string

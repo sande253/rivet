@@ -77,6 +77,26 @@ resource "aws_iam_role_policy_attachment" "ec2_secrets" {
   policy_arn = var.read_secret_policy_arn
 }
 
+# Attach Secrets Manager read policy (Flask secret key)
+resource "aws_iam_role_policy" "ec2_secret_key" {
+  name = "${local.name_prefix}-read-secret-key"
+  role = aws_iam_role.ec2.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = var.secret_key_arn
+      }
+    ]
+  })
+}
+
 # Attach Secrets Manager read policy (database credentials)
 resource "aws_iam_role_policy_attachment" "ec2_db_secret" {
   role       = aws_iam_role.ec2.name
@@ -256,6 +276,7 @@ resource "aws_launch_template" "app" {
     environment            = var.environment
     upload_bucket_name     = var.upload_bucket_name
     anthropic_secret_arn   = var.anthropic_secret_arn
+    secret_key_arn         = var.secret_key_arn
     db_secret_arn          = var.db_secret_arn
     use_bedrock            = var.use_bedrock
     draft_model_id         = var.draft_model_id

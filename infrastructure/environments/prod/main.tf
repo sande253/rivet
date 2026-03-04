@@ -289,6 +289,7 @@ module "ec2" {
 
   # Secrets
   anthropic_secret_arn      = module.secrets.secret_arn
+  secret_key_arn            = "arn:aws:secretsmanager:${var.aws_region}:976792586595:secret:rivet-prod/secret-key-UfocEW"
   read_secret_policy_arn    = module.secrets.read_secret_policy_arn
   read_db_secret_policy_arn = module.secrets.read_db_secret_policy_arn
   read_ssm_policy_arn       = module.secrets.read_ssm_policy_arn

@@ -174,6 +174,15 @@ else
     DB_ENV=""
 fi
 
+# ── Get Flask Secret Key ─────────────────────────────────────────────────────
+echo "Retrieving Flask secret key from Secrets Manager..."
+SECRET_KEY=$(aws secretsmanager get-secret-value \
+    --secret-id ${secret_key_arn} \
+    --region ${aws_region} \
+    --query SecretString \
+    --output text)
+echo "✓ Flask secret key retrieved"
+
 # ── Get Anthropic API Key (only if USE_BEDROCK=false) ────────────────────────
 USE_BEDROCK="${use_bedrock}"
 
@@ -200,6 +209,7 @@ docker run -d \
     -p ${container_port}:8080 \
     -e FLASK_ENV=production \
     -e ENVIRONMENT=${environment} \
+    -e SECRET_KEY="$SECRET_KEY" \
     -e AWS_REGION=${aws_region} \
     -e AWS_DEFAULT_REGION=${aws_region} \
     -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
