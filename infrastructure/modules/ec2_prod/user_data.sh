@@ -207,7 +207,7 @@ echo "Starting Docker container..."
 docker run -d \
     --name rivet-backend \
     --restart unless-stopped \
-    -p ${container_port}:8080 \
+    -p ${container_port}:8000 \
     -e FLASK_ENV=production \
     -e ENVIRONMENT=${environment} \
     -e SECRET_KEY="$SECRET_KEY" \
