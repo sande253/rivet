@@ -85,6 +85,10 @@ class MessagesAPI:
         # Check if using Titan model (different API format)
         if bedrock_model.startswith("amazon.titan"):
             return self._invoke_titan(bedrock_model, max_tokens, messages, system, **kwargs)
+
+        # Nova models use Amazon's native request/response format
+        if bedrock_model.startswith("amazon.nova"):
+            return self._invoke_nova(bedrock_model, max_tokens, messages, system, **kwargs)
         
         # Build Bedrock request body for Anthropic models
         body = {
@@ -117,6 +121,75 @@ class MessagesAPI:
             log.error("Bedrock invocation failed: %s", e)
             raise
     
+    def _invoke_nova(
+        self,
+        model: str,
+        max_tokens: int,
+        messages: list[dict],
+        system: str = None,
+        **kwargs
+    ) -> "MessageResponse":
+        """Invoke Amazon Nova model (supports vision + text)."""
+        nova_messages = []
+        for msg in messages:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+
+            if isinstance(content, str):
+                nova_content = [{"text": content}]
+            elif isinstance(content, list):
+                nova_content = []
+                for block in content:
+                    if block.get("type") == "text":
+                        nova_content.append({"text": block["text"]})
+                    elif block.get("type") == "image":
+                        source = block.get("source", {})
+                        if source.get("type") == "base64":
+                            # e.g. "image/jpeg" → "jpeg"
+                            fmt = source.get("media_type", "image/jpeg").split("/")[-1]
+                            nova_content.append({
+                                "image": {
+                                    "format": fmt,
+                                    "source": {"bytes": source["data"]},
+                                }
+                            })
+            else:
+                nova_content = [{"text": str(content)}]
+
+            nova_messages.append({"role": role, "content": nova_content})
+
+        body = {
+            "messages": nova_messages,
+            "inferenceConfig": {"max_new_tokens": max_tokens},
+        }
+        if system:
+            body["system"] = [{"text": system}]
+        if "temperature" in kwargs:
+            body["inferenceConfig"]["temperature"] = kwargs["temperature"]
+
+        try:
+            response = self.client.invoke_model(
+                modelId=model,
+                contentType="application/json",
+                accept="application/json",
+                body=json.dumps(body),
+            )
+            result = json.loads(response["body"].read())
+            text = (
+                result.get("output", {})
+                      .get("message", {})
+                      .get("content", [{}])[0]
+                      .get("text", "")
+            )
+            return MessageResponse({
+                "content": [{"type": "text", "text": text}],
+                "role": "assistant",
+                "model": model,
+            })
+        except Exception as e:
+            log.error("Nova invocation failed: %s", e)
+            raise
+
     def _invoke_titan(
         self,
         model: str,
@@ -193,15 +266,32 @@ class MessagesAPI:
         Returns a context manager that yields text chunks.
         """
         bedrock_model = self._convert_model_id(model)
-        
-        body = {
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": max_tokens,
-            "messages": messages,
-        }
-        
-        if system:
-            body["system"] = system
+
+        if bedrock_model.startswith("amazon.nova"):
+            # Nova streaming format
+            nova_messages = []
+            for msg in messages:
+                role = msg.get("role", "user")
+                content = msg.get("content", "")
+                if isinstance(content, str):
+                    nova_content = [{"text": content}]
+                elif isinstance(content, list):
+                    nova_content = [{"text": b["text"]} for b in content if b.get("type") == "text"]
+                else:
+                    nova_content = [{"text": str(content)}]
+                nova_messages.append({"role": role, "content": nova_content})
+
+            body = {"messages": nova_messages, "inferenceConfig": {"max_new_tokens": max_tokens}}
+            if system:
+                body["system"] = [{"text": system}]
+        else:
+            body = {
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": max_tokens,
+                "messages": messages,
+            }
+            if system:
+                body["system"] = system
         
         try:
             response = self.client.invoke_model_with_response_stream(
@@ -218,39 +308,44 @@ class MessagesAPI:
             raise
 
     def _convert_model_id(self, model: str) -> str:
-        """Convert Anthropic model ID to Bedrock format.
-        
-        Uses Amazon Titan Text which doesn't require approval.
-        
-        Examples:
-            claude-opus-4-6 → amazon.titan-tg1-large
-            claude-sonnet-4-6 → amazon.titan-tg1-large
-            claude-haiku-4-5-20251001 → amazon.titan-tg1-large
+        """Convert model ID to Bedrock format.
+
+        Maps Claude model IDs to Amazon Nova equivalents (no Anthropic approval
+        required). Nova Pro handles vision + complex JSON; Nova Lite for cheaper
+        draft/critique tasks.
         """
-        # If already in Bedrock format, return as-is
-        if model.startswith("anthropic.") or model.startswith("amazon."):
-            return model
-        
-        # Strip us. prefix if present
-        if model.startswith("us.anthropic."):
-            return model.replace("us.anthropic.", "anthropic.")
-        
-        # Map all models to Amazon Titan Text (no approval needed)
+        # Explicit mapping takes priority
         model_map = {
-            "claude-opus-4-6": "amazon.titan-tg1-large",
-            "claude-sonnet-4-6": "amazon.titan-tg1-large",
-            "claude-3-5-sonnet-20241022": "amazon.titan-tg1-large",
-            "claude-haiku-4-5-20251001": "amazon.titan-tg1-large",
-            "claude-3-5-haiku-20241022": "amazon.titan-tg1-large",
-            "claude-3-haiku-20240307": "amazon.titan-tg1-large",
+            # Opus / Sonnet → Nova Pro (vision-capable, best quality)
+            "claude-opus-4-6": "amazon.nova-pro-v1:0",
+            "claude-sonnet-4-6": "amazon.nova-pro-v1:0",
+            "claude-3-5-sonnet-20241022": "amazon.nova-pro-v1:0",
+            # Haiku → Nova Lite (cheaper, text-only tasks)
+            "claude-haiku-4-5-20251001": "amazon.nova-lite-v1:0",
+            "claude-3-5-haiku-20241022": "amazon.nova-lite-v1:0",
+            "claude-3-haiku-20240307": "amazon.nova-lite-v1:0",
+            # Bedrock-format Anthropic IDs → Nova equivalents
+            "anthropic.claude-3-5-sonnet-20241022-v2:0": "amazon.nova-pro-v1:0",
+            "anthropic.claude-3-5-haiku-20241022-v1:0": "amazon.nova-lite-v1:0",
         }
-        
         if model in model_map:
             return model_map[model]
-        
-        # Default fallback to Amazon Titan Text
-        log.warning("Unknown model ID '%s', using Amazon Titan Text", model)
-        return "amazon.titan-tg1-large"
+
+        # Already an Amazon model ID — use as-is
+        if model.startswith("amazon."):
+            return model
+
+        # Strip cross-region prefix
+        if model.startswith("us.anthropic."):
+            stripped = model.replace("us.anthropic.", "anthropic.")
+            return model_map.get(stripped, "amazon.nova-pro-v1:0")
+
+        # Any remaining anthropic.* IDs → Nova Pro
+        if model.startswith("anthropic."):
+            return "amazon.nova-pro-v1:0"
+
+        log.warning("Unknown model ID '%s', defaulting to Nova Pro", model)
+        return "amazon.nova-pro-v1:0"
 
 
 
@@ -288,16 +383,20 @@ class StreamingResponse:
         pass
 
     def text_stream(self) -> Generator[str, None, None]:
-        """Yield text chunks from the stream."""
+        """Yield text chunks from the stream (handles both Nova and Anthropic events)."""
         for event in self.stream:
             chunk = event.get("chunk")
-            if chunk:
-                chunk_data = json.loads(chunk.get("bytes").decode())
-                
-                if chunk_data.get("type") == "content_block_delta":
-                    delta = chunk_data.get("delta", {})
-                    if delta.get("type") == "text_delta":
-                        yield delta.get("text", "")
+            if not chunk:
+                continue
+            chunk_data = json.loads(chunk.get("bytes").decode())
+            # Anthropic-format streaming
+            if chunk_data.get("type") == "content_block_delta":
+                delta = chunk_data.get("delta", {})
+                if delta.get("type") == "text_delta":
+                    yield delta.get("text", "")
+            # Nova-format streaming
+            elif chunk_data.get("type") == "contentBlockDelta":
+                yield chunk_data.get("delta", {}).get("text", "")
 
 
 # Factory function for backward compatibility

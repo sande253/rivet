@@ -49,7 +49,7 @@ module "networking" {
   database_subnet_cidrs = var.database_subnet_cidrs
   
   enable_nat_gateway = true
-  single_nat_gateway = false  # Multi-AZ NAT for production HA
+  single_nat_gateway = true   # Single NAT — saves ~$32/month
 }
 
 # ── Storage Module ────────────────────────────────────────────────────────────
