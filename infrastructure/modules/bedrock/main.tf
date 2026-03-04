@@ -37,6 +37,8 @@ resource "aws_iam_policy" "bedrock_invoke" {
           "arn:aws:bedrock:${var.aws_region}::foundation-model/anthropic.claude-*",
           # Amazon Titan models (foundation models)
           "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-*",
+          # Amazon Nova models (foundation models)
+          "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.nova-*",
           # Cross-region inference profiles (required for us.anthropic.* model IDs)
           "arn:aws:bedrock:${var.aws_region}:${var.aws_account_id}:inference-profile/us.anthropic.claude-*",
           "arn:aws:bedrock:${var.aws_region}:${var.aws_account_id}:inference-profile/anthropic.claude-*",
