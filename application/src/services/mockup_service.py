@@ -6,7 +6,8 @@ Local mode  (ENVIRONMENT != 'production'):
     UPLOAD_FOLDER/mockups/.  Returns /static/… URLs served by Flask.
 
 Production mode (ENVIRONMENT=production):
-    Amazon Bedrock Titan Image Generator v2 (IMAGE_VARIATION task).
+    Amazon Bedrock Titan Image Generator v2 (IMAGE_VARIATION, similarityStrength=0.3).
+    Uses the sketch as structural reference but renders photorealistically.
     IAM-role credentials — no hardcoded keys.
     Uploads sketch + generated mockup to S3.
     Returns https://… public S3 URLs.
@@ -105,12 +106,18 @@ def _save_local(
         log.error("Failed to save sketch: %s", e)
         raise RuntimeError(f"Failed to process sketch image: {e}")
 
-    # Apply PIL enhancement
+    # Local mode: PIL simulation (no Bedrock available).
+    # Adds a visible "DEV PREVIEW" overlay so it's clear this is not the real mockup.
     try:
         _pil_enhance(sketch_path, mockup_dest)
     except Exception as e:
         log.error("Failed to enhance mockup: %s", e)
         raise RuntimeError(f"Failed to generate mockup: {e}")
+
+    log.warning(
+        "LOCAL MODE: mockup is a PIL-enhanced copy of the sketch. "
+        "Set ENVIRONMENT=production and configure Bedrock for realistic generation."
+    )
 
     # Build URL paths relative to Flask static root.
     # upload_folder is normally "static/uploads"; strip the "static/" prefix
@@ -145,11 +152,16 @@ def _bedrock_client():
 
 
 def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
-    """Call Bedrock TEXT_IMAGE to generate realistic mockup. Returns raw PNG bytes."""
-    # Use TEXT_IMAGE instead of IMAGE_VARIATION to generate completely new realistic images
+    """Call Bedrock IMAGE_VARIATION to generate realistic mockup from sketch. Returns raw PNG bytes."""
+    with open(sketch_path, "rb") as f:
+        sketch_b64 = base64.standard_b64encode(f.read()).decode("utf-8")
+
+    # IMAGE_VARIATION with low similarityStrength: uses sketch structure as reference
+    # but diverges enough to render photorealistically (0.2=min, 1.0=identical)
     body = {
-        "taskType": "TEXT_IMAGE",
-        "textToImageParams": {
+        "taskType": "IMAGE_VARIATION",
+        "imageVariationParams": {
+            "images": [sketch_b64],
             "text": prompt,
             "negativeText": (
                 "blurry, cartoon, sketch, drawing, line art, pencil drawing, "
@@ -157,13 +169,13 @@ def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
                 "unrealistic, flat colors, amateur, pixelated, illustration, "
                 "anime, painting, digital art"
             ),
+            "similarityStrength": 0.3,  # 0.2–0.4 = creative divergence, photorealistic output
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
-            "width": 768,  # Higher resolution for better quality
-            "height": 1024,  # Portrait orientation for fashion
-            "cfgScale": 10.0,  # Higher value = stronger prompt adherence
-            "seed": 42,  # Consistent results
+            "width": 768,
+            "height": 1024,
+            "cfgScale": 10.0,
         },
     }
 

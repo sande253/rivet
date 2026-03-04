@@ -1,27 +1,65 @@
-name: Deploy to AWS EC2
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
   workflow_dispatch:
+
+# Queue deploys — never cancel an in-progress deployment
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: rivet-dev
-  CONTAINER_NAME: rivet-backend
 
 jobs:
-  build-and-deploy:
+  # ── Test ────────────────────────────────────────────────────────────────────
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r application/requirements.txt
+
+      - name: Run tests
+        run: cd application && pytest tests/ -v --tb=short
+
+  # ── Build & Push ─────────────────────────────────────────────────────────────
+  build:
+    name: Build & Push Image
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
+    outputs:
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+      ecr_repository: ${{ steps.resolve.outputs.ecr_repository }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Resolve environment and ECR repository
+        id: resolve
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            ENV=prod
+            REPO=rivet-prod
+          else
+            ENV=dev
+            REPO=rivet-dev
+          fi
+          echo "environment=$ENV"     >> $GITHUB_OUTPUT
+          echo "ecr_repository=$REPO" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -33,117 +71,438 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build, tag, and push image
         id: build-image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./application
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.resolve.outputs.ecr_repository }}:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.resolve.outputs.ecr_repository }}:latest
+          # GitHub Actions layer cache — speeds up rebuilds significantly
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+
+      - name: Wait for ECR image scan and gate on CRITICAL findings
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ steps.resolve.outputs.ecr_repository }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          cd application
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "Waiting for ECR scan to complete..."
+          for i in $(seq 1 18); do
+            STATUS=$(aws ecr describe-image-scan-findings \
+              --repository-name "$ECR_REPOSITORY" \
+              --image-id imageTag="$IMAGE_TAG" \
+              --query 'imageScanStatus.status' \
+              --output text 2>/dev/null || echo "IN_PROGRESS")
+
+            echo "  attempt $i/18 — status: $STATUS"
+
+            if [[ "$STATUS" == "COMPLETE" || "$STATUS" == "FAILED" ]]; then
+              break
+            fi
+            sleep 10
+          done
+
+          CRITICAL=$(aws ecr describe-image-scan-findings \
+            --repository-name "$ECR_REPOSITORY" \
+            --image-id imageTag="$IMAGE_TAG" \
+            --query 'imageScanFindings.findingSeverityCounts.CRITICAL' \
+            --output text 2>/dev/null || echo "0")
+
+          HIGH=$(aws ecr describe-image-scan-findings \
+            --repository-name "$ECR_REPOSITORY" \
+            --image-id imageTag="$IMAGE_TAG" \
+            --query 'imageScanFindings.findingSeverityCounts.HIGH' \
+            --output text 2>/dev/null || echo "0")
+
+          CRITICAL=${CRITICAL:-0}; HIGH=${HIGH:-0}
+          echo "Scan results — CRITICAL: $CRITICAL  HIGH: $HIGH"
+
+          if [[ "$CRITICAL" != "None" && "$CRITICAL" != "0" ]]; then
+            echo "::error::Blocking deployment — $CRITICAL CRITICAL vulnerabilities found. Review ECR scan results."
+            exit 1
+          fi
+
+          echo "::notice::Image scan passed (CRITICAL: $CRITICAL, HIGH: $HIGH)"
+
+  # ── Deploy to Dev ─────────────────────────────────────────────────────────
+  deploy-dev:
+    name: Deploy → Dev
+    needs: build
+    if: github.ref_name == 'dev'
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      ECR_REPOSITORY: rivet-dev
+      IMAGE_TAG: ${{ github.sha }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Update launch template with new image tag
+        id: update-lt
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          # Find the launch template for this environment
+          LT_NAME=$(aws ec2 describe-launch-templates \
+            --filters "Name=tag:Project,Values=rivet" "Name=tag:Environment,Values=dev" \
+            --query 'LaunchTemplates[0].LaunchTemplateName' \
+            --output text)
+
+          if [[ -z "$LT_NAME" || "$LT_NAME" == "None" ]]; then
+            echo "::error::Could not find launch template for Project=rivet Environment=dev"
+            exit 1
+          fi
+          echo "Found launch template: $LT_NAME"
+
+          # Decode existing user_data
+          CURRENT_USER_DATA=$(aws ec2 describe-launch-template-versions \
+            --launch-template-name "$LT_NAME" \
+            --versions '$Latest' \
+            --query 'LaunchTemplateVersions[0].LaunchTemplateData.UserData' \
+            --output text)
+
+          DECODED=$(echo "$CURRENT_USER_DATA" | base64 -d)
+
+          # Replace the image tag — the ECR image appears as registry/repo:TAG
+          # Replace any existing tag after the ECR repo name with the new SHA
+          UPDATED=$(echo "$DECODED" | sed "s|${ECR_REGISTRY}/${ECR_REPOSITORY}:[^[:space:]]*|${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}|g")
+          NEW_USER_DATA=$(echo "$UPDATED" | base64 -w 0)
+
+          # Create a new launch template version
+          NEW_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-name "$LT_NAME" \
+            --source-version '$Latest' \
+            --launch-template-data "{\"UserData\":\"$NEW_USER_DATA\"}" \
+            --query 'LaunchTemplateVersion.VersionNumber' \
+            --output text)
+
+          echo "Created launch template version: $NEW_VERSION"
+
+          # Set new version as the default
+          aws ec2 modify-launch-template \
+            --launch-template-name "$LT_NAME" \
+            --default-version "$NEW_VERSION"
+
+          echo "lt_name=$LT_NAME"       >> $GITHUB_OUTPUT
+          echo "lt_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Set default version to $NEW_VERSION"
 
       - name: Get Auto Scaling Group name
         id: get-asg
         run: |
           ASG_NAME=$(aws autoscaling describe-auto-scaling-groups \
-            --query "AutoScalingGroups[?Tags[?Key=='Project' && Value=='rivet'] && Tags[?Key=='Environment' && Value=='dev']].AutoScalingGroupName" \
+            --filters "Name=tag:Project,Values=rivet" "Name=tag:Environment,Values=dev" \
+            --query 'AutoScalingGroups[0].AutoScalingGroupName' \
             --output text)
-          echo "asg_name=$ASG_NAME" >> $GITHUB_OUTPUT
 
-      - name: Trigger instance refresh
+          if [[ -z "$ASG_NAME" || "$ASG_NAME" == "None" ]]; then
+            echo "::error::Could not find ASG for Project=rivet Environment=dev"
+            exit 1
+          fi
+
+          echo "asg_name=$ASG_NAME" >> $GITHUB_OUTPUT
+          echo "Found ASG: $ASG_NAME"
+
+      - name: Start instance refresh
+        id: refresh
         env:
           ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
-          IMAGE_TAG: ${{ github.sha }}
         run: |
-          # Check if there's already an instance refresh in progress
-          EXISTING_STATUS=$(aws autoscaling describe-instance-refreshes \
-            --auto-scaling-group-name $ASG_NAME \
-            --query 'InstanceRefreshes[0].Status' \
-            --output text 2>/dev/null || echo "None")
-          
-          if [ "$EXISTING_STATUS" = "InProgress" ] || [ "$EXISTING_STATUS" = "Pending" ]; then
-            echo "⚠️  Instance refresh already in progress"
-            echo "Status: $EXISTING_STATUS"
-            echo ""
-            echo "The previous deployment is still running."
-            echo "This is normal - the new image will be used when the current refresh completes."
-            echo ""
-            echo "Current refresh will continue with the latest image from ECR."
+          # Cancel any stale refresh that is Pending (not InProgress — those are live)
+          EXISTING=$(aws autoscaling describe-instance-refreshes \
+            --auto-scaling-group-name "$ASG_NAME" \
+            --query 'InstanceRefreshes[0].{Status:Status,Id:InstanceRefreshId}' \
+            --output json 2>/dev/null || echo '{}')
+
+          STATUS=$(echo "$EXISTING" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('Status','None'))" 2>/dev/null || echo "None")
+
+          if [[ "$STATUS" == "InProgress" ]]; then
+            echo "::warning::Another instance refresh is already in progress — queuing after it completes is not supported. New image is in ECR; re-run this workflow after the current refresh finishes."
             exit 0
           fi
-          
-          # Start instance refresh for zero-downtime deployment
-          echo "Starting instance refresh for zero-downtime deployment..."
-          aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name $ASG_NAME \
+
+          REFRESH_ID=$(aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name "$ASG_NAME" \
             --preferences '{
               "MinHealthyPercentage": 90,
               "InstanceWarmup": 300,
               "CheckpointPercentages": [50, 100],
-              "CheckpointDelay": 300
-            }'
-          
-          echo "✓ Instance refresh started for ASG: $ASG_NAME"
-          echo "New instances will pull image: $IMAGE_TAG"
+              "CheckpointDelay": 120,
+              "SkipMatching": false
+            }' \
+            --query 'InstanceRefreshId' \
+            --output text)
 
-      - name: Monitor deployment status
+          echo "refresh_id=$REFRESH_ID" >> $GITHUB_OUTPUT
+          echo "Started instance refresh: $REFRESH_ID"
+
+      - name: Monitor instance refresh
         env:
           ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
+          REFRESH_ID: ${{ steps.refresh.outputs.refresh_id }}
         run: |
-          echo "Instance refresh started successfully!"
-          echo "Checking initial status..."
-          
-          # Check status a few times to ensure it started properly
-          for i in {1..3}; do
-            STATUS=$(aws autoscaling describe-instance-refreshes \
-              --auto-scaling-group-name $ASG_NAME \
-              --query 'InstanceRefreshes[0].Status' \
-              --output text)
-            
-            PERCENT=$(aws autoscaling describe-instance-refreshes \
-              --auto-scaling-group-name $ASG_NAME \
-              --query 'InstanceRefreshes[0].PercentageComplete' \
-              --output text)
-            
-            echo "Status: $STATUS | Progress: $PERCENT%"
-            
-            if [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ]; then
-              echo "✗ Deployment failed with status: $STATUS"
-              exit 1
-            fi
-            
-            if [ "$STATUS" = "Successful" ]; then
-              echo "✓ Deployment completed successfully!"
+          if [[ -z "$REFRESH_ID" ]]; then
+            echo "No refresh ID (skipped above) — exiting."
+            exit 0
+          fi
+
+          echo "Monitoring instance refresh $REFRESH_ID..."
+          for i in $(seq 1 6); do
+            RESULT=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name "$ASG_NAME" \
+              --instance-refresh-ids "$REFRESH_ID" \
+              --query 'InstanceRefreshes[0].{Status:Status,Pct:PercentageComplete,Reason:StatusReason}' \
+              --output json)
+
+            STATUS=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin)['Status'])")
+            PCT=$(echo "$RESULT"    | python3 -c "import sys,json; print(json.load(sys.stdin).get('PercentageComplete',0))")
+            REASON=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('Reason',''))")
+
+            echo "  check $i/6 — status: $STATUS  progress: ${PCT}%"
+
+            if [[ "$STATUS" == "Successful" ]]; then
+              echo "Instance refresh completed successfully."
               exit 0
             fi
-            
-            sleep 10
+
+            if [[ "$STATUS" == "Failed" || "$STATUS" == "Cancelled" || "$STATUS" == "RollbackSuccessful" ]]; then
+              echo "::error::Instance refresh $STATUS: $REASON"
+              exit 1
+            fi
+
+            sleep 20
           done
-          
+
+          echo "Instance refresh is in progress and healthy (${PCT}% complete)."
+          echo "Deployment will continue in the background — estimated ~25–40 min total."
           echo ""
-          echo "✓ Deployment is in progress and healthy"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "The deployment will continue in the background."
-          echo "Estimated completion time: 25-40 minutes"
-          echo ""
-          echo "Monitor progress with:"
+          echo "Monitor with:"
           echo "  aws autoscaling describe-instance-refreshes \\"
           echo "    --auto-scaling-group-name $ASG_NAME \\"
-          echo "    --max-records 1"
-          echo ""
-          echo "The deployment will complete automatically."
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "    --instance-refresh-ids $REFRESH_ID"
+
+      - name: Rollback on failure
+        if: failure() && steps.refresh.outputs.refresh_id != ''
+        env:
+          ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
+          REFRESH_ID: ${{ steps.refresh.outputs.refresh_id }}
+        run: |
+          echo "Attempting to cancel instance refresh $REFRESH_ID..."
+          aws autoscaling cancel-instance-refresh \
+            --auto-scaling-group-name "$ASG_NAME" || true
 
       - name: Deployment summary
         if: success()
         run: |
-          echo "🚀 Deployment Summary"
-          echo "===================="
-          echo "Image: ${{ steps.build-image.outputs.image }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Deployed by: ${{ github.actor }}"
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
+          ## Deployment Summary — Dev
+          | Field       | Value |
+          |-------------|-------|
+          | Image       | \`$ECR_REPOSITORY:$IMAGE_TAG\` |
+          | Commit      | \`${{ github.sha }}\` |
+          | Branch      | \`${{ github.ref_name }}\` |
+          | Actor       | ${{ github.actor }} |
+          | LT Version  | ${{ steps.update-lt.outputs.lt_version }} |
+          EOF
+
+  # ── Deploy to Production ──────────────────────────────────────────────────
+  deploy-prod:
+    name: Deploy → Production
+    needs: build
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    # Requires a reviewer approval in GitHub → Settings → Environments → production
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      ECR_REPOSITORY: rivet-prod
+      IMAGE_TAG: ${{ github.sha }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (production role)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Update launch template with new image tag
+        id: update-lt
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          LT_NAME=$(aws ec2 describe-launch-templates \
+            --filters "Name=tag:Project,Values=rivet" "Name=tag:Environment,Values=prod" \
+            --query 'LaunchTemplates[0].LaunchTemplateName' \
+            --output text)
+
+          if [[ -z "$LT_NAME" || "$LT_NAME" == "None" ]]; then
+            echo "::error::Could not find launch template for Project=rivet Environment=prod"
+            exit 1
+          fi
+          echo "Found launch template: $LT_NAME"
+
+          CURRENT_USER_DATA=$(aws ec2 describe-launch-template-versions \
+            --launch-template-name "$LT_NAME" \
+            --versions '$Latest' \
+            --query 'LaunchTemplateVersions[0].LaunchTemplateData.UserData' \
+            --output text)
+
+          DECODED=$(echo "$CURRENT_USER_DATA" | base64 -d)
+
+          UPDATED=$(echo "$DECODED" | sed "s|${ECR_REGISTRY}/${ECR_REPOSITORY}:[^[:space:]]*|${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}|g")
+          NEW_USER_DATA=$(echo "$UPDATED" | base64 -w 0)
+
+          NEW_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-name "$LT_NAME" \
+            --source-version '$Latest' \
+            --launch-template-data "{\"UserData\":\"$NEW_USER_DATA\"}" \
+            --query 'LaunchTemplateVersion.VersionNumber' \
+            --output text)
+
+          aws ec2 modify-launch-template \
+            --launch-template-name "$LT_NAME" \
+            --default-version "$NEW_VERSION"
+
+          echo "lt_name=$LT_NAME"       >> $GITHUB_OUTPUT
+          echo "lt_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Launch template updated to version $NEW_VERSION"
+
+      - name: Get Auto Scaling Group name
+        id: get-asg
+        run: |
+          ASG_NAME=$(aws autoscaling describe-auto-scaling-groups \
+            --filters "Name=tag:Project,Values=rivet" "Name=tag:Environment,Values=prod" \
+            --query 'AutoScalingGroups[0].AutoScalingGroupName' \
+            --output text)
+
+          if [[ -z "$ASG_NAME" || "$ASG_NAME" == "None" ]]; then
+            echo "::error::Could not find ASG for Project=rivet Environment=prod"
+            exit 1
+          fi
+
+          echo "asg_name=$ASG_NAME" >> $GITHUB_OUTPUT
+          echo "Found ASG: $ASG_NAME"
+
+      - name: Start instance refresh
+        id: refresh
+        env:
+          ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
+        run: |
+          EXISTING=$(aws autoscaling describe-instance-refreshes \
+            --auto-scaling-group-name "$ASG_NAME" \
+            --query 'InstanceRefreshes[0].{Status:Status,Id:InstanceRefreshId}' \
+            --output json 2>/dev/null || echo '{}')
+
+          STATUS=$(echo "$EXISTING" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('Status','None'))" 2>/dev/null || echo "None")
+
+          if [[ "$STATUS" == "InProgress" ]]; then
+            echo "::warning::Another instance refresh is already in progress. New image is in ECR; re-run after the current refresh finishes."
+            exit 0
+          fi
+
+          # Production uses more conservative settings
+          REFRESH_ID=$(aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name "$ASG_NAME" \
+            --preferences '{
+              "MinHealthyPercentage": 100,
+              "InstanceWarmup": 300,
+              "CheckpointPercentages": [25, 50, 75, 100],
+              "CheckpointDelay": 300,
+              "SkipMatching": false
+            }' \
+            --query 'InstanceRefreshId' \
+            --output text)
+
+          echo "refresh_id=$REFRESH_ID" >> $GITHUB_OUTPUT
+          echo "Started production instance refresh: $REFRESH_ID"
+
+      - name: Monitor instance refresh
+        env:
+          ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
+          REFRESH_ID: ${{ steps.refresh.outputs.refresh_id }}
+        run: |
+          if [[ -z "$REFRESH_ID" ]]; then
+            exit 0
+          fi
+
+          echo "Monitoring instance refresh $REFRESH_ID..."
+          for i in $(seq 1 6); do
+            RESULT=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name "$ASG_NAME" \
+              --instance-refresh-ids "$REFRESH_ID" \
+              --query 'InstanceRefreshes[0].{Status:Status,Pct:PercentageComplete,Reason:StatusReason}' \
+              --output json)
+
+            STATUS=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin)['Status'])")
+            PCT=$(echo "$RESULT"    | python3 -c "import sys,json; print(json.load(sys.stdin).get('PercentageComplete',0))")
+            REASON=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('Reason',''))")
+
+            echo "  check $i/6 — status: $STATUS  progress: ${PCT}%"
+
+            if [[ "$STATUS" == "Successful" ]]; then
+              echo "Production deployment completed successfully."
+              exit 0
+            fi
+
+            if [[ "$STATUS" == "Failed" || "$STATUS" == "Cancelled" || "$STATUS" == "RollbackSuccessful" ]]; then
+              echo "::error::Instance refresh $STATUS: $REASON"
+              exit 1
+            fi
+
+            sleep 20
+          done
+
+          echo "Production deployment is in progress and healthy (${PCT}% complete)."
+
+      - name: Rollback on failure
+        if: failure() && steps.refresh.outputs.refresh_id != ''
+        env:
+          ASG_NAME: ${{ steps.get-asg.outputs.asg_name }}
+          REFRESH_ID: ${{ steps.refresh.outputs.refresh_id }}
+        run: |
+          echo "::error::Deployment failed — cancelling instance refresh $REFRESH_ID"
+          aws autoscaling cancel-instance-refresh \
+            --auto-scaling-group-name "$ASG_NAME" || true
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
+          ## Deployment Summary — Production
+          | Field       | Value |
+          |-------------|-------|
+          | Image       | \`$ECR_REPOSITORY:$IMAGE_TAG\` |
+          | Commit      | \`${{ github.sha }}\` |
+          | Branch      | \`${{ github.ref_name }}\` |
+          | Actor       | ${{ github.actor }} |
+          | LT Version  | ${{ steps.update-lt.outputs.lt_version }} |
+          EOF

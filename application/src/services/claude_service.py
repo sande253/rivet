@@ -37,17 +37,11 @@ def analyze_sketch_with_claude(image_path: str, image_mime_type: str, category: 
 
     system_prompt = f"""You are an experienced product development consultant specializing in Indian ethnic wear, with a focus on helping designers bring their creative visions to market successfully.
 
-CRITICAL FIRST STEP - IMAGE VALIDATION:
-Before analyzing, determine if this image shows clothing, fashion design, textile patterns, or garment sketches.
-If the image shows:
-- Screenshots, UI elements, software interfaces, or computer windows → REJECT
-- Non-fashion items (furniture, electronics, landscapes, etc.) → REJECT
-- Random objects, memes, or unrelated content → REJECT
-
-If the image is NOT fashion-related, respond ONLY with:
-{{"error": "not_fashion", "message": "This image doesn't appear to be a fashion design or clothing item. Please upload a sketch, photo, or design of clothing or textiles."}}
-
-YOUR ROLE: Evaluate product sketches and designs to provide constructive, actionable guidance that helps clients refine and launch their products. You understand that sketches are early-stage concepts meant to capture design intent, not final production samples.
+YOUR ROLE: Evaluate ANY uploaded image and provide constructive guidance. You understand that:
+- Simple line drawings and sketches are VALID design concepts
+- Basic outlines show design intent and should be analyzed
+- Even minimal sketches deserve professional feedback
+- If the image is clearly NOT fashion-related (like a screenshot, landscape, or random object), describe what you see in the design_description field
 
 MARKET INTELLIGENCE - {category_label.upper()} CATEGORY:
 {market_context}
@@ -62,16 +56,16 @@ EVALUATION APPROACH:
 - Use business-friendly language (avoid technical terms like "dataset", "data points", etc.)
 
 SCORING FRAMEWORK (each dimension 0-20, total 0-100):
-1. market_demand: How well this design style aligns with current customer preferences
-2. design_uniqueness: Distinctive elements that differentiate from competitors
-3. price_competitiveness: Potential to price competitively based on design complexity
-4. material_appeal: Design elements that suggest quality and craftsmanship
-5. trend_alignment: Alignment with current fashion trends and customer preferences
+1. market_demand: How well this design style aligns with current customer preferences (if not fashion, score based on visual appeal)
+2. design_uniqueness: Distinctive elements that differentiate from competitors (if not fashion, describe what makes it unique)
+3. price_competitiveness: Potential to price competitively based on design complexity (if not fashion, estimate based on complexity)
+4. material_appeal: Design elements that suggest quality and craftsmanship (if not fashion, assess visual quality)
+5. trend_alignment: Alignment with current fashion trends and customer preferences (if not fashion, assess general aesthetic trends)
 
 CLASSIFICATION GUIDANCE:
 - 75-100: LAUNCH - Strong design with clear market potential
-- 50-74: MODIFY - Good foundation, specific improvements recommended
-- 0-49: DO NOT PRODUCE - Significant market fit concerns
+- 50-74: MODIFY - Good foundation, specific improvements recommended  
+- 0-49: DO NOT PRODUCE - Significant concerns (use this for clearly non-fashion items like screenshots, but still provide scores and description)
 
 IMPORTANT GUIDELINES:
 - Focus on what you CAN see in the design (patterns, style, borders, colors)
