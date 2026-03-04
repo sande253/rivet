@@ -132,7 +132,7 @@ class TestGenerateGroundedTips:
             "improved_tips": "",
         })
 
-        with patch("application.src.services.genai._client") as mock_client_fn:
+        with patch("src.services.genai._client") as mock_client_fn:
             mock_client = MagicMock()
             mock_client.messages.create.side_effect = [
                 _make_mock_response(draft_text),   # draft call
@@ -171,7 +171,7 @@ class TestGenerateGroundedTips:
             "improved_tips": "",
         })
 
-        with patch("application.src.services.genai._client") as mock_client_fn:
+        with patch("src.services.genai._client") as mock_client_fn:
             mock_client = MagicMock()
             mock_client.messages.create.side_effect = [
                 _make_mock_response(draft_text),     # first draft
@@ -200,7 +200,7 @@ class TestGenerateGroundedTips:
             "improved_tips": improved,
         })
 
-        with patch("application.src.services.genai._client") as mock_client_fn:
+        with patch("src.services.genai._client") as mock_client_fn:
             mock_client = MagicMock()
             mock_client.messages.create.side_effect = [
                 _make_mock_response(draft_text),
@@ -223,7 +223,7 @@ class TestGenerateGroundedTips:
         cb.record_failure()  # opens circuit
 
         # Patch module-level circuit breaker
-        with patch("application.src.services.genai._circuit_breaker", cb):
+        with patch("src.services.genai._circuit_breaker", cb):
             result = generate_grounded_tips(
                 api_key="test-key",
                 context="ctx",
@@ -233,13 +233,13 @@ class TestGenerateGroundedTips:
         assert result == _empty_genai()
 
     def test_exception_returns_empty_and_records_failure(self):
-        with patch("application.src.services.genai._client") as mock_client_fn:
+        with patch("src.services.genai._client") as mock_client_fn:
             mock_client = MagicMock()
             mock_client.messages.create.side_effect = Exception("API error")
             mock_client_fn.return_value = mock_client
 
             cb = CircuitBreaker(failure_threshold=5, window_seconds=60, circuit_timeout_seconds=300)
-            with patch("application.src.services.genai._circuit_breaker", cb):
+            with patch("src.services.genai._circuit_breaker", cb):
                 result = generate_grounded_tips(
                     api_key="test-key",
                     context="ctx",
@@ -267,7 +267,7 @@ class TestVisionAssist:
         vision_json = json.dumps({"fabric": "kanjivaram silk", "palette": "gold, red, green"})
 
         with patch.dict("os.environ", {"VISION_MODEL_ID": "claude-sonnet-4-6"}):
-            with patch("application.src.services.genai._client") as mock_client_fn:
+            with patch("src.services.genai._client") as mock_client_fn:
                 mock_client = MagicMock()
                 mock_client.messages.create.return_value = _make_mock_response(vision_json)
                 mock_client_fn.return_value = mock_client
@@ -282,7 +282,7 @@ class TestVisionAssist:
         img.write_bytes(b"\x89PNG\r\n\x1a\n")
 
         with patch.dict("os.environ", {"VISION_MODEL_ID": "claude-sonnet-4-6"}):
-            with patch("application.src.services.genai._client") as mock_client_fn:
+            with patch("src.services.genai._client") as mock_client_fn:
                 mock_client = MagicMock()
                 mock_client.messages.create.side_effect = Exception("Vision API down")
                 mock_client_fn.return_value = mock_client
