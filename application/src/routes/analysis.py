@@ -91,33 +91,34 @@ def analyze():
         log.info("Image rejected (not fashion): %s", exc)
         return jsonify({"error": str(exc)}), 400
 
-    # ── Optional: vision assist for fabric/palette extraction ─────────
-    # API key is optional when using Bedrock (USE_BEDROCK=true)
-    api_key = current_app.config.get("ANTHROPIC_API_KEY", "")
-    vision_attrs: dict = {}
-    if current_app.config.get("VISION_MODEL_ID"):
-        from ..services.genai import vision_assist
-        vision_attrs = vision_assist(api_key, filepath, mime_type)
-        if vision_attrs:
-            result["genai_vision"] = vision_attrs
+    try:
+        # ── Optional: vision assist for fabric/palette extraction ─────────
+        # API key is optional when using Bedrock (USE_BEDROCK=true)
+        api_key = current_app.config.get("ANTHROPIC_API_KEY", "")
+        vision_attrs: dict = {}
+        if current_app.config.get("VISION_MODEL_ID"):
+            from ..services.genai import vision_assist
+            vision_attrs = vision_assist(api_key, filepath, mime_type)
+            if vision_attrs:
+                result["genai_vision"] = vision_attrs
 
-    # ── Grounded context (CSV RAG-lite) ───────────────────────────────
-    df = load_df(category)
-    category_label = category_labels[category]
+        # ── Grounded context (CSV RAG-lite) ───────────────────────────────
+        df = load_df(category)
+        category_label = category_labels[category]
 
-    # Enrich description with vision-extracted attributes
-    enriched_desc = description
-    if vision_attrs.get("fabric"):
-        enriched_desc = (
-            f"Fabric: {vision_attrs['fabric']}. "
-            f"Palette: {vision_attrs.get('palette', '')}. "
-            + enriched_desc
-        ).strip()
+        # Enrich description with vision-extracted attributes
+        enriched_desc = description
+        if vision_attrs.get("fabric"):
+            enriched_desc = (
+                f"Fabric: {vision_attrs['fabric']}. "
+                f"Palette: {vision_attrs.get('palette', '')}. "
+                + enriched_desc
+            ).strip()
 
-    context = build_context(enriched_desc, price, category, category_label, df)
-    result["grounding_context"] = context
+        context = build_context(enriched_desc, price, category, category_label, df)
+        result["grounding_context"] = context
 
-    # ── GenAI Draft → Critic loop ─────────────────────────────────────
+        # ── GenAI Draft → Critic loop ─────────────────────────────────────
         if current_app.config.get("GENAI_ENABLED", True):
             from ..services.cache_service import cache_get, cache_set, make_analysis_key
             from ..services.safety import post_flight_clean, pre_flight_check
