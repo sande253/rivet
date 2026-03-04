@@ -384,7 +384,16 @@ jobs:
 
           DECODED=$(echo "$CURRENT_USER_DATA" | base64 -d)
 
+          # Replace image tag
           UPDATED=$(echo "$DECODED" | sed "s|${ECR_REGISTRY}/${ECR_REPOSITORY}:[^[:space:]]*|${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}|g")
+          
+          # Validate the updated script has balanced quotes
+          if ! echo "$UPDATED" | bash -n 2>/dev/null; then
+            echo "::error::Updated user_data script has syntax errors. Aborting deployment."
+            echo "This usually means the sed replacement broke quote balancing."
+            exit 1
+          fi
+          
           NEW_USER_DATA=$(echo "$UPDATED" | base64 -w 0)
 
           NEW_VERSION=$(aws ec2 create-launch-template-version \
