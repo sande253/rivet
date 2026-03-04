@@ -66,8 +66,8 @@ class TestFindSimilar:
         assert any("Banarasi" in t or "Silk" in t or "Wedding" in t for t in titles)
 
     def test_returns_empty_for_no_overlap(self, sample_df):
-        results = _find_similar("zari brocade lehenga", sample_df, top_n=5)
-        # no title in sample_df contains "lehenga" or "brocade"
+        results = _find_similar("velvet brocade lehenga", sample_df, top_n=5)
+        # no title in sample_df contains "velvet", "brocade", or "lehenga"
         assert results == []
 
     def test_respects_top_n_limit(self, sample_df):

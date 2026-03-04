@@ -51,9 +51,9 @@ def pre_flight_check(text: str) -> tuple[bool, str]:
 
     lower = text.lower()
 
-    # Profanity
+    # Profanity - check if profane word appears anywhere (including as part of other words)
     for word in _PROFANITY:
-        if re.search(r"\b" + re.escape(word) + r"\b", lower):
+        if word in lower:
             log.warning("Pre-flight blocked: profanity (%s)", word)
             return False, "Content policy violation: inappropriate language detected."
 
