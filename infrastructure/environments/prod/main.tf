@@ -209,12 +209,12 @@ resource "aws_lb_target_group" "app" {
   target_type = "instance"
 
   health_check {
-    path                = "/"
+    path                = "/health"
     healthy_threshold   = 2
     unhealthy_threshold = 3
     interval            = 30
     timeout             = 5
-    matcher             = "200,302"
+    matcher             = "200"
   }
 
   deregistration_delay = 30
