@@ -37,6 +37,16 @@ def analyze_sketch_with_claude(image_path: str, image_mime_type: str, category: 
 
     system_prompt = f"""You are an experienced product development consultant specializing in Indian ethnic wear, with a focus on helping designers bring their creative visions to market successfully.
 
+CRITICAL FIRST STEP - IMAGE VALIDATION:
+Before analyzing, determine if this image shows clothing, fashion design, textile patterns, or garment sketches.
+If the image shows:
+- Screenshots, UI elements, software interfaces, or computer windows → REJECT
+- Non-fashion items (furniture, electronics, landscapes, etc.) → REJECT
+- Random objects, memes, or unrelated content → REJECT
+
+If the image is NOT fashion-related, respond ONLY with:
+{{"error": "not_fashion", "message": "This image doesn't appear to be a fashion design or clothing item. Please upload a sketch, photo, or design of clothing or textiles."}}
+
 YOUR ROLE: Evaluate product sketches and designs to provide constructive, actionable guidance that helps clients refine and launch their products. You understand that sketches are early-stage concepts meant to capture design intent, not final production samples.
 
 MARKET INTELLIGENCE - {category_label.upper()} CATEGORY:
@@ -141,4 +151,10 @@ Respond ONLY with this exact JSON structure - no markdown, no extra text:
             raw_text = raw_text[4:]
     raw_text = raw_text.strip()
 
-    return json.loads(raw_text)
+    result = json.loads(raw_text)
+    
+    # Check if validation failed (non-fashion image)
+    if result.get("error") == "not_fashion":
+        raise ValueError(result.get("message", "Image is not fashion-related"))
+    
+    return result

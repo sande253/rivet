@@ -85,6 +85,11 @@ def analyze():
         # ── Core deterministic analysis (Claude vision) ───────────────────
         result = analyze_sketch_with_claude(filepath, mime_type, category)
         result["image_url"] = f"/static/uploads/{filename}"
+    
+    except ValueError as exc:
+        # Handle non-fashion image rejection
+        log.info("Image rejected (not fashion): %s", exc)
+        return jsonify({"error": str(exc)}), 400
 
         # ── Optional: vision assist for fabric/palette extraction ─────────
         # API key is optional when using Bedrock (USE_BEDROCK=true)
