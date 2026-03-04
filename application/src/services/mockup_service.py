@@ -52,10 +52,12 @@ def _build_prompt(category: str, description: str) -> str:
     )
     extra = f", {description}" if description else ""
     return (
-        f"Photorealistic fashion product photograph of a {base}{extra}. "
-        "Professional studio lighting, pure white background, realistic fabric "
-        "folds and draping, high-detail textile texture, sharp focus, "
-        "commercial fashion photography style, no mannequin."
+        f"Professional fashion product photography: {base}{extra}. "
+        "Worn by model, full body shot, studio lighting with soft shadows, "
+        "clean white background, ultra-realistic fabric texture with visible weave, "
+        "natural draping and folds, high resolution commercial photography, "
+        "professional color grading, sharp details, photorealistic rendering, "
+        "magazine quality fashion shoot."
     )
 
 
@@ -152,17 +154,18 @@ def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
         "imageVariationParams": {
             "text": prompt,
             "negativeText": (
-                "blurry, cartoon, sketch, drawing, low quality, watermark, "
-                "cropped, deformed, out of frame"
+                "blurry, cartoon, sketch, drawing, line art, pencil drawing, "
+                "low quality, watermark, cropped, deformed, out of frame, "
+                "unrealistic, flat colors, amateur, pixelated"
             ),
             "images": [sketch_b64],
-            "similarityStrength": 0.7,
+            "similarityStrength": 0.4,  # Lower value = more creative/realistic interpretation
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
-            "width": 512,
-            "height": 512,
-            "cfgScale": 8.0,
+            "width": 768,  # Higher resolution for better quality
+            "height": 1024,  # Portrait orientation for fashion
+            "cfgScale": 10.0,  # Higher value = stronger prompt adherence
         },
     }
 
