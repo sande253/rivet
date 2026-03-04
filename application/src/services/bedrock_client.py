@@ -82,7 +82,11 @@ class MessagesAPI:
         # Convert model ID to Bedrock format if needed
         bedrock_model = self._convert_model_id(model)
         
-        # Build Bedrock request body
+        # Check if using Titan model (different API format)
+        if bedrock_model.startswith("amazon.titan"):
+            return self._invoke_titan(bedrock_model, max_tokens, messages, system, **kwargs)
+        
+        # Build Bedrock request body for Anthropic models
         body = {
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": max_tokens,
@@ -111,6 +115,69 @@ class MessagesAPI:
             
         except Exception as e:
             log.error("Bedrock invocation failed: %s", e)
+            raise
+    
+    def _invoke_titan(
+        self,
+        model: str,
+        max_tokens: int,
+        messages: list[dict],
+        system: str = None,
+        **kwargs
+    ) -> "MessageResponse":
+        """Invoke Amazon Titan model (different API format)."""
+        # Convert messages to Titan format
+        prompt = ""
+        if system:
+            prompt = f"{system}\n\n"
+        
+        for msg in messages:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            
+            # Handle content that might be a list (for images)
+            if isinstance(content, list):
+                text_parts = [c.get("text", "") for c in content if c.get("type") == "text"]
+                content = " ".join(text_parts)
+            
+            if role == "user":
+                prompt += f"User: {content}\n\n"
+            elif role == "assistant":
+                prompt += f"Assistant: {content}\n\n"
+        
+        prompt += "Assistant:"
+        
+        # Build Titan request body
+        body = {
+            "inputText": prompt,
+            "textGenerationConfig": {
+                "maxTokenCount": max_tokens,
+                "temperature": kwargs.get("temperature", 0.7),
+                "topP": kwargs.get("top_p", 0.9),
+            }
+        }
+        
+        try:
+            response = self.client.invoke_model(
+                modelId=model,
+                contentType="application/json",
+                accept="application/json",
+                body=json.dumps(body),
+            )
+            
+            result = json.loads(response["body"].read())
+            
+            # Convert Titan response to Anthropic format
+            text = result.get("results", [{}])[0].get("outputText", "")
+            
+            return MessageResponse({
+                "content": [{"type": "text", "text": text}],
+                "role": "assistant",
+                "model": model,
+            })
+            
+        except Exception as e:
+            log.error("Titan invocation failed: %s", e)
             raise
 
     def stream(
@@ -153,38 +220,37 @@ class MessagesAPI:
     def _convert_model_id(self, model: str) -> str:
         """Convert Anthropic model ID to Bedrock format.
         
-        Uses Claude 3 Haiku which supports on-demand throughput.
-        Claude 3.5 models require inference profiles which have permission issues.
+        Uses Amazon Titan Text which doesn't require approval.
         
         Examples:
-            claude-opus-4-6 → anthropic.claude-3-haiku-20240307-v1:0
-            claude-sonnet-4-6 → anthropic.claude-3-haiku-20240307-v1:0
-            claude-haiku-4-5-20251001 → anthropic.claude-3-haiku-20240307-v1:0
+            claude-opus-4-6 → amazon.titan-tg1-large
+            claude-sonnet-4-6 → amazon.titan-tg1-large
+            claude-haiku-4-5-20251001 → amazon.titan-tg1-large
         """
         # If already in Bedrock format, return as-is
-        if model.startswith("anthropic."):
+        if model.startswith("anthropic.") or model.startswith("amazon."):
             return model
         
         # Strip us. prefix if present
         if model.startswith("us.anthropic."):
             return model.replace("us.anthropic.", "anthropic.")
         
-        # Map all models to Claude 3 Haiku (supports on-demand throughput)
-        # Claude 3.5 models require inference profiles which have permission issues
+        # Map all models to Amazon Titan Text (no approval needed)
         model_map = {
-            "claude-opus-4-6": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-sonnet-4-6": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-3-5-sonnet-20241022": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-haiku-4-5-20251001": "anthropic.claude-3-haiku-20240307-v1:0",
-            "claude-3-5-haiku-20241022": "anthropic.claude-3-haiku-20240307-v1:0",
+            "claude-opus-4-6": "amazon.titan-tg1-large",
+            "claude-sonnet-4-6": "amazon.titan-tg1-large",
+            "claude-3-5-sonnet-20241022": "amazon.titan-tg1-large",
+            "claude-haiku-4-5-20251001": "amazon.titan-tg1-large",
+            "claude-3-5-haiku-20241022": "amazon.titan-tg1-large",
+            "claude-3-haiku-20240307": "amazon.titan-tg1-large",
         }
         
         if model in model_map:
             return model_map[model]
         
-        # Default fallback to Claude 3 Haiku
-        log.warning("Unknown model ID '%s', using Claude 3 Haiku", model)
-        return "anthropic.claude-3-haiku-20240307-v1:0"
+        # Default fallback to Amazon Titan Text
+        log.warning("Unknown model ID '%s', using Amazon Titan Text", model)
+        return "amazon.titan-tg1-large"
 
 
 
