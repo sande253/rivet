@@ -2728,20 +2728,34 @@ function sanitizePriceInput(el) {
 }
 
 var rawMarket = [];
+var marketDataLoaded = false;
 
 // Load market data from API
 function loadMarketData() {
+  console.log('Loading market data from API...');
   fetch('/market/products')
-    .then(function(response) { return response.json(); })
+    .then(function(response) { 
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        throw new Error('Network response was not ok: ' + response.status);
+      }
+      return response.json(); 
+    })
     .then(function(data) {
+      console.log('Received data:', data);
       rawMarket = data.products || [];
+      marketDataLoaded = true;
+      console.log('Loaded', rawMarket.length, 'products');
+      
+      // If market page is active, initialize it
       if (document.getElementById('page-market').classList.contains('active')) {
         initMarket();
       }
     })
     .catch(function(error) {
       console.error('Error loading market data:', error);
-      showToast('Failed to load market data', 'error');
+      showToast('Failed to load market data: ' + error.message, 'error');
+      marketDataLoaded = true; // Set to true to prevent infinite loading
     });
 }
 
@@ -2796,6 +2810,13 @@ function applyTableFilters() {
 }
 
 function initMarket() {
+  if (!marketDataLoaded) {
+    console.log('Market data not loaded yet, waiting...');
+    setTimeout(initMarket, 100);
+    return;
+  }
+  
+  console.log('Initializing market with', rawMarket.length, 'products');
   marketLoaded = true;
   marketPage = 1;
   allRenderedRows = [];
