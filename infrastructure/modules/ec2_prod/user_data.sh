@@ -213,10 +213,6 @@ docker run -d \
     -e SECRET_KEY="$SECRET_KEY" \
     -e AWS_REGION=${aws_region} \
     -e AWS_DEFAULT_REGION=${aws_region} \
-    -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
-    -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-    -e AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN" \
-    -e AWS_EC2_METADATA_DISABLED=true \
     -e S3_BUCKET=${upload_bucket_name} \
     -e USE_BEDROCK="${use_bedrock}" \
     $ANTHROPIC_ENV \
