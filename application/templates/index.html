@@ -116,61 +116,31 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   min-height: 600px;
 }
 
-/* Animated background layers */
+/* Animated background layers - simplified */
 .home-hero::before {
   content: '';
   position: absolute; 
   inset: 0;
   background-image:
-    radial-gradient(circle at 20% 80%, rgba(236,230,208,0.12) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(45,139,107,0.5) 0%, transparent 60%),
-    radial-gradient(circle at 50% 50%, rgba(27,82,71,0.3) 0%, transparent 70%);
+    radial-gradient(circle at 20% 80%, rgba(236,230,208,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(45,139,107,0.3) 0%, transparent 60%);
   pointer-events: none;
   animation: gradientShift 20s ease infinite;
-  opacity: 0.8;
+  opacity: 0.6;
 }
 
-/* Floating geometric shapes */
+/* Floating geometric shapes - simplified */
 .home-hero::after {
   content: '';
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(236,230,208,0.1) 0%, transparent 25%),
-    radial-gradient(circle at 85% 85%, rgba(158,122,26,0.15) 0%, transparent 30%);
+    radial-gradient(circle at 15% 15%, rgba(236,230,208,0.06) 0%, transparent 25%);
   animation: float 8s ease-in-out infinite;
   pointer-events: none;
 }
 
-/* Parallax layers */
-.parallax-layer {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.parallax-layer-1 {
-  background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='rgba(236,230,208,0.03)' /%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  animation: parallaxMove1 30s linear infinite;
-}
-
-.parallax-layer-2 {
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='none' stroke='rgba(45,139,107,0.08)' stroke-width='1'/%3E%3C/svg%3E");
-  background-size: 150px 150px;
-  animation: parallaxMove2 40s linear infinite reverse;
-}
-
-@keyframes parallaxMove1 {
-  from { background-position: 0 0; }
-  to { background-position: 200px 200px; }
-}
-
-@keyframes parallaxMove2 {
-  from { background-position: 0 0; }
-  to { background-position: -150px -150px; }
-}
+/* Parallax layers - removed for cleaner look */
 
 /* Inner wrapper: max-width container, no manual left margin */
 .home-hero-inner {
@@ -305,7 +275,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 }
 
 .home-hero-right img {
-  width: 147%;
+  width: 100%;
+  max-width: 400px;
   border-radius: var(--radius-lg);
   box-shadow: 0 20px 60px rgba(10,31,23,0.3), 0 8px 30px rgba(10,31,23,0.2);
   object-fit: cover;
@@ -316,7 +287,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 }
 
 .home-hero-right img:hover {
-  transform: scale(1.03) translateY(-4px) rotate(1deg);
+  transform: scale(1.02) translateY(-2px);
   box-shadow: 0 30px 80px rgba(10, 31, 23, 0.35), 0 12px 40px rgba(10, 31, 23, 0.25);
   filter: brightness(0.9) contrast(1.08) saturate(1.15);
 }
@@ -366,9 +337,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   transition: transform .4s cubic-bezier(.4,0,.2,1);
 }
 .home-card:hover { 
-  box-shadow: 0 20px 50px rgba(27,82,71,0.2), 0 10px 25px rgba(27,82,71,0.15); 
-  transform: translateY(-10px) scale(1.02); 
-  border-color: rgba(27,82,71,0.3); 
+  box-shadow: 0 12px 35px rgba(27,82,71,0.15), 0 6px 18px rgba(27,82,71,0.1); 
+  transform: translateY(-4px); 
+  border-color: rgba(27,82,71,0.25); 
 }
 .home-card:hover::before { opacity: 1; }
 .home-card:hover::after { transform: scaleX(1); }
@@ -379,7 +350,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   margin-bottom: 20px; box-shadow: 0 2px 8px rgba(27,82,71,0.15);
   transition: transform .3s ease, box-shadow .3s ease;
 }
-.home-card:hover .card-icon-wrap { transform: scale(1.1) rotate(-5deg); box-shadow: 0 6px 20px rgba(27,82,71,0.25); }
+.home-card:hover .card-icon-wrap { transform: scale(1.05); box-shadow: 0 4px 15px rgba(27,82,71,0.2); }
 .card-icon-wrap .material-icons-round { font-size: 28px; color: var(--indigo); }
 .home-card h4 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
 .home-card p { font-size: 13px; color: var(--ink-lt); line-height: 1.7; }
@@ -1437,10 +1408,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   <!-- ══════ HOME ══════ -->
   <div class="page {% if active_page == 'home' or not active_page %}active{% endif %}" id="page-home">
     <div class="home-hero">
-      <!-- Parallax background layers -->
-      <div class="parallax-layer parallax-layer-1"></div>
-      <div class="parallax-layer parallax-layer-2"></div>
-      
       <!-- FIX 1: Single centered inner wrapper, no margin-left hack -->
       <div class="home-hero-inner">
         <div class="home-hero-left">
@@ -3399,11 +3366,9 @@ window.addEventListener('scroll', function() {
   setTimeout(checkAnimations, 100);
 })();
 
-// Parallax scroll effect for hero section
+// Simplified parallax scroll effect for hero section
 (function() {
   var heroSection = document.querySelector('.home-hero');
-  var parallaxLayer1 = document.querySelector('.parallax-layer-1');
-  var parallaxLayer2 = document.querySelector('.parallax-layer-2');
   var heroImage = document.querySelector('.home-hero-right img');
   
   if (!heroSection) return;
@@ -3412,21 +3377,13 @@ window.addEventListener('scroll', function() {
     var scrolled = window.scrollY;
     var heroRect = heroSection.getBoundingClientRect();
     
-    // Only apply parallax when hero is visible
+    // Only apply subtle parallax when hero is visible
     if (heroRect.bottom > 0 && heroRect.top < window.innerHeight) {
       var scrollPercent = scrolled / (heroRect.height + heroRect.top);
       
-      // Move parallax layers at different speeds
-      if (parallaxLayer1) {
-        parallaxLayer1.style.transform = 'translateY(' + (scrollPercent * 50) + 'px)';
-      }
-      if (parallaxLayer2) {
-        parallaxLayer2.style.transform = 'translateY(' + (scrollPercent * -30) + 'px)';
-      }
-      
-      // Subtle image parallax
+      // Subtle image parallax only
       if (heroImage) {
-        heroImage.style.transform = 'translateY(' + (scrollPercent * 20) + 'px) scale(1)';
+        heroImage.style.transform = 'translateY(' + (scrollPercent * 15) + 'px)';
       }
     }
   }
