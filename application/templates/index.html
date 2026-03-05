@@ -895,7 +895,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
 <!-- TOPNAV -->
 <nav class="topnav">
-  <div class="nav-brand" onclick="showPage('home')">
+  <a href="{{ url_for('ui.home') }}" class="nav-brand">
     <div class="brand-mark">
       <img src="{{ url_for('static', filename='logo.png') }}" alt="Rivet Logo" class="brand-logo" />
     </div>
@@ -903,19 +903,19 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
       <span class="brand-name">Rivet</span>
       <span class="brand-tag">For Artisans</span>
     </div>
-  </div>
+  </a>
   <div class="nav-spacer"></div>
   <div class="nav-links">
-    <button class="nav-link-btn" id="pill-home" onclick="showPage('home')" data-en="Home" data-te="హోమ్">Home</button>
-    <button class="nav-link-btn" id="pill-market" onclick="showPage('market')" data-en="Market" data-te="మార్కెట్">Market</button>
-    <button class="nav-link-btn" id="pill-how" onclick="showPage('how')" data-en="How It Works" data-te="ఎలా పని చేస్తుంది">How It Works</button>
+    <a href="{{ url_for('ui.home') }}" class="nav-link-btn {% if active_page == 'home' %}active{% endif %}" id="pill-home" data-en="Home" data-te="హోమ్">Home</a>
+    <a href="{{ url_for('ui.market') }}" class="nav-link-btn {% if active_page == 'market' %}active{% endif %}" id="pill-market" data-en="Market" data-te="మార్కెట్">Market</a>
+    <a href="{{ url_for('ui.how') }}" class="nav-link-btn {% if active_page == 'how' %}active{% endif %}" id="pill-how" data-en="How It Works" data-te="ఎలా పని చేస్తుంది">How It Works</a>
     <a href="/admin" class="nav-link-btn" style="text-decoration:none;" data-en="Admin" data-te="అడ్మిన్">Admin</a>
-    <button class="btn-nav-cta" id="pill-analyze" onclick="showPage('analyze')">
+    <a href="{{ url_for('ui.analyze') }}" class="btn-nav-cta {% if active_page == 'analyze' %}active{% endif %}" id="pill-analyze">
       <span style="display:flex;align-items:center;gap:6px;">
         <span class="material-icons-round" style="font-size:16px;">analytics</span>
         <span data-en="Analyse Product" data-te="ఉత్పత్తి విశ్లేషించండి">Analyse Product</span>
       </span>
-    </button>
+    </a>
   </div>
   <div class="lang-toggle" style="margin-left:12px;">
     <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
@@ -929,14 +929,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           <div class="user-dd-name">{{ user.email.split('@')[0] | title }}</div>
           <div class="user-dd-email">{{ user.email }}</div>
         </div>
-        <button class="dd-item" onclick="showPage('account'); closeUserMenu()">
+        <a href="{{ url_for('ui.account') }}" class="dd-item">
           <span class="material-icons-round">manage_accounts</span>
           <span data-en="Manage Account" data-te="ఖాతా నిర్వహించు">Manage Account</span>
-        </button>
-        <button class="dd-item" onclick="showPage('analyses'); closeUserMenu()">
+        </a>
+        <a href="{{ url_for('ui.analyses') }}" class="dd-item">
           <span class="material-icons-round">history</span>
           <span data-en="My Analyses" data-te="నా విశ్లేషణలు">My Analyses</span>
-        </button>
+        </a>
         <div class="dd-divider"></div>
         <a class="dd-item danger" href="{{ url_for('auth.logout') }}" style="text-decoration:none;">
           <span class="material-icons-round">logout</span>
@@ -949,32 +949,32 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
 <!-- Mobile tab bar -->
 <nav class="mobile-tab-bar" id="mobileTabBar">
-  <button class="mob-tab active" id="mob-tab-home" onclick="showPage('home')">
+  <a href="{{ url_for('ui.home') }}" class="mob-tab {% if active_page == 'home' %}active{% endif %}" id="mob-tab-home">
     <span class="material-icons-round">home</span>
     <span data-en="Home" data-te="హోమ్">Home</span>
-  </button>
-  <button class="mob-tab" id="mob-tab-market" onclick="showPage('market')">
+  </a>
+  <a href="{{ url_for('ui.market') }}" class="mob-tab {% if active_page == 'market' %}active{% endif %}" id="mob-tab-market">
     <span class="material-icons-round">bar_chart</span>
     <span data-en="Market" data-te="మార్కెట్">Market</span>
-  </button>
-  <button class="mob-tab mob-tab-cta" id="mob-tab-analyze" onclick="showPage('analyze')">
+  </a>
+  <a href="{{ url_for('ui.analyze') }}" class="mob-tab mob-tab-cta {% if active_page == 'analyze' %}active{% endif %}" id="mob-tab-analyze">
     <span class="material-icons-round">analytics</span>
     <span data-en="Analyse" data-te="విశ్లేషించు">Analyse</span>
-  </button>
-  <button class="mob-tab" id="mob-tab-how" onclick="showPage('how')">
+  </a>
+  <a href="{{ url_for('ui.how') }}" class="mob-tab {% if active_page == 'how' %}active{% endif %}" id="mob-tab-how">
     <span class="material-icons-round">help_outline</span>
     <span data-en="How" data-te="ఎలా">How</span>
-  </button>
-  <button class="mob-tab" id="mob-tab-account" onclick="showPage('account')">
+  </a>
+  <a href="{{ url_for('ui.account') }}" class="mob-tab {% if active_page == 'account' %}active{% endif %}" id="mob-tab-account">
     <span class="material-icons-round">account_circle</span>
     <span data-en="Account" data-te="ఖాతా">Account</span>
-  </button>
+  </a>
 </nav>
 
 <div class="page-shell">
 
   <!-- ══════ HOME ══════ -->
-  <div class="page active" id="page-home">
+  <div class="page {% if active_page == 'home' or not active_page %}active{% endif %}" id="page-home">
     <div class="home-hero">
       <!-- FIX 1: Single centered inner wrapper, no margin-left hack -->
       <div class="home-hero-inner">
@@ -983,14 +983,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           <h1 data-en="Should you <em>make</em> this product?" data-te="ఈ ఉత్పత్తిని <em>తయారు చేయాలా?</em>">Should you <em>make</em> this product?</h1>
           <p class="home-hero-desc" data-en="Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers." data-te="మీ డిజైన్ అప్లోడ్ చేయండి. స్పష్టమైన సమాధానం పొందండి — నిజమైన మార్కెట్ డేటాతో.">Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers.</p>
           <div class="hero-cta-row">
-            <button class="btn-hero" onclick="showPage('analyze')">
+            <a href="{{ url_for('ui.analyze') }}" class="btn-hero">
               <span class="material-icons-round">analytics</span>
               <span data-en="Analyse a Product" data-te="ఉత్పత్తిని విశ్లేషించండి">Analyse a Product</span>
-            </button>
-            <button class="btn-hero-ghost" onclick="showPage('how')">
+            </a>
+            <a href="{{ url_for('ui.how') }}" class="btn-hero-ghost">
               <span class="material-icons-round" style="font-size:16px;">play_circle</span>
               <span data-en="How it works" data-te="ఇది ఎలా పని చేస్తుంది">How it works</span>
-            </button>
+            </a>
           </div>
           <div class="hero-trust">
             <span data-en="Trusted by 1,200+ artisans across India" data-te="భారతదేశంలో 1,200+ చేతివృత్తుల కారులకు నమ్మకమైనది">Trusted by 1,200+ artisans across India</span>
@@ -1010,61 +1010,61 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         <p data-en="Three tools. One clear answer." data-te="మూడు సాధనాలు. ఒక స్పష్టమైన సమాధానం.">Three tools. One clear answer.</p>
       </div>
       <div class="home-cards">
-        <div class="home-card" onclick="showPage('analyze')">
+        <a href="{{ url_for('ui.analyze') }}" class="home-card">
           <div class="card-icon-wrap"><span class="material-icons-round">image_search</span></div>
           <h4 data-en="Analyse Your Design" data-te="మీ డిజైన్ విశ్లేషించండి">Analyse Your Design</h4>
           <p data-en="Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds." data-te="మీ ఉత్పత్తిని వివరించండి లేదా అప్లోడ్ చేయండి. 30 సెకన్లలో నిర్ణయం పొందండి.">Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds.</p>
-        </div>
-        <div class="home-card" onclick="showPage('market')">
+        </a>
+        <a href="{{ url_for('ui.market') }}" class="home-card">
           <div class="card-icon-wrap"><span class="material-icons-round">bar_chart</span></div>
           <h4 data-en="Market Intelligence" data-te="మార్కెట్ మేధస్సు">Market Intelligence</h4>
           <p data-en="Explore pricing, competition, demand signals, and market gaps — all in one place." data-te="ధరలు, పోటీ, డిమాండ్ సంకేతాలు మరియు మార్కెట్ ఖాళీలను అన్వేషించండి.">Explore pricing, competition, demand signals, and market gaps — all in one place.</p>
-        </div>
-        <div class="home-card" onclick="showPage('how')">
+        </a>
+        <a href="{{ url_for('ui.how') }}" class="home-card">
           <div class="card-icon-wrap"><span class="material-icons-round">help_outline</span></div>
           <h4 data-en="How It Works" data-te="ఇది ఎలా పని చేస్తుంది">How It Works</h4>
           <p data-en="Understand the rating system and how your product gets scored — in plain language." data-te="రేటింగ్ సిస్టమ్ మరియు మీ ఉత్పత్తి ఎలా స్కోర్ పొందుతుందో అర్థం చేసుకోండి.">Understand the rating system and how your product gets scored — in plain language.</p>
-        </div>
+        </a>
       </div>
     </div>
 
     <div class="recent-section">
       <div class="section-head">
         <h3 data-en="Recent Analyses" data-te="ఇటీవలి విశ్లేషణలు">Recent Analyses</h3>
-        <button class="link-btn" onclick="showPage('analyses')">
+        <a href="{{ url_for('ui.analyses') }}" class="link-btn">
           <span data-en="View all" data-te="అన్నీ చూడండి">View all</span>
           <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
-        </button>
+        </a>
       </div>
-      <div class="analysis-row" onclick="showPage('analyze')">
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row">
         <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
         <div class="analysis-info">
           <div class="analysis-title">Kanjivaram Silk Saree — Wedding Range</div>
           <div class="analysis-meta">Analysed 2 days ago &nbsp;·&nbsp; Score: 82 / 100</div>
         </div>
         <span class="badge-decision badge-launch">Proceed</span>
-      </div>
-      <div class="analysis-row" onclick="showPage('analyze')">
+      </a>
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row">
         <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
         <div class="analysis-info">
           <div class="analysis-title">Bridal Lehenga Choli — Embroidered Silk</div>
           <div class="analysis-meta">Analysed 5 days ago &nbsp;·&nbsp; Score: 61 / 100</div>
         </div>
         <span class="badge-decision badge-modify">Adjust</span>
-      </div>
-      <div class="analysis-row" onclick="showPage('analyze')">
+      </a>
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row">
         <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
         <div class="analysis-info">
           <div class="analysis-title">Anarkali Suit — Synthetic Georgette</div>
           <div class="analysis-meta">Analysed 1 week ago &nbsp;·&nbsp; Score: 29 / 100</div>
         </div>
         <span class="badge-decision badge-stop">Stop</span>
-      </div>
+      </a>
     </div>
   </div>
 
   <!-- ══════ ANALYZE PAGE ══════ -->
-  <div class="page" id="page-analyze">
+  <div class="page {% if active_page == 'analyze' %}active{% endif %}" id="page-analyze">
     <div class="analyze-page-wrap">
       <div class="container-xl px-3 px-md-4">
         <div class="row g-3 g-lg-4 align-items-start">
@@ -1443,7 +1443,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
 
     <!-- ══════ MARKET ══════ -->
-  <div class="page" id="page-market">
+  <div class="page {% if active_page == 'market' %}active{% endif %}" id="page-market">
     <div class="market-wrap">
       <div class="page-title" data-en="Market Intelligence" data-te="మార్కెట్ మేధస్సు">Market Intelligence</div>
       <div class="market-hero-banner">
@@ -1581,7 +1581,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         </div>
 
         <!-- ══════ HOW IT WORKS ══════ -->
-        <div class="page" id="page-how">
+        <div class="page {% if active_page == 'how' %}active{% endif %}" id="page-how">
           <div class="how-wrap">
             <div class="how-hero">
         <div class="how-kicker">Simple Process</div>
@@ -1611,13 +1611,13 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             <div class="how-cta">
         <h4>Ready to Test Your Product?</h4>
         <p>Describe your idea and get a decision in under 30 seconds.</p>
-        <button class="btn-cta-saffron" onclick="showPage('analyze')"><span class="material-icons-round">analytics</span> Analyse a Product Now</button>
+        <a href="{{ url_for('ui.analyze') }}" class="btn-cta-saffron"><span class="material-icons-round">analytics</span> Analyse a Product Now</a>
             </div>
           </div>
         </div>
 
         <!-- ACCOUNT -->
-        <div class="page" id="page-account">
+        <div class="page {% if active_page == 'account' %}active{% endif %}" id="page-account">
           <div class="account-wrap">
             <div class="page-title">My Account</div>
             <div class="page-subtitle">Manage your profile, preferences, and account settings.</div>
@@ -1655,7 +1655,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         </div>
 
         <!-- MY ANALYSES -->
-        <div class="page" id="page-analyses">
+        <div class="page {% if active_page == 'analyses' %}active{% endif %}" id="page-analyses">
           <div class="analyses-wrap">
             <div class="page-title">My Analyses</div>
             <div class="page-subtitle">All your past product analyses, most recent first.</div>
@@ -1678,10 +1678,10 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           </div>
           <div>
             <div class="footer-col-title">Platform</div>
-            <a class="footer-link" onclick="showPage('analyze')">Analyse Product</a>
-            <a class="footer-link" onclick="showPage('market')">Market Data</a>
-            <a class="footer-link" onclick="showPage('how')">How It Works</a>
-            <a class="footer-link" onclick="showPage('analyses')">My Analyses</a>
+            <a href="{{ url_for('ui.analyze') }}" class="footer-link">Analyse Product</a>
+            <a href="{{ url_for('ui.market') }}" class="footer-link">Market Data</a>
+            <a href="{{ url_for('ui.how') }}" class="footer-link">How It Works</a>
+            <a href="{{ url_for('ui.analyses') }}" class="footer-link">My Analyses</a>
           </div>
           <div>
             <div class="footer-col-title">Support</div>
@@ -1866,36 +1866,7 @@ function setLang(lang) {
   }
 }
 
-var currentPage = 'home';
-function showPage(id) {
-  if (id === currentPage) return;
-  var outEl = document.getElementById('page-' + currentPage);
-  var inEl  = document.getElementById('page-' + id);
-  if (!inEl) return;
-  if (outEl) {
-    outEl.classList.add('fade-out');
-    setTimeout(function() {
-      outEl.classList.remove('active', 'fade-out');
-      inEl.classList.add('active', 'fade-in');
-      setTimeout(function() { inEl.classList.remove('fade-in'); }, 400);
-    }, 220);
-  } else {
-    inEl.classList.add('active', 'fade-in');
-    setTimeout(function() { inEl.classList.remove('fade-in'); }, 400);
-  }
-  currentPage = id;
-  document.querySelectorAll('.nav-link-btn, .btn-nav-cta').forEach(function(b) { b.classList.remove('active'); });
-  var pillMap = { home:'pill-home', market:'pill-market', how:'pill-how', analyze:'pill-analyze' };
-  if (pillMap[id]) { var pill = document.getElementById(pillMap[id]); if (pill) pill.classList.add('active'); }
-  ['home','market','analyze','how','account'].forEach(function(p) {
-    var tab = document.getElementById('mob-tab-' + p);
-    if (tab) tab.classList.toggle('active', p === id);
-  });
-  window.scrollTo(0, 0);
-  if (id === 'market') { if (!marketLoaded) initMarket(); animateMarketCharts(); }
-  if (id === 'analyze') { animatePieChart(); }
-  if (id === 'analyses' && !analysesLoaded) { initAnalyses(); }
-}
+var currentPage = '{{ active_page or "home" }}';
 
 function toggleUserMenu() { document.getElementById('userBtn').classList.toggle('open'); }
 function closeUserMenu()  { document.getElementById('userBtn').classList.remove('open'); }
@@ -2546,8 +2517,13 @@ window.addEventListener('scroll', function() {
   if (fabBottom) fabBottom.classList.toggle('visible', !atBottom);
 }, { passive: true });
 
-initMarket();
-showPage('home');
+// Initialize the active page
+(function() {
+  var activePage = '{{ active_page or "home" }}';
+  if (activePage === 'market') { initMarket(); animateMarketCharts(); }
+  if (activePage === 'analyze') { animatePieChart(); }
+  if (activePage === 'analyses') { initAnalyses(); }
+})();
 </script>
 </body>
 </html>
