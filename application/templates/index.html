@@ -544,6 +544,60 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .skeleton-title { height: 20px; width: 60%; margin-bottom: 12px; }
 .skeleton-card { height: 120px; }
 
+/* Scroll-triggered animations */
+.animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.animate-on-scroll.animated { opacity: 1; transform: translateY(0); }
+.animate-on-scroll.delay-1 { transition-delay: 0.1s; }
+.animate-on-scroll.delay-2 { transition-delay: 0.2s; }
+.animate-on-scroll.delay-3 { transition-delay: 0.3s; }
+.animate-on-scroll.delay-4 { transition-delay: 0.4s; }
+
+/* Fade in from left */
+.fade-in-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in-left.animated { opacity: 1; transform: translateX(0); }
+
+/* Fade in from right */
+.fade-in-right { opacity: 0; transform: translateX(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in-right.animated { opacity: 1; transform: translateX(0); }
+
+/* Scale in animation */
+.scale-in { opacity: 0; transform: scale(0.9); transition: opacity 0.5s ease, transform 0.5s ease; }
+.scale-in.animated { opacity: 1; transform: scale(1); }
+
+/* Ripple effect for buttons */
+.ripple { position: relative; overflow: hidden; }
+.ripple::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: rgba(255,255,255,0.5); transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+.ripple:active::after { width: 300px; height: 300px; }
+
+/* Floating animation */
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.float { animation: float 3s ease-in-out infinite; }
+
+/* Bounce animation */
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.bounce-on-hover:hover { animation: bounce 0.5s ease; }
+
+/* Glow effect */
+@keyframes glow { 0%, 100% { box-shadow: 0 0 5px rgba(27,82,71,0.2); } 50% { box-shadow: 0 0 20px rgba(27,82,71,0.4), 0 0 30px rgba(27,82,71,0.2); } }
+.glow { animation: glow 2s ease-in-out infinite; }
+
+/* Rotate on hover */
+.rotate-on-hover { transition: transform 0.3s ease; }
+.rotate-on-hover:hover { transform: rotate(5deg) scale(1.05); }
+
+/* Slide up animation */
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.slide-up { animation: slideUp 0.5s ease forwards; }
+
+/* Stagger animation for lists */
+.stagger-item { opacity: 0; animation: slideUp 0.5s ease forwards; }
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+.stagger-item:nth-child(6) { animation-delay: 0.6s; }
+
 /* Export button */
 .btn-export { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1.5px solid var(--indigo); border-radius: var(--radius); background: transparent; color: var(--indigo); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: 'DM Sans',sans-serif; }
 .btn-export:hover { background: var(--indigo); color: white; }
@@ -1096,11 +1150,11 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           <h1 data-en="Should you <em>make</em> this product?" data-te="ఈ ఉత్పత్తిని <em>తయారు చేయాలా?</em>">Should you <em>make</em> this product?</h1>
           <p class="home-hero-desc" data-en="Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers." data-te="మీ డిజైన్ అప్లోడ్ చేయండి. స్పష్టమైన సమాధానం పొందండి — నిజమైన మార్కెట్ డేటాతో.">Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers.</p>
           <div class="hero-cta-row">
-            <a href="{{ url_for('ui.analyze') }}" class="btn-hero">
+            <a href="{{ url_for('ui.analyze') }}" class="btn-hero ripple">
               <span class="material-icons-round">analytics</span>
               <span data-en="Analyse a Product" data-te="ఉత్పత్తిని విశ్లేషించండి">Analyse a Product</span>
             </a>
-            <a href="{{ url_for('ui.how') }}" class="btn-hero-ghost">
+            <a href="{{ url_for('ui.how') }}" class="btn-hero-ghost ripple">
               <span class="material-icons-round" style="font-size:16px;">play_circle</span>
               <span data-en="How it works" data-te="ఇది ఎలా పని చేస్తుంది">How it works</span>
             </a>
@@ -1123,17 +1177,17 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         <p data-en="Three tools. One clear answer." data-te="మూడు సాధనాలు. ఒక స్పష్టమైన సమాధానం.">Three tools. One clear answer.</p>
       </div>
       <div class="home-cards">
-        <a href="{{ url_for('ui.analyze') }}" class="home-card">
+        <a href="{{ url_for('ui.analyze') }}" class="home-card animate-on-scroll scale-in ripple">
           <div class="card-icon-wrap"><span class="material-icons-round">image_search</span></div>
           <h4 data-en="Analyse Your Design" data-te="మీ డిజైన్ విశ్లేషించండి">Analyse Your Design</h4>
           <p data-en="Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds." data-te="మీ ఉత్పత్తిని వివరించండి లేదా అప్లోడ్ చేయండి. 30 సెకన్లలో నిర్ణయం పొందండి.">Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds.</p>
         </a>
-        <a href="{{ url_for('ui.market') }}" class="home-card">
+        <a href="{{ url_for('ui.market') }}" class="home-card animate-on-scroll scale-in delay-1 ripple">
           <div class="card-icon-wrap"><span class="material-icons-round">bar_chart</span></div>
           <h4 data-en="Market Intelligence" data-te="మార్కెట్ మేధస్సు">Market Intelligence</h4>
           <p data-en="Explore pricing, competition, demand signals, and market gaps — all in one place." data-te="ధరలు, పోటీ, డిమాండ్ సంకేతాలు మరియు మార్కెట్ ఖాళీలను అన్వేషించండి.">Explore pricing, competition, demand signals, and market gaps — all in one place.</p>
         </a>
-        <a href="{{ url_for('ui.how') }}" class="home-card">
+        <a href="{{ url_for('ui.how') }}" class="home-card animate-on-scroll scale-in delay-2 ripple">
           <div class="card-icon-wrap"><span class="material-icons-round">help_outline</span></div>
           <h4 data-en="How It Works" data-te="ఇది ఎలా పని చేస్తుంది">How It Works</h4>
           <p data-en="Understand the rating system and how your product gets scored — in plain language." data-te="రేటింగ్ సిస్టమ్ మరియు మీ ఉత్పత్తి ఎలా స్కోర్ పొందుతుందో అర్థం చేసుకోండి.">Understand the rating system and how your product gets scored — in plain language.</p>
@@ -1149,7 +1203,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
         </a>
       </div>
-      <a href="{{ url_for('ui.analyze') }}" class="analysis-row">
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row animate-on-scroll fade-in-left stagger-item">
         <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
         <div class="analysis-info">
           <div class="analysis-title">Kanjivaram Silk Saree — Wedding Range</div>
@@ -1157,7 +1211,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         </div>
         <span class="badge-decision badge-launch">Proceed</span>
       </a>
-      <a href="{{ url_for('ui.analyze') }}" class="analysis-row">
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row animate-on-scroll fade-in-left stagger-item">
         <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
         <div class="analysis-info">
           <div class="analysis-title">Bridal Lehenga Choli — Embroidered Silk</div>
@@ -1165,7 +1219,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         </div>
         <span class="badge-decision badge-modify">Adjust</span>
       </a>
-      <a href="{{ url_for('ui.analyze') }}" class="analysis-row">
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row animate-on-scroll fade-in-left stagger-item">
         <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
         <div class="analysis-info">
           <div class="analysis-title">Anarkali Suit — Synthetic Georgette</div>
@@ -1360,15 +1414,15 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
 
                 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                  <button class="az-run-btn" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
+                  <button class="az-run-btn ripple" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
                     <span class="material-icons-round">analytics</span>
                     <span data-en="Run Analysis" data-te="విశ్లేషణ అమలు చేయండి">Run Analysis</span>
                   </button>
-                  <button class="az-run-btn" id="mockupBtn" onclick="runMockup()" style="flex:1;min-width:160px;background:var(--indigo);">
+                  <button class="az-run-btn ripple" id="mockupBtn" onclick="runMockup()" style="flex:1;min-width:160px;background:var(--indigo);">
                     <span class="material-icons-round">auto_fix_high</span>
                     <span>Generate Mockup</span>
                   </button>
-                  <button class="btn-clear" onclick="clearForm()" title="Clear all fields">
+                  <button class="btn-clear ripple" onclick="clearForm()" title="Clear all fields">
                     <span class="material-icons-round" style="font-size:16px;">refresh</span>
                     <span>Clear</span>
                   </button>
@@ -1427,7 +1481,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             <div class="results-block" id="resultsBlock">
 
               <!-- Decision hero -->
-              <div class="rating-hero" id="ratingHero">
+              <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
                 <div class="rating-big">
                   <div class="rating-num" id="ratingNum">—</div>
                   <div class="rating-denom" id="ratingDenom">out of 100</div>
@@ -1442,14 +1496,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     <span id="comparisonText"></span>
                   </div>
                 </div>
-                <button class="btn-export" onclick="exportResults()" id="exportBtn" style="display:none;">
+                <button class="btn-export ripple" onclick="exportResults()" id="exportBtn" style="display:none;">
                   <span class="material-icons-round" style="font-size:18px;">download</span>
                   <span>Export PDF</span>
                 </button>
               </div>
 
               <!-- Score Breakdown — interactive pie -->
-              <div class="res-card" id="section-breakdown">
+              <div class="res-card animate-on-scroll fade-in-left" id="section-breakdown">
                 <div class="res-card-head">
                   <span class="material-icons-round">pie_chart</span>
                   <div style="flex:1;">
@@ -1510,25 +1564,25 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
               </div>
 
               <!-- Product Analysis -->
-              <div class="res-card" id="section-product">
+              <div class="res-card animate-on-scroll fade-in-right" id="section-product">
                 <div class="res-card-head"><span class="material-icons-round">style</span><div><div class="res-card-title">Product Analysis</div><div class="res-card-subtitle">What we identified from your description</div></div></div>
                 <div class="res-card-body"><p style="font-size:12.5px;color:var(--ink-mid);line-height:1.7;margin-bottom:10px;" id="designDesc"></p><div class="feat-tags" id="featTags"></div></div>
               </div>
 
               <!-- Market Insights -->
-              <div class="res-card" id="section-market">
+              <div class="res-card animate-on-scroll fade-in-left" id="section-market">
                 <div class="res-card-head"><span class="material-icons-round">insights</span><div><div class="res-card-title">Market Insights</div><div class="res-card-subtitle">What the data says about your category</div></div></div>
                 <div class="res-card-body"><ul class="insight-list" id="marketList"></ul></div>
               </div>
 
               <!-- Recommendations -->
-              <div class="res-card" id="section-recommendations">
+              <div class="res-card animate-on-scroll fade-in-right" id="section-recommendations">
                 <div class="res-card-head"><span class="material-icons-round" id="recsIcon">lightbulb</span><div><div class="res-card-title" id="recsLabel">Recommendations</div><div class="res-card-subtitle" id="recsSubtitle">Suggested next steps</div></div></div>
                 <div class="res-card-body"><ul class="insight-list" id="recsList"></ul></div>
               </div>
 
               <!-- Why this decision -->
-              <div class="res-card" id="section-reasoning">
+              <div class="res-card animate-on-scroll fade-in-left" id="section-reasoning">
                 <div class="res-card-head"><span class="material-icons-round">comment</span><div><div class="res-card-title">Why This Decision?</div><div class="res-card-subtitle">The reasoning behind your result</div></div></div>
                 <div class="res-card-body"><p style="font-size:12.5px;color:var(--ink-mid);line-height:1.7;" id="reasonText"></p></div>
               </div>
@@ -1624,24 +1678,24 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
     <div class="market-wrap">
       <div class="page-title" data-en="Market Intelligence" data-te="మార్కెట్ మేధస్సు">Market Intelligence</div>
       <div class="market-hero-banner">
-        <div class="market-hero-stat">
+        <div class="market-hero-stat animate-on-scroll fade-in-left">
           <span class="market-hero-num">₹749</span>
           <div class="market-hero-label">Median Selling Price</div>
           <div class="market-hero-sub">₹499–₹1,499 sweet spot</div>
         </div>
-        <div class="market-hero-stat">
+        <div class="market-hero-stat animate-on-scroll fade-in-left delay-1">
           <span class="market-hero-num">4.1★</span>
           <div class="market-hero-label">Avg Rating</div>
           <div class="market-hero-sub">3,200+ reviews analysed</div>
         </div>
-        <div class="market-hero-stat">
+        <div class="market-hero-stat animate-on-scroll fade-in-left delay-2">
           <span class="market-hero-num">68%</span>
           <div class="market-hero-label">Avg Discount</div>
           <div class="market-hero-sub">Off MRP across listings</div>
         </div>
       </div>
       <div class="market-insights-row">
-        <div class="insight-panel">
+        <div class="insight-panel animate-on-scroll fade-in-left">
           <div class="insight-panel-head"><span class="material-icons-round">sell</span><div><div class="insight-panel-title">Price Distribution</div><div class="insight-panel-desc">Where buyers are actually spending</div></div></div>
           <div class="insight-panel-body">
             <div class="price-dist">
@@ -1654,7 +1708,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             <div style="margin-top:14px;padding:10px 12px;background:var(--saffron-lt);border-radius:var(--radius-sm);font-size:12px;color:var(--orange);font-weight:500;"><strong>Insight:</strong> The ₹500–₹999 range is most crowded. Pricing above ₹1,000 gives more room to stand out.</div>
           </div>
         </div>
-        <div class="insight-panel">
+        <div class="insight-panel animate-on-scroll fade-in-right">
           <div class="insight-panel-head"><span class="material-icons-round">groups</span><div><div class="insight-panel-title">Competition by Category</div><div class="insight-panel-desc">How crowded each segment is</div></div></div>
           <div class="insight-panel-body">
             <div class="comp-density">
@@ -1666,7 +1720,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             <div style="margin-top:14px;padding:10px 12px;background:var(--green-bg);border-radius:var(--radius-sm);font-size:12px;color:var(--green);font-weight:500;"><strong>Opportunity:</strong> Kurtis and Salwar Suits have lower competition with growing urban buyer interest.</div>
           </div>
         </div>
-        <div class="insight-panel">
+        <div class="insight-panel animate-on-scroll fade-in-left">
           <div class="insight-panel-head"><span class="material-icons-round">thumb_up</span><div><div class="insight-panel-title">Buyer Sentiment</div><div class="insight-panel-desc">Based on 3,200+ reviews analysed</div></div></div>
           <div class="insight-panel-body">
             <div class="sentiment-row" style="margin-bottom:16px;">
@@ -1681,7 +1735,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             </ul>
           </div>
         </div>
-        <div class="insight-panel">
+        <div class="insight-panel animate-on-scroll fade-in-right">
           <div class="insight-panel-head"><span class="material-icons-round">trending_up</span><div><div class="insight-panel-title">Demand Signals</div><div class="insight-panel-desc">Search and sales trends right now</div></div></div>
           <div class="insight-panel-body">
             <ul class="insight-list">
@@ -1699,9 +1753,9 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--ink);margin-bottom:4px;">Market Gaps — Where to Enter</div>
           <div style="font-size:13px;color:var(--ink-lt);">High demand, low supply — a clear advantage for a well-made product.</div>
         </div>
-        <div class="opportunity-card"><div class="opp-icon"><span class="material-icons-round">star</span></div><div class="opp-text"><h6>Premium Handloom Cotton Sarees (₹1,000–₹1,500)</h6><p>Only 2 sellers currently. Strong demand for authentic handloom with certification. Low competition, high price tolerance.</p></div></div>
-        <div class="opportunity-card" style="background:linear-gradient(135deg,#1A4535,#256B56);"><div class="opp-icon"><span class="material-icons-round">local_offer</span></div><div class="opp-text"><h6>Mid-Range Bridal Lehenga Choli (₹2,000–₹4,000)</h6><p>Very few products occupy this range. Buyers want quality bridal lehengas without premium ₹10,000+ pricing.</p></div></div>
-        <div class="opportunity-card" style="background:linear-gradient(135deg,#3D2800,#7A5200);"><div class="opp-icon"><span class="material-icons-round">eco</span></div><div class="opp-text"><h6>Embroidered Cotton Salwar Suits (₹800–₹1,200)</h6><p>Rising buyer interest in office-friendly ethnic wear. Subtle embroidery commands 20–30% premium over plain versions.</p></div></div>
+        <div class="opportunity-card animate-on-scroll fade-in-left"><div class="opp-icon"><span class="material-icons-round">star</span></div><div class="opp-text"><h6>Premium Handloom Cotton Sarees (₹1,000–₹1,500)</h6><p>Only 2 sellers currently. Strong demand for authentic handloom with certification. Low competition, high price tolerance.</p></div></div>
+        <div class="opportunity-card animate-on-scroll fade-in-left delay-1" style="background:linear-gradient(135deg,#1A4535,#256B56);"><div class="opp-icon"><span class="material-icons-round">local_offer</span></div><div class="opp-text"><h6>Mid-Range Bridal Lehenga Choli (₹2,000–₹4,000)</h6><p>Very few products occupy this range. Buyers want quality bridal lehengas without premium ₹10,000+ pricing.</p></div></div>
+        <div class="opportunity-card animate-on-scroll fade-in-left delay-2" style="background:linear-gradient(135deg,#3D2800,#7A5200);"><div class="opp-icon"><span class="material-icons-round">eco</span></div><div class="opp-text"><h6>Embroidered Cotton Salwar Suits (₹800–₹1,200)</h6><p>Rising buyer interest in office-friendly ethnic wear. Subtle embroidery commands 20–30% premium over plain versions.</p></div></div>
       </div>
       <div class="market-cards-section">
         <div class="market-cards-head">
@@ -1777,24 +1831,24 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         <p>No spreadsheets. No guessing. Just a clear answer based on real market data.</p>
             </div>
             <div class="steps-grid">
-        <div class="step-card"><div class="step-num-badge">1</div><div class="step-icon-wrap"><span class="material-icons-round">edit_note</span></div><div class="step-card-title">Describe Your Product</div><div class="step-card-line">Tell us what you want to make — fabric, style, occasion, and target price.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>Takes under 2 minutes</span></li><li><span class="material-icons-round">check_circle</span><span>No technical knowledge needed</span></li></ul></div>
-        <div class="step-card"><div class="step-num-badge">2</div><div class="step-icon-wrap"><span class="material-icons-round">manage_search</span></div><div class="step-card-title">We Check the Market</div><div class="step-card-line">Your product is compared against 578 real products across all 4 categories.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>How many similar products exist?</span></li><li><span class="material-icons-round">check_circle</span><span>What are buyers actually paying?</span></li></ul></div>
-        <div class="step-card"><div class="step-num-badge">3</div><div class="step-icon-wrap"><span class="material-icons-round">stars</span></div><div class="step-card-title">Your Product Gets Rated</div><div class="step-card-line">We score 5 dimensions out of 20 each. Your final score is the total out of 100.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>Final score out of 100</span></li><li><span class="material-icons-round">check_circle</span><span>Clear breakdown per dimension</span></li></ul></div>
-        <div class="step-card"><div class="step-num-badge">4</div><div class="step-icon-wrap"><span class="material-icons-round">task_alt</span></div><div class="step-card-title">You Get a Clear Decision</div><div class="step-card-line">One of three outcomes, with the reasons behind it and exactly what to do next.</div><ul class="step-points-new"><li><span class="material-icons-round" style="color:var(--green)">check_circle</span><span>LAUNCH — strong market fit (75–100)</span></li><li><span class="material-icons-round" style="color:var(--saffron)">warning</span><span>MODIFY — improvements needed (50–74)</span></li><li><span class="material-icons-round" style="color:var(--red)">cancel</span><span>DO NOT PRODUCE — too risky (0–49)</span></li></ul></div>
+        <div class="step-card animate-on-scroll scale-in"><div class="step-num-badge">1</div><div class="step-icon-wrap"><span class="material-icons-round">edit_note</span></div><div class="step-card-title">Describe Your Product</div><div class="step-card-line">Tell us what you want to make — fabric, style, occasion, and target price.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>Takes under 2 minutes</span></li><li><span class="material-icons-round">check_circle</span><span>No technical knowledge needed</span></li></ul></div>
+        <div class="step-card animate-on-scroll scale-in delay-1"><div class="step-num-badge">2</div><div class="step-icon-wrap"><span class="material-icons-round">manage_search</span></div><div class="step-card-title">We Check the Market</div><div class="step-card-line">Your product is compared against 578 real products across all 4 categories.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>How many similar products exist?</span></li><li><span class="material-icons-round">check_circle</span><span>What are buyers actually paying?</span></li></ul></div>
+        <div class="step-card animate-on-scroll scale-in delay-2"><div class="step-num-badge">3</div><div class="step-icon-wrap"><span class="material-icons-round">stars</span></div><div class="step-card-title">Your Product Gets Rated</div><div class="step-card-line">We score 5 dimensions out of 20 each. Your final score is the total out of 100.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>Final score out of 100</span></li><li><span class="material-icons-round">check_circle</span><span>Clear breakdown per dimension</span></li></ul></div>
+        <div class="step-card animate-on-scroll scale-in delay-3"><div class="step-num-badge">4</div><div class="step-icon-wrap"><span class="material-icons-round">task_alt</span></div><div class="step-card-title">You Get a Clear Decision</div><div class="step-card-line">One of three outcomes, with the reasons behind it and exactly what to do next.</div><ul class="step-points-new"><li><span class="material-icons-round" style="color:var(--green)">check_circle</span><span>LAUNCH — strong market fit (75–100)</span></li><li><span class="material-icons-round" style="color:var(--saffron)">warning</span><span>MODIFY — improvements needed (50–74)</span></li><li><span class="material-icons-round" style="color:var(--red)">cancel</span><span>DO NOT PRODUCE — too risky (0–49)</span></li></div>ul></div>
             </div>
             <div class="scoring-section-head"><h3>The 5 Scoring Dimensions</h3><p>Each rated out of 20. Final score = total of all five (out of 100).</p></div>
             <div class="scoring-grid-new">
-        <div class="scoring-mini-card"><div class="scoring-mini-icon"><span class="material-icons-round">trending_up</span></div><div class="scoring-mini-title">Market Demand</div><div class="scoring-mini-desc">How many buyers are actively looking for this type of product</div><span class="scoring-mini-weight">/ 20</span></div>
-        <div class="scoring-mini-card"><div class="scoring-mini-icon"><span class="material-icons-round">fingerprint</span></div><div class="scoring-mini-title">Design Uniqueness</div><div class="scoring-mini-desc">How different your product is from what's already available</div><span class="scoring-mini-weight">/ 20</span></div>
-        <div class="scoring-mini-card"><div class="scoring-mini-icon"><span class="material-icons-round">sell</span></div><div class="scoring-mini-title">Price Fit</div><div class="scoring-mini-desc">Whether your target price matches what buyers actually pay</div><span class="scoring-mini-weight">/ 20</span></div>
-        <div class="scoring-mini-card"><div class="scoring-mini-icon"><span class="material-icons-round">texture</span></div><div class="scoring-mini-title">Material Appeal</div><div class="scoring-mini-desc">How desirable the material is. Silk and handloom score higher than synthetic</div><span class="scoring-mini-weight">/ 20</span></div>
-        <div class="scoring-mini-card"><div class="scoring-mini-icon"><span class="material-icons-round">auto_awesome</span></div><div class="scoring-mini-title">Trend Alignment</div><div class="scoring-mini-desc">Whether the product fits current seasonal or buyer trends</div><span class="scoring-mini-weight">/ 20</span></div>
+        <div class="scoring-mini-card animate-on-scroll scale-in"><div class="scoring-mini-icon"><span class="material-icons-round">trending_up</span></div><div class="scoring-mini-title">Market Demand</div><div class="scoring-mini-desc">How many buyers are actively looking for this type of product</div><span class="scoring-mini-weight">/ 20</span></div>
+        <div class="scoring-mini-card animate-on-scroll scale-in delay-1"><div class="scoring-mini-icon"><span class="material-icons-round">fingerprint</span></div><div class="scoring-mini-title">Design Uniqueness</div><div class="scoring-mini-desc">How different your product is from what's already available</div><span class="scoring-mini-weight">/ 20</span></div>
+        <div class="scoring-mini-card animate-on-scroll scale-in delay-2"><div class="scoring-mini-icon"><span class="material-icons-round">sell</span></div><div class="scoring-mini-title">Price Fit</div><div class="scoring-mini-desc">Whether your target price matches what buyers actually pay</div><span class="scoring-mini-weight">/ 20</span></div>
+        <div class="scoring-mini-card animate-on-scroll scale-in delay-3"><div class="scoring-mini-icon"><span class="material-icons-round">texture</span></div><div class="scoring-mini-title">Material Appeal</div><div class="scoring-mini-desc">How desirable the material is. Silk and handloom score higher than synthetic</div><span class="scoring-mini-weight">/ 20</span></div>
+        <div class="scoring-mini-card animate-on-scroll scale-in delay-4"><div class="scoring-mini-icon"><span class="material-icons-round">auto_awesome</span></div><div class="scoring-mini-title">Trend Alignment</div><div class="scoring-mini-desc">Whether the product fits current seasonal or buyer trends</div><span class="scoring-mini-weight">/ 20</span></div>
             </div>
             <div class="scoring-section-head" style="margin-top:8px;"><h3>Understanding the Outcomes</h3><p>Your total score out of 100 determines which outcome you receive.</p></div>
             <div class="outcome-strip">
-        <div class="outcome-card oc-green"><div class="outcome-icon-wrap"><span class="material-icons-round">check</span></div><div class="outcome-title">LAUNCH</div><div class="outcome-range">Score: 75 – 100</div><div class="outcome-desc">Strong market fit confirmed. Buyer demand exists, pricing is competitive, and the market has room for your product.</div></div>
-        <div class="outcome-card oc-amber"><div class="outcome-icon-wrap"><span class="material-icons-round">tune</span></div><div class="outcome-title">MODIFY</div><div class="outcome-range">Score: 50 – 74</div><div class="outcome-desc">Your product has potential but one or more areas need improvement before you invest in production.</div></div>
-        <div class="outcome-card oc-red"><div class="outcome-icon-wrap"><span class="material-icons-round">close</span></div><div class="outcome-title">DO NOT PRODUCE</div><div class="outcome-range">Score: 0 – 49</div><div class="outcome-desc">Too much risk at this stage. Producing this product is likely to lead to financial loss.</div></div>
+        <div class="outcome-card oc-green animate-on-scroll scale-in"><div class="outcome-icon-wrap"><span class="material-icons-round">check</span></div><div class="outcome-title">LAUNCH</div><div class="outcome-range">Score: 75 – 100</div><div class="outcome-desc">Strong market fit confirmed. Buyer demand exists, pricing is competitive, and the market has room for your product.</div></div>
+        <div class="outcome-card oc-amber animate-on-scroll scale-in delay-1"><div class="outcome-icon-wrap"><span class="material-icons-round">tune</span></div><div class="outcome-title">MODIFY</div><div class="outcome-range">Score: 50 – 74</div><div class="outcome-desc">Your product has potential but one or more areas need improvement before you invest in production.</div></div>
+        <div class="outcome-card oc-red animate-on-scroll scale-in delay-2"><div class="outcome-icon-wrap"><span class="material-icons-round">close</span></div><div class="outcome-title">DO NOT PRODUCE</div><div class="outcome-range">Score: 0 – 49</div><div class="outcome-desc">Too much risk at this stage. Producing this product is likely to lead to financial loss.</div></div>
             </div>
             <div class="how-cta">
         <h4>Ready to Test Your Product?</h4>
@@ -2918,6 +2972,51 @@ window.addEventListener('scroll', function() {
   updateResultsNav();
   highlightActiveSection();
 }, { passive: true });
+
+// Scroll-triggered animations observer
+(function() {
+  var animatedElements = new Set();
+  
+  function checkAnimations() {
+    var elements = document.querySelectorAll('.animate-on-scroll:not(.animated)');
+    elements.forEach(function(el) {
+      if (animatedElements.has(el)) return;
+      
+      var rect = el.getBoundingClientRect();
+      var windowHeight = window.innerHeight || document.documentElement.clientHeight;
+      
+      // Trigger when element is 80% visible in viewport
+      if (rect.top <= windowHeight * 0.8 && rect.bottom >= 0) {
+        el.classList.add('animated');
+        animatedElements.add(el);
+      }
+    });
+  }
+  
+  // Check on scroll
+  window.addEventListener('scroll', checkAnimations, { passive: true });
+  
+  // Check on page load and when switching pages
+  window.addEventListener('load', checkAnimations);
+  document.addEventListener('DOMContentLoaded', checkAnimations);
+  
+  // Check when results are shown
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'class') {
+        setTimeout(checkAnimations, 50);
+      }
+    });
+  });
+  
+  var resultsBlock = document.getElementById('resultsBlock');
+  if (resultsBlock) {
+    observer.observe(resultsBlock, { attributes: true });
+  }
+  
+  // Initial check
+  setTimeout(checkAnimations, 100);
+})();
 
 // Initialize the active page
 (function() {
