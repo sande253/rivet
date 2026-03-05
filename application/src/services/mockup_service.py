@@ -222,8 +222,14 @@ def _s3_upload(data: bytes, bucket: str, key: str, region: str) -> str:
 
     s3 = boto3.client("s3", region_name=region)
     s3.put_object(Bucket=bucket, Key=key, Body=data, ContentType="image/png")
-    url = f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
-    log.info("Uploaded to S3: %s", url)
+    
+    # Generate presigned URL (valid for 1 hour)
+    url = s3.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': bucket, 'Key': key},
+        ExpiresIn=3600
+    )
+    log.info("Uploaded to S3 with presigned URL: %s", key)
     return url
 
 

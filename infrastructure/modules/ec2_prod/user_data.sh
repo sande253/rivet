@@ -213,7 +213,7 @@ docker run -d \
     --restart unless-stopped \
     -p ${container_port}:8000 \
     -e FLASK_ENV=production \
-    -e ENVIRONMENT=${environment} \
+    -e ENVIRONMENT=production \
     -e SECRET_KEY="$SECRET_KEY" \
     -e AWS_REGION=${aws_region} \
     -e AWS_DEFAULT_REGION=${aws_region} \
