@@ -2729,6 +2729,7 @@ function sanitizePriceInput(el) {
 
 var rawMarket = [];
 var marketDataLoaded = false;
+var marketAnalytics = null;
 
 // Load market data from API
 function loadMarketData() {
@@ -2759,8 +2760,79 @@ function loadMarketData() {
     });
 }
 
+// Load market analytics
+function loadMarketAnalytics() {
+  console.log('Loading market analytics...');
+  fetch('/market/analytics')
+    .then(function(response) {
+      if (!response.ok) throw new Error('Failed to load analytics');
+      return response.json();
+    })
+    .then(function(data) {
+      console.log('Analytics loaded:', data);
+      marketAnalytics = data;
+      populateMarketAnalytics(data);
+    })
+    .catch(function(error) {
+      console.error('Error loading analytics:', error);
+    });
+}
+
+// Populate market analytics in the UI
+function populateMarketAnalytics(data) {
+  if (!data) return;
+  
+  // Hero stats
+  if (data.hero) {
+    var heroNums = document.querySelectorAll('.market-hero-num');
+    var heroSubs = document.querySelectorAll('.market-hero-sub');
+    if (heroNums[0]) heroNums[0].textContent = '₹' + data.hero.median_price.toLocaleString('en-IN');
+    if (heroNums[1]) heroNums[1].textContent = data.hero.avg_rating + '★';
+    if (heroNums[2]) heroNums[2].textContent = data.hero.avg_discount + '%';
+    if (heroSubs[2]) heroSubs[2].textContent = data.hero.total_reviews.toLocaleString('en-IN') + '+ reviews analysed';
+  }
+  
+  // Price distribution
+  if (data.price_distribution) {
+    data.price_distribution.forEach(function(item, idx) {
+      var fill = document.getElementById('pd' + (idx + 1));
+      if (fill) {
+        fill.setAttribute('data-w', item.percentage);
+        fill.querySelector('.price-band-count').textContent = item.percentage + '%';
+        fill.parentElement.nextElementSibling.textContent = item.percentage + '%';
+      }
+    });
+  }
+  
+  // Competition
+  if (data.competition) {
+    data.competition.forEach(function(item, idx) {
+      var fill = document.getElementById('cd' + (idx + 1));
+      if (fill) {
+        fill.setAttribute('data-w', item.percentage);
+        fill.className = 'comp-bar-fill ' + item.css_class;
+        fill.parentElement.nextElementSibling.textContent = item.level;
+      }
+    });
+  }
+  
+  // Sentiment
+  if (data.sentiment) {
+    var sentimentChips = document.querySelectorAll('.sentiment-chip');
+    if (sentimentChips[0]) sentimentChips[0].querySelector('.sentiment-pct').textContent = data.sentiment.positive + '%';
+    if (sentimentChips[1]) sentimentChips[1].querySelector('.sentiment-pct').textContent = data.sentiment.neutral + '%';
+    if (sentimentChips[2]) sentimentChips[2].querySelector('.sentiment-pct').textContent = data.sentiment.negative + '%';
+  }
+  
+  // Trigger animations
+  if (document.getElementById('page-market').classList.contains('active')) {
+    animateMarketCharts();
+  }
+}
+
 // Load data on page load
 loadMarketData();
+loadMarketAnalytics();
 
 function renderStars(rating) {
   if (!rating) return '<span style="color:var(--ink-lt);font-size:12px;">—</span>';

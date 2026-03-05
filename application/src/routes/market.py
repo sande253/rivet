@@ -171,3 +171,158 @@ def products():
         log.error(f"Error in products endpoint: {e}", exc_info=True)
         return jsonify({"error": str(e), "products": [], "total": 0}), 500
 
+
+@market_bp.route("/analytics")
+@login_required
+def analytics():
+    """Return comprehensive market analytics calculated from CSV data."""
+    try:
+        category_csv_map = current_app.config["CATEGORY_CSV_MAP"]
+        category_labels = current_app.config["CATEGORY_LABELS"]
+        
+        # Collect all data
+        all_products = []
+        category_counts = {}
+        
+        for cat_id in category_csv_map.keys():
+            try:
+                df = load_df(cat_id)
+                category_counts[cat_id] = len(df)
+                
+                required_cols = {"title", "price_current", "price_mrp", "rating", "review_count"}
+                if not required_cols.issubset(df.columns):
+                    continue
+                
+                for _, row in df.iterrows():
+                    if pd.notna(row["price_current"]) and pd.notna(row["price_mrp"]):
+                        all_products.append({
+                            "cat": cat_id,
+                            "price": float(row["price_current"]),
+                            "mrp": float(row["price_mrp"]),
+                            "rating": float(row["rating"]) if pd.notna(row["rating"]) else 0,
+                            "reviews": int(row["review_count"]) if pd.notna(row["review_count"]) else 0,
+                            "title": str(row["title"])
+                        })
+            except Exception as e:
+                log.error(f"Error loading {cat_id}: {e}")
+                continue
+        
+        if not all_products:
+            return jsonify({"error": "No data available"}), 500
+        
+        # Calculate hero stats
+        prices = [p["price"] for p in all_products if p["price"] > 0]
+        ratings = [p["rating"] for p in all_products if p["rating"] > 0]
+        discounts = [
+            ((p["mrp"] - p["price"]) / p["mrp"] * 100) 
+            for p in all_products 
+            if p["mrp"] > p["price"] > 0
+        ]
+        
+        median_price = int(pd.Series(prices).median()) if prices else 0
+        avg_rating = round(pd.Series(ratings).mean(), 1) if ratings else 0
+        avg_discount = int(pd.Series(discounts).mean()) if discounts else 0
+        total_reviews = sum(p["reviews"] for p in all_products)
+        
+        # Price distribution
+        price_ranges = [
+            ("Under ₹500", 0, 500),
+            ("₹500–₹999", 500, 1000),
+            ("₹1,000–₹1,499", 1000, 1500),
+            ("₹1,500–₹2,499", 1500, 2500),
+            ("₹2,500+", 2500, float('inf'))
+        ]
+        
+        price_dist = []
+        for label, min_p, max_p in price_ranges:
+            count = sum(1 for p in all_products if min_p <= p["price"] < max_p)
+            pct = int((count / len(all_products)) * 100) if all_products else 0
+            price_dist.append({"label": label, "percentage": pct, "count": count})
+        
+        # Competition by category
+        max_count = max(category_counts.values()) if category_counts else 1
+        competition = []
+        for cat_id, count in category_counts.items():
+            level_pct = int((count / max_count) * 100)
+            if level_pct >= 70:
+                level = "High competition"
+                css_class = "comp-high"
+            elif level_pct >= 40:
+                level = "Med competition"
+                css_class = "comp-med"
+            else:
+                level = "Low competition"
+                css_class = "comp-low"
+            
+            competition.append({
+                "category": category_labels.get(cat_id, cat_id),
+                "count": count,
+                "level": level,
+                "percentage": level_pct,
+                "css_class": css_class
+            })
+        
+        # Buyer sentiment (based on ratings)
+        rating_5 = sum(1 for p in all_products if p["rating"] >= 4.5)
+        rating_3_4 = sum(1 for p in all_products if 3.5 <= p["rating"] < 4.5)
+        rating_low = sum(1 for p in all_products if 0 < p["rating"] < 3.5)
+        
+        total_rated = rating_5 + rating_3_4 + rating_low
+        sentiment = {
+            "positive": int((rating_5 / total_rated) * 100) if total_rated else 0,
+            "neutral": int((rating_3_4 / total_rated) * 100) if total_rated else 0,
+            "negative": int((rating_low / total_rated) * 100) if total_rated else 0
+        }
+        
+        # Top trending products (high rating + high reviews)
+        trending = sorted(
+            [p for p in all_products if p["rating"] >= 4.0 and p["reviews"] > 50],
+            key=lambda x: (x["rating"] * 0.5 + (x["reviews"] / 1000) * 0.5),
+            reverse=True
+        )[:5]
+        
+        demand_signals = []
+        for p in trending:
+            cat_label = category_labels.get(p["cat"], p["cat"])
+            demand_signals.append({
+                "title": p["title"][:60],
+                "category": cat_label,
+                "rating": p["rating"],
+                "reviews": p["reviews"]
+            })
+        
+        # Market gaps (price ranges with few products)
+        gap_ranges = [
+            ("₹1,000–₹1,500", 1000, 1500),
+            ("₹2,000–₹4,000", 2000, 4000),
+            ("₹800–₹1,200", 800, 1200)
+        ]
+        
+        market_gaps = []
+        for label, min_p, max_p in gap_ranges:
+            count = sum(1 for p in all_products if min_p <= p["price"] <= max_p)
+            if count < 20:  # Low supply
+                market_gaps.append({
+                    "range": label,
+                    "count": count,
+                    "opportunity": "Low competition" if count < 10 else "Moderate competition"
+                })
+        
+        return jsonify({
+            "hero": {
+                "median_price": median_price,
+                "avg_rating": avg_rating,
+                "avg_discount": avg_discount,
+                "total_reviews": total_reviews,
+                "total_products": len(all_products)
+            },
+            "price_distribution": price_dist,
+            "competition": competition,
+            "sentiment": sentiment,
+            "demand_signals": demand_signals,
+            "market_gaps": market_gaps[:3]
+        })
+        
+    except Exception as e:
+        log.error(f"Error in analytics endpoint: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
