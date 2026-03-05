@@ -1977,6 +1977,14 @@ function renderResults(data) {
   var m  = sc.material_appeal       || 0;
   var tr = sc.trend_alignment       || 0;
   var total = data.total_score || (d + u + p + m + tr);
+  
+  // Fallback: determine classification from score if model returns old values
+  if (cls === 'LAUNCH' || cls === 'DO NOT PRODUCE' || !cls) {
+    if (total >= 75) cls = 'PROCEED';
+    else if (total >= 50) cls = 'MODIFY';
+    else cls = 'RECONSIDER';
+  }
+  
   var hero = document.getElementById('ratingHero');
   hero.className = 'rating-hero';
   if (cls === 'PROCEED') {
