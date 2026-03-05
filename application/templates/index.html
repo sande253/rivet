@@ -112,16 +112,64 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   background: linear-gradient(135deg, #0A1F17 0%, #1B5247 50%, #256B56 100%);
   position: relative;
   overflow: hidden;
-  padding: 64px 40px;
+  padding: 80px 40px;
+  min-height: 600px;
 }
+
+/* Animated background layers */
 .home-hero::before {
   content: '';
-  position: absolute; inset: 0;
+  position: absolute; 
+  inset: 0;
   background-image:
-    radial-gradient(circle at 10% 90%, rgba(236,230,208,0.08) 0%, transparent 45%),
-    radial-gradient(circle at 90% 10%, rgba(37,107,86,0.4) 0%, transparent 55%);
+    radial-gradient(circle at 20% 80%, rgba(236,230,208,0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(45,139,107,0.5) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(27,82,71,0.3) 0%, transparent 70%);
   pointer-events: none;
   animation: gradientShift 20s ease infinite;
+  opacity: 0.8;
+}
+
+/* Floating geometric shapes */
+.home-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(236,230,208,0.1) 0%, transparent 25%),
+    radial-gradient(circle at 85% 85%, rgba(158,122,26,0.15) 0%, transparent 30%);
+  animation: float 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Parallax layers */
+.parallax-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.parallax-layer-1 {
+  background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='rgba(236,230,208,0.03)' /%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: parallaxMove1 30s linear infinite;
+}
+
+.parallax-layer-2 {
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='none' stroke='rgba(45,139,107,0.08)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 150px 150px;
+  animation: parallaxMove2 40s linear infinite reverse;
+}
+
+@keyframes parallaxMove1 {
+  from { background-position: 0 0; }
+  to { background-position: 200px 200px; }
+}
+
+@keyframes parallaxMove2 {
+  from { background-position: 0 0; }
+  to { background-position: -150px -150px; }
 }
 
 /* Inner wrapper: max-width container, no manual left margin */
@@ -170,12 +218,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   font-weight: 400; color: #FFFFFF;
   line-height: 1.1; margin-bottom: 20px; letter-spacing: -1.5px;
   animation: fadeInUp 0.6s 0.2s both;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3), 0 4px 40px rgba(10,31,23,0.4);
 }
-.home-hero h1 em { font-style: italic; color: #ECE6D0; }
+.home-hero h1 em { 
+  font-style: italic; 
+  color: #ECE6D0; 
+  text-shadow: 0 0 30px rgba(236,230,208,0.4), 0 2px 20px rgba(0,0,0,0.3);
+}
 .home-hero-desc {
-  font-size: 17px; color: rgba(255,255,255,0.65);
+  font-size: 17px; color: rgba(255,255,255,0.75);
   line-height: 1.75; margin-bottom: 40px; max-width: 480px;
   animation: fadeInUp 0.6s 0.3s both;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.2);
 }
 .hero-cta-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; animation: fadeInUp 0.6s 0.4s both; }
 .btn-hero {
@@ -231,20 +285,40 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   align-items: center;
   justify-content: center;
   animation: fadeInUp 0.7s 0.35s both;
-  
+  position: relative;
 }
+
+/* Decorative frame around image */
+.home-hero-right::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  background: linear-gradient(135deg, rgba(236,230,208,0.3), rgba(45,139,107,0.3));
+  border-radius: calc(var(--radius-lg) + 4px);
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.home-hero-right:hover::before {
+  opacity: 1;
+}
+
 .home-hero-right img {
   width: 147%;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 20px 60px rgba(10,31,23,0.3), 0 8px 30px rgba(10,31,23,0.2);
   object-fit: cover;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  filter: brightness(0.79);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease, filter 0.4s ease;
+  filter: brightness(0.85) contrast(1.05) saturate(1.1);
+  position: relative;
+  z-index: 1;
 }
 
 .home-hero-right img:hover {
-  transform: scale(1.05) translateZ(0);
-  box-shadow: 0 20px 60px rgba(10, 31, 23, 0.25);
+  transform: scale(1.03) translateY(-4px) rotate(1deg);
+  box-shadow: 0 30px 80px rgba(10, 31, 23, 0.35), 0 12px 40px rgba(10, 31, 23, 0.25);
+  filter: brightness(0.9) contrast(1.08) saturate(1.15);
 }
 
 /* ══════════════════════════════════════
@@ -1363,6 +1437,10 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   <!-- ══════ HOME ══════ -->
   <div class="page {% if active_page == 'home' or not active_page %}active{% endif %}" id="page-home">
     <div class="home-hero">
+      <!-- Parallax background layers -->
+      <div class="parallax-layer parallax-layer-1"></div>
+      <div class="parallax-layer parallax-layer-2"></div>
+      
       <!-- FIX 1: Single centered inner wrapper, no margin-left hack -->
       <div class="home-hero-inner">
         <div class="home-hero-left">
@@ -3319,6 +3397,68 @@ window.addEventListener('scroll', function() {
   
   // Initial check
   setTimeout(checkAnimations, 100);
+})();
+
+// Parallax scroll effect for hero section
+(function() {
+  var heroSection = document.querySelector('.home-hero');
+  var parallaxLayer1 = document.querySelector('.parallax-layer-1');
+  var parallaxLayer2 = document.querySelector('.parallax-layer-2');
+  var heroImage = document.querySelector('.home-hero-right img');
+  
+  if (!heroSection) return;
+  
+  function updateParallax() {
+    var scrolled = window.scrollY;
+    var heroRect = heroSection.getBoundingClientRect();
+    
+    // Only apply parallax when hero is visible
+    if (heroRect.bottom > 0 && heroRect.top < window.innerHeight) {
+      var scrollPercent = scrolled / (heroRect.height + heroRect.top);
+      
+      // Move parallax layers at different speeds
+      if (parallaxLayer1) {
+        parallaxLayer1.style.transform = 'translateY(' + (scrollPercent * 50) + 'px)';
+      }
+      if (parallaxLayer2) {
+        parallaxLayer2.style.transform = 'translateY(' + (scrollPercent * -30) + 'px)';
+      }
+      
+      // Subtle image parallax
+      if (heroImage) {
+        heroImage.style.transform = 'translateY(' + (scrollPercent * 20) + 'px) scale(1)';
+      }
+    }
+  }
+  
+  window.addEventListener('scroll', updateParallax, { passive: true });
+  updateParallax(); // Initial call
+})();
+
+// Interactive gradient overlay on hero (mouse movement)
+(function() {
+  var heroSection = document.querySelector('.home-hero');
+  if (!heroSection) return;
+  
+  // Create interactive overlay element
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.3s; background: radial-gradient(circle 600px at 50% 50%, rgba(236,230,208,0.15), transparent);';
+  heroSection.insertBefore(overlay, heroSection.firstChild);
+  
+  heroSection.addEventListener('mouseenter', function() {
+    overlay.style.opacity = '1';
+  });
+  
+  heroSection.addEventListener('mouseleave', function() {
+    overlay.style.opacity = '0';
+  });
+  
+  heroSection.addEventListener('mousemove', function(e) {
+    var rect = heroSection.getBoundingClientRect();
+    var x = ((e.clientX - rect.left) / rect.width) * 100;
+    var y = ((e.clientY - rect.top) / rect.height) * 100;
+    overlay.style.background = 'radial-gradient(circle 600px at ' + x + '% ' + y + '%, rgba(236,230,208,0.15), transparent)';
+  });
 })();
 
 // Initialize the active page
