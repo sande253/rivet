@@ -778,14 +778,29 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .filter-chip { padding: 7px 16px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 500; color: var(--ink-mid); background: var(--white); cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
 .filter-chip:hover, .filter-chip.active { background: var(--indigo); color: var(--white); border-color: var(--indigo); transform: translateY(-1px); }
 .market-cards-section { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
-.market-cards-head { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.market-cards-head h6 { font-size: 13px; font-weight: 700; color: var(--ink); margin: 0; }
+.market-cards-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(27,82,71,0.03), transparent); }
+.market-cards-head h6 { font-size: 14px; font-weight: 700; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 8px; }
+.market-cards-head h6 .material-icons-round { font-size: 18px; color: var(--indigo); }
+
+/* Enhanced pagination */
+.pagination-wrap { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-top: 1px solid var(--border); background: var(--cream); flex-wrap: wrap; gap: 12px; }
+.pagination-controls { display: flex; align-items: center; gap: 8px; }
+.pagination-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; background: white; color: var(--ink-mid); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+.pagination-btn:hover:not(:disabled) { background: var(--indigo-light); border-color: var(--indigo); color: var(--indigo); }
+.pagination-btn.active { background: var(--indigo); color: white; border-color: var(--indigo); }
+.pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination-btn .material-icons-round { font-size: 18px; }
+.pagination-info { font-size: 13px; color: var(--ink-mid); display: flex; align-items: center; gap: 8px; }
+.pagination-info strong { color: var(--ink); font-weight: 600; }
+.items-per-page { display: flex; align-items: center; gap: 8px; }
+.items-per-page-label { font-size: 13px; color: var(--ink-mid); white-space: nowrap; }
 .market-table { width: 100%; border-collapse: collapse; }
-.market-table th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-lt); background: var(--cream); border-bottom: 1px solid var(--border); }
-.market-table td { padding: 13px 16px; border-bottom: 1px solid var(--cream); font-size: 13px; color: var(--ink); vertical-align: middle; }
+.market-table th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-lt); background: var(--cream); border-bottom: 2px solid var(--border); white-space: nowrap; }
+.market-table td { padding: 14px 16px; border-bottom: 1px solid var(--cream); font-size: 13px; color: var(--ink); vertical-align: middle; }
 .market-table tr:last-child td { border-bottom: none; }
-.market-table tr:hover td { background: var(--cream); }
-.market-table tbody tr { transition: all .2s; }
+.market-table tbody tr { transition: all .2s; cursor: pointer; }
+.market-table tbody tr:hover { background: var(--indigo-light); transform: translateX(4px); }
+.market-table tbody tr:hover td { border-bottom-color: transparent; }
 .items-per-page-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--ink); background: var(--white); font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .18s; }
 .items-per-page-select:hover, .items-per-page-select:focus { border-color: var(--indigo); box-shadow: 0 0 0 2px rgba(27,82,71,0.1); outline: none; }
 .brand-sub { font-size: 11px; color: var(--ink-lt); }
@@ -1689,7 +1704,13 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         <div class="opportunity-card" style="background:linear-gradient(135deg,#3D2800,#7A5200);"><div class="opp-icon"><span class="material-icons-round">eco</span></div><div class="opp-text"><h6>Embroidered Cotton Salwar Suits (₹800–₹1,200)</h6><p>Rising buyer interest in office-friendly ethnic wear. Subtle embroidery commands 20–30% premium over plain versions.</p></div></div>
       </div>
       <div class="market-cards-section">
-        <div class="market-cards-head"><h6>Product Listings</h6></div>
+        <div class="market-cards-head">
+          <h6>
+            <span class="material-icons-round">inventory_2</span>
+            Product Listings
+          </h6>
+          <span style="font-size:12px;color:var(--ink-lt);" id="tableCount">28 products</span>
+        </div>
         <div style="padding:14px 20px;border-bottom:1px solid var(--border);">
           <div class="filter-bar" style="margin:0;">
             <span class="filter-bar-label">Filter:</span>
@@ -1719,16 +1740,21 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           </table>
         </div>
         <div class="loading-spinner" id="marketSpinner"><div class="spinner-border spinner-border-sm" role="status" style="color:var(--indigo);"></div>&nbsp;<span>Loading…</span></div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:24px;flex-wrap:wrap;" id="paginationWrap">
-          <button class="btn-outline" id="prevPageBtn" onclick="goToMarketPage(marketPage - 1)" style="display:none;">
-            <span class="material-icons-round" style="font-size:18px;">chevron_left</span> Previous
-          </button>
-          <div id="pageIndicator" style="font-size:13px;color:var(--ink-lt);font-weight:600;min-width:120px;text-align:center;">Page 1</div>
-          <button class="btn-outline" id="nextPageBtn" onclick="goToMarketPage(marketPage + 1)">
-            Next <span class="material-icons-round" style="font-size:18px;">chevron_right</span>
-          </button>
-          <div style="display:flex;align-items:center;gap:6px;margin-left:10px;">
-            <label for="itemsPerPageSelect" style="font-size:13px;color:var(--ink-lt);white-space:nowrap;">Items per page:</label>
+        <div class="pagination-wrap" id="paginationWrap">
+          <div class="pagination-info">
+            <span>Showing <strong id="showingStart">1</strong>-<strong id="showingEnd">8</strong> of <strong id="totalItems">28</strong></span>
+          </div>
+          <div class="pagination-controls">
+            <button class="pagination-btn" id="prevPageBtn" onclick="goToMarketPage(marketPage - 1)" disabled>
+              <span class="material-icons-round">chevron_left</span>
+            </button>
+            <div id="pageNumbers" style="display:flex;gap:4px;"></div>
+            <button class="pagination-btn" id="nextPageBtn" onclick="goToMarketPage(marketPage + 1)">
+              <span class="material-icons-round">chevron_right</span>
+            </button>
+          </div>
+          <div class="items-per-page">
+            <label for="itemsPerPageSelect" class="items-per-page-label">Show:</label>
             <select id="itemsPerPageSelect" class="items-per-page-select" onchange="changeItemsPerPage(this.value)">
               <option value="8" selected>8</option>
               <option value="12">12</option>
@@ -1895,12 +1921,49 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
       function updatePaginationControls() {
         var data = getFilteredMarket();
         var totalPages = Math.ceil(data.length / mPageSize);
+        var start = (marketPage - 1) * mPageSize + 1;
+        var end = Math.min(marketPage * mPageSize, data.length);
+        
+        // Update prev/next buttons
         var prevBtn = document.getElementById('prevPageBtn');
         var nextBtn = document.getElementById('nextPageBtn');
-        var indicator = document.getElementById('pageIndicator');
-        if (prevBtn) prevBtn.style.display = marketPage > 1 ? 'inline-flex' : 'none';
-        if (nextBtn) nextBtn.style.display = marketPage < totalPages ? 'inline-flex' : 'none';
-        if (indicator) indicator.textContent = 'Page ' + marketPage + ' of ' + totalPages;
+        if (prevBtn) prevBtn.disabled = marketPage <= 1;
+        if (nextBtn) nextBtn.disabled = marketPage >= totalPages;
+        
+        // Update showing info
+        var showingStart = document.getElementById('showingStart');
+        var showingEnd = document.getElementById('showingEnd');
+        var totalItems = document.getElementById('totalItems');
+        if (showingStart) showingStart.textContent = start;
+        if (showingEnd) showingEnd.textContent = end;
+        if (totalItems) totalItems.textContent = data.length;
+        
+        // Update table count
+        var tableCount = document.getElementById('tableCount');
+        if (tableCount) tableCount.textContent = data.length + ' products';
+        
+        // Generate page numbers
+        var pageNumbers = document.getElementById('pageNumbers');
+        if (pageNumbers) {
+          pageNumbers.innerHTML = '';
+          var maxButtons = 5;
+          var startPage = Math.max(1, marketPage - 2);
+          var endPage = Math.min(totalPages, startPage + maxButtons - 1);
+          
+          if (endPage - startPage < maxButtons - 1) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+          }
+          
+          for (var i = startPage; i <= endPage; i++) {
+            var btn = document.createElement('button');
+            btn.className = 'pagination-btn' + (i === marketPage ? ' active' : '');
+            btn.textContent = i;
+            btn.onclick = (function(page) {
+              return function() { goToMarketPage(page); };
+            })(i);
+            pageNumbers.appendChild(btn);
+          }
+        }
       }
 
       function renderMarketPage() {
