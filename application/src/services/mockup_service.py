@@ -109,7 +109,6 @@ def _save_local(
         raise RuntimeError(f"Failed to process sketch image: {e}")
 
     # Local mode: PIL simulation (no Bedrock available).
-    # Adds a visible "DEV PREVIEW" overlay so it's clear this is not the real mockup.
     try:
         _pil_enhance(sketch_path, mockup_dest)
     except Exception as e:
@@ -121,9 +120,6 @@ def _save_local(
         "Set ENVIRONMENT=production and configure Bedrock for realistic generation."
     )
 
-    # Build URL paths relative to Flask static root.
-    # upload_folder is normally "static/uploads"; strip the "static/" prefix
-    # so Flask serves them correctly via /static/…
     rel = upload_folder.replace("\\", "/")
     if rel.startswith("static/"):
         url_base = "/" + rel
@@ -145,21 +141,42 @@ def _bedrock_client():
 
     region = os.environ.get("AWS_REGION", "us-east-1")
     cfg = botocore.config.Config(
-        read_timeout=60,
+        read_timeout=120,   # Image generation can be slow; give it more time
         connect_timeout=10,
-        retries={"max_attempts": 1},
+        retries={"max_attempts": 2},
     )
     # Credentials come from IAM role / environment — never hardcoded.
     return boto3.client("bedrock-runtime", region_name=region, config=cfg)
 
 
+def _sketch_to_base64(sketch_path: str) -> str:
+    """Read sketch file and return base64-encoded PNG string."""
+    from PIL import Image  # type: ignore[import]
+    import io
+
+    with Image.open(sketch_path) as img:
+        img = img.convert("RGB")
+        # Titan Image Generator v2 requires dimensions to be multiples of 64,
+        # between 320 and 1408. Resize to 768x1024 (portrait, fashion-friendly).
+        img = img.resize((768, 1024), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return base64.standard_b64encode(buf.getvalue()).decode("utf-8")
+
+
 def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
-    """Call Bedrock TEXT_IMAGE to generate realistic mockup. Returns raw PNG bytes."""
-    # Use TEXT_IMAGE to generate photorealistic product photos from description
-    # The sketch is analyzed by Claude first, and that analysis is used in the prompt
+    """Call Bedrock IMAGE_VARIATION to generate realistic mockup from sketch.
+
+    IMAGE_VARIATION uses the sketch as a structural reference image and
+    renders it photorealistically according to the text prompt.
+    similarityStrength=0.3 keeps the garment shape/layout from the sketch
+    while allowing the model to add realistic fabric texture, lighting, model, etc.
+    """
+    sketch_b64 = _sketch_to_base64(sketch_path)
+
     body = {
-        "taskType": "TEXT_IMAGE",
-        "textToImageParams": {
+        "taskType": "IMAGE_VARIATION",
+        "imageVariationParams": {
             "text": prompt,
             "negativeText": (
                 "blurry, cartoon, sketch, drawing, line art, pencil drawing, "
@@ -167,17 +184,24 @@ def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
                 "unrealistic, flat colors, amateur, pixelated, illustration, "
                 "anime, painting, digital art, mannequin, headless, faceless"
             ),
+            "images": [sketch_b64],           # sketch as structural reference
+            "similarityStrength": 0.3,         # 0.2–0.5: low = more creative,
+                                               # high = closer to sketch structure
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
-            "width": 768,  # Higher resolution for better quality
-            "height": 1024,  # Portrait orientation for fashion
-            "cfgScale": 10.0,  # Higher value = stronger prompt adherence
-            "seed": 42,  # Consistent results
+            "width": 768,
+            "height": 1024,
+            "cfgScale": 10.0,
+            "seed": 42,
         },
     }
 
     client = _bedrock_client()
+    log.info(
+        "Invoking Bedrock IMAGE_VARIATION [model=%s similarityStrength=0.3]",
+        model_id,
+    )
     response = client.invoke_model(
         modelId=model_id,
         contentType="application/json",
@@ -185,6 +209,13 @@ def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
         body=json.dumps(body),
     )
     result = json.loads(response["body"].read())
+
+    # Titan returns a list; grab the first image
+    if "images" not in result or not result["images"]:
+        raise RuntimeError(
+            f"Bedrock returned no images. Full response keys: {list(result.keys())}"
+        )
+
     return base64.standard_b64decode(result["images"][0])
 
 
@@ -259,11 +290,11 @@ def generate_mockup(
     try:
         if is_production:
             model_id = os.environ.get("BEDROCK_IMAGE_MODEL_ID", _BEDROCK_DEFAULT_MODEL)
-            log.info("Using Bedrock model: %s", model_id)
+            log.info("Using Bedrock IMAGE_VARIATION model: %s", model_id)
             mockup_bytes = _bedrock_generate(prompt, sketch_path, model_id)
             sketch_url, mockup_url = _save_production(sketch_path, mockup_bytes, uid)
         else:
-            log.info("Using local PIL enhancement")
+            log.info("Using local PIL enhancement (dev preview only)")
             sketch_url, mockup_url = _save_local(sketch_path, upload_folder, uid)
 
         log.info("Mockup generated successfully [sketch=%s mockup=%s]", sketch_url, mockup_url)
