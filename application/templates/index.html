@@ -1420,8 +1420,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 <div class="res-card-body">
                   <div class="score-pie-wrap">
                     <div class="score-pie-chart" id="scorePieWrap">
-                      <svg id="scorePieChart" viewBox="0 0 200 200" width="200" height="200" style="overflow:visible;">
-                        <g id="scorePieSectors" transform="translate(100,100)"></g>
+                      <svg id="scorePieChart" viewBox="0 0 280 280" width="280" height="280" style="overflow:visible;">
+                        <g id="scorePieSectors" transform="translate(140,140)"></g>
                       </svg>
                       <div id="scorePieTip" class="score-pie-tip"></div>
                       <div class="score-pie-centre">
@@ -2356,11 +2356,11 @@ function drawScorePie(scores) {
         tip.style.display = 'block';
         var svgRect = document.getElementById('scorePieChart').getBoundingClientRect();
         var wrapRect = document.getElementById('scorePieWrap').getBoundingClientRect();
-        var scale = svgRect.width / 200;
+        var scale = svgRect.width / 280;
         var mid = polarToCart(0, 0, rOuter + 16, midD);
         tip.style.left = (mid.x * scale + svgRect.width / 2 - wrapRect.left + wrapRect.left - wrapRect.left) + 'px';
-        var offsetX = (mid.x + 100) * scale;
-        var offsetY = (mid.y + 100) * scale;
+        var offsetX = (mid.x + 140) * scale;
+        var offsetY = (mid.y + 140) * scale;
         tip.style.left = offsetX + 'px';
         tip.style.top  = (offsetY - 28) + 'px';
         // highlight legend row
