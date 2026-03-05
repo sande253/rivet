@@ -1,5 +1,6 @@
 import logging
 
+import pandas as pd
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required
 
@@ -111,3 +112,52 @@ def market_insights():
         insights["top_products"] = []
 
     return jsonify(insights)
+
+
+@market_bp.route("/products")
+@login_required
+def products():
+    """Return product listings from CSV files for the market table."""
+    category_csv_map = current_app.config["CATEGORY_CSV_MAP"]
+    category_labels = current_app.config["CATEGORY_LABELS"]
+    
+    # Get all products from all categories
+    all_products = []
+    
+    for cat_id, csv_file in category_csv_map.items():
+        try:
+            df = load_df(cat_id)
+            
+            # Required columns check
+            required_cols = {"title", "brand", "price_current", "price_mrp", "rating", "review_count"}
+            if not required_cols.issubset(df.columns):
+                log.warning(f"Category {cat_id} missing required columns")
+                continue
+            
+            # Convert to list of dicts
+            for _, row in df.iterrows():
+                try:
+                    product = {
+                        "title": str(row["title"])[:80],
+                        "brand": str(row.get("brand", "Unknown")),
+                        "cat": cat_id,
+                        "price": int(row["price_current"]) if pd.notna(row["price_current"]) else 0,
+                        "mrp": int(row["price_mrp"]) if pd.notna(row["price_mrp"]) else 0,
+                        "rating": round(float(row["rating"]), 1) if pd.notna(row["rating"]) else 0,
+                        "reviews": int(row["review_count"]) if pd.notna(row["review_count"]) else 0,
+                    }
+                    all_products.append(product)
+                except (ValueError, TypeError) as e:
+                    log.debug(f"Skipping row due to data error: {e}")
+                    continue
+                    
+        except Exception as e:
+            log.error(f"Error loading products from {cat_id}: {e}")
+            continue
+    
+    return jsonify({
+        "products": all_products,
+        "total": len(all_products),
+        "categories": category_labels
+    })
+

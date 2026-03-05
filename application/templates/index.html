@@ -2727,36 +2727,26 @@ function sanitizePriceInput(el) {
   else { err.style.display = 'block'; el.style.borderColor = 'var(--red)'; }
 }
 
-var rawMarket = [
-  { title:'Kanjivaram Pure Soft Silk Saree', brand:'SGF11', cat:'saree', price:1499, rating:4.3, reviews:462, mrp:8999 },
-  { title:'Banarasi Kanjivaram Silk Saree — Wedding', brand:'Sugathari', cat:'saree', price:499, rating:4.0, reviews:267, mrp:2499 },
-  { title:'Jacquard Kanjivaram Soft Silk Saree', brand:'SIRIL', cat:'saree', price:729, rating:3.8, reviews:20, mrp:3799 },
-  { title:'Pure Kanjivaram Cotton Silk Saree', brand:'C J Enterprise', cat:'saree', price:599, rating:3.6, reviews:321, mrp:2999 },
-  { title:'Handloom Bengal Tant Pure Cotton Saree', brand:'Tant Vastra', cat:'saree', price:939, rating:4.3, reviews:99, mrp:3199 },
-  { title:'Cotton Banarasi Silk Saree', brand:'Mehrang', cat:'saree', price:1199, rating:4.2, reviews:569, mrp:3999 },
-  { title:'Pure Cotton Printed Mul Mul Saree', brand:'RADHA LAKSHMI', cat:'saree', price:999, rating:4.0, reviews:370, mrp:3899 },
-  { title:'Chanderi Cotton Printed Saree', brand:'SIRIL', cat:'saree', price:919, rating:3.5, reviews:78, mrp:3999 },
-  { title:'Paithani Zari Border Silk Saree', brand:'SGF11', cat:'saree', price:1499, rating:4.3, reviews:161, mrp:8999 },
-  { title:'Bomkai Silk Handloom Saree', brand:'Odisha Weaves', cat:'saree', price:1850, rating:4.5, reviews:43, mrp:5499 },
-  { title:'Bridal Embroidered Lehenga Choli — Red Silk', brand:'Ethnic Junction', cat:'lehenga', price:3499, rating:4.4, reviews:312, mrp:12999 },
-  { title:'Party Wear Flared Net Lehenga Set', brand:'Sangria', cat:'lehenga', price:1299, rating:3.9, reviews:187, mrp:4999 },
-  { title:'Festive Georgette Lehenga with Dupatta', brand:'Anouk', cat:'lehenga', price:899, rating:4.1, reviews:258, mrp:3499 },
-  { title:'Designer Mirror Work Lehenga Choli', brand:'Biba', cat:'lehenga', price:2499, rating:4.6, reviews:89, mrp:7999 },
-  { title:'Cotton A-Line Lehenga Set — Printed', brand:'Global Desi', cat:'lehenga', price:749, rating:3.7, reviews:134, mrp:2999 },
-  { title:'Silk Gharara Set — Bridal Collection', brand:'Zari Zardosi', cat:'lehenga', price:4999, rating:4.5, reviews:56, mrp:18999 },
-  { title:'Anarkali Suit — Embroidered Georgette', brand:'W for Woman', cat:'salwar', price:1149, rating:4.2, reviews:445, mrp:3999 },
-  { title:'Churidar Suit — Cotton Printed', brand:'Fabindia', cat:'salwar', price:1499, rating:4.4, reviews:321, mrp:4499 },
-  { title:'Palazzo Suit Set — Rayon Printed', brand:'Aurelia', cat:'salwar', price:899, rating:4.0, reviews:556, mrp:2999 },
-  { title:'Punjabi Salwar Kameez — Pure Cotton', brand:'Jaipur Kurti', cat:'salwar', price:799, rating:3.8, reviews:289, mrp:2499 },
-  { title:'Silk Salwar Suit — Festive Collection', brand:'BIBA', cat:'salwar', price:1999, rating:4.3, reviews:178, mrp:6499 },
-  { title:'Cotton Sharara Set — Block Print', brand:'Rang by Indya', cat:'salwar', price:1249, rating:4.1, reviews:203, mrp:3999 },
-  { title:'Printed Cotton A-Line Kurti', brand:'Jaipur Kurti', cat:'kurti', price:499, rating:4.1, reviews:1243, mrp:1499 },
-  { title:'Embroidered Rayon Straight Kurti', brand:'Libas', cat:'kurti', price:699, rating:4.3, reviews:867, mrp:1999 },
-  { title:'Floral Cotton Kurta Set with Pant', brand:'W for Woman', cat:'kurti', price:999, rating:4.2, reviews:534, mrp:2999 },
-  { title:'Silk Blend Embroidered Kurti — Festive', brand:'Biba', cat:'kurti', price:1299, rating:4.5, reviews:312, mrp:3999 },
-  { title:'Kaftan Style Cotton Printed Kurti', brand:'Global Desi', cat:'kurti', price:599, rating:3.9, reviews:421, mrp:1799 },
-  { title:'Asymmetric Hem Rayon Kurti — Casual', brand:'Anouk', cat:'kurti', price:449, rating:3.7, reviews:678, mrp:1299 },
-];
+var rawMarket = [];
+
+// Load market data from API
+function loadMarketData() {
+  fetch('/market/products')
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      rawMarket = data.products || [];
+      if (document.getElementById('page-market').classList.contains('active')) {
+        initMarket();
+      }
+    })
+    .catch(function(error) {
+      console.error('Error loading market data:', error);
+      showToast('Failed to load market data', 'error');
+    });
+}
+
+// Load data on page load
+loadMarketData();
 
 function renderStars(rating) {
   if (!rating) return '<span style="color:var(--ink-lt);font-size:12px;">—</span>';
