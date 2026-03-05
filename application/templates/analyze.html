@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- ══════ ANALYZE PAGE ══════ -->
+  <div class="page" id="page-analyze">
+    <div class="analyze-page-wrap">
+      <div class="container-xl px-3 px-md-4">
+        <div class="row g-3 g-lg-4 align-items-start">
+
+          <!-- ═══ LEFT SIDEBAR ═══ -->
+          <div class="col-12 col-md-4 col-lg-3 d-flex flex-column gap-3">
+
+            <!-- How to Use -->
+            <div class="az-card">
+              <div class="az-card-head">
+                <span class="material-icons-round">info</span>
+                <h6 data-en="How to Use" data-te="ఎలా ఉపయోగించాలి">How to Use</h6>
+              </div>
+              <div class="az-card-body">
+                <ol class="az-steps">
+                  <li data-en="Describe your product — fabric, style, and occasion" data-te="మీ ఉత్పత్తిని వివరించండి">Describe your product — fabric, style, and occasion</li>
+                  <li data-en="Select your product category" data-te="వర్గం ఎంచుకోండి">Select your product category</li>
+                  <li data-en="Enter your target price and other details" data-te="లక్ష్య ధర నమోదు చేయండి">Enter your target price and other details</li>
+                  <li data-en="Upload a photo or sketch" data-te="ఫోటో అప్లోడ్ చేయండి">Upload a photo or sketch</li>
+                  <li data-en="Click Run Analysis for your decision" data-te="విశ్లేషణ అమలు చేయండి">Click Run Analysis for your decision</li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- Decision Guide -->
+            <div class="az-card">
+              <div class="az-card-head">
+                <span class="material-icons-round">rule</span>
+                <h6 data-en="Decision Guide" data-te="నిర్ణయ మార్గదర్శి">Decision Guide</h6>
+              </div>
+              <div class="az-card-body">
+                <div class="az-dl-item dl-green">
+                  <div class="az-dl-icon"><span class="material-icons-round">check</span></div>
+                  <div>
+                    <div class="az-dl-title" data-en="Proceed to Production" data-te="ఉత్పత్తికి కొనసాగించండి">Proceed to Production</div>
+                    <div class="az-dl-range">Score 75–100 · Strong fit</div>
+                  </div>
+                </div>
+                <div class="az-dl-item dl-amber">
+                  <div class="az-dl-icon"><span class="material-icons-round">tune</span></div>
+                  <div>
+                    <div class="az-dl-title" data-en="Adjust Before Producing" data-te="తయారు చేయడానికి ముందు మార్చుకోండి">Adjust Before Producing</div>
+                    <div class="az-dl-range">Score 50–74 · Changes needed</div>
+                  </div>
+                </div>
+                <div class="az-dl-item dl-red">
+                  <div class="az-dl-icon"><span class="material-icons-round">close</span></div>
+                  <div>
+                    <div class="az-dl-title" data-en="Do Not Produce" data-te="తయారు చేయవద్దు">Do Not Produce</div>
+                    <div class="az-dl-range">Score 0–49 · High risk</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- What Gets Rated -->
+            <div class="az-card">
+              <div class="az-card-head">
+                <span class="material-icons-round">donut_large</span>
+                <h6 data-en="What Gets Rated" data-te="ఏమి రేట్ చేయబడుతుంది">What Gets Rated</h6>
+              </div>
+              <div class="az-card-body">
+                <div style="display:flex;justify-content:center;margin-bottom:12px;">
+                  <div style="position:relative;width:130px;height:130px;">
+                    <svg id="ratingPieChart" viewBox="0 0 200 200" width="130" height="130" style="overflow:visible;">
+                      <g id="pieSectors"></g>
+                    </svg>
+                    <div id="pieTooltip" style="display:none;position:absolute;background:#0A1F17;color:#fff;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:600;padding:5px 9px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:10;transform:translate(-50%,-120%);box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                      <span style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink);line-height:1;" id="pieCentreNum">5</span>
+                      <span style="font-size:8px;color:var(--ink-lt);font-weight:700;letter-spacing:.8px;text-transform:uppercase;" data-en="CRITERIA" data-te="ప్రమాణాలు">CRITERIA</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="pie-legend">
+                  <div class="pie-legend-item" data-idx="0"><span class="pie-dot" style="background:#1B5247;"></span><span class="pie-label" data-en="Market Demand"    data-te="మార్కెట్ డిమాండ్">Market Demand</span><span class="pie-weight">20%</span></div>
+                  <div class="pie-legend-item" data-idx="1"><span class="pie-dot" style="background:#2D8B6B;"></span><span class="pie-label" data-en="Design Uniqueness" data-te="డిజైన్ విశిష్టత">Design Uniqueness</span><span class="pie-weight">20%</span></div>
+                  <div class="pie-legend-item" data-idx="2"><span class="pie-dot" style="background:#9E7A1A;"></span><span class="pie-label" data-en="Price Fit"         data-te="ధర అనుకూలత">Price Fit</span><span class="pie-weight">20%</span></div>
+                  <div class="pie-legend-item" data-idx="3"><span class="pie-dot" style="background:#C4962A;"></span><span class="pie-label" data-en="Material Appeal"   data-te="వస్తు ఆకర్షణ">Material Appeal</span><span class="pie-weight">20%</span></div>
+                  <div class="pie-legend-item" data-idx="4"><span class="pie-dot" style="background:#5B3B8C;"></span><span class="pie-label" data-en="Trend Alignment"   data-te="ట్రెండ్ అనుకూలత">Trend Alignment</span><span class="pie-weight">20%</span></div>
+                </div>
+                <p style="font-size:10px;color:var(--ink-lt);margin:9px 0 0;padding-top:8px;border-top:1px solid var(--border);text-align:center;">Hover a slice · Each = 20%</p>
+              </div>
+            </div>
+
+          </div><!-- /sidebar -->
+
+          <!-- ═══ MAIN CONTENT ═══ -->
+          <div class="col-12 col-md-8 col-lg-9">
+
+            <!-- Form card -->
+            <div class="az-form-card">
+              <div class="az-form-header">
+                <span class="material-icons-round">edit_note</span>
+                <h5 data-en="Describe Your Product" data-te="మీ ఉత్పత్తిని వివరించండి">Describe Your Product</h5>
+                <span class="hint" data-en="Fill in the details below" data-te="దిగువ వివరాలు పూరించండి">Fill in the details below</span>
+              </div>
+              <div class="az-form-body">
+
+                <div class="mb-3">
+                  <label class="az-label" data-en="PRODUCT DESCRIPTION" data-te="ఉత్పత్తి వివరణ">PRODUCT DESCRIPTION</label>
+                  <textarea class="az-field" id="productDesc" placeholder="E.g. A red Kanjivaram silk saree with gold zari border, meant for wedding wear…"></textarea>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-sm-6">
+                    <!-- REPLACE the entire category col-sm-6 div content: -->
+                    <label class="az-label" data-en="CATEGORY" data-te="వర్గం">CATEGORY</label>
+                    <div class="cat-wrap" id="categorySearchWrap" style="position:relative;">
+                      <input type="text" class="az-field" id="categorySearchInput"
+                        placeholder="Search or select category…"
+                        autocomplete="off"
+                        readonly
+                        onclick="toggleCategoryDropdown()"
+                        style="cursor:pointer;padding-right:36px;"/>
+                      <span class="material-icons-round" id="catChevron"
+                        style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--ink-lt);pointer-events:none;transition:transform .2s;">
+                        expand_more
+                      </span>
+                      <div class="cat-dropdown" id="categoryDropdown" style="max-height:280px;overflow-y:auto;"></div>
+                      <input type="hidden" id="productCategory" value="saree"/>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="az-label" data-en="TARGET PRICE (₹)" data-te="లక్ష్య ధర (₹)">TARGET PRICE (₹)</label>
+                    <input type="text" class="az-field" id="productPrice" placeholder="e.g. 1499" inputmode="numeric" oninput="sanitizePriceInput(this)"/>
+                    <div id="priceError" style="font-size:10.5px;color:var(--red);margin-top:3px;display:none;">Please enter a valid price</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="az-label" data-en="OCCASION" data-te="సందర్భం">OCCASION</label>
+                    <select class="az-field" id="productOccasion">
+                      <option value="">Select occasion…</option>
+                      <option value="Wedding">Wedding</option>
+                      <option value="Festival">Festival / Puja</option>
+                      <option value="Casual">Casual / Daily</option>
+                      <option value="Party">Party / Event</option>
+                      <option value="Office">Office / Formal</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6">
+                   <label class="az-label" data-en="PRIMARY MATERIAL" data-te="ప్రాథమిక వస్తువు">PRIMARY MATERIAL</label>
+                   <input type="text" class="az-field" id="productMaterial" 
+                     placeholder="e.g. Pure Silk, Cotton, Georgette…"
+                    autocomplete="off"/>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="az-upload" id="uploadZone">
+                    <span class="material-icons-round">add_photo_alternate</span>
+                    <div>
+                      <h6 data-en="Attach a photo or sketch" data-te="ఫోటో లేదా స్కెచ్ జోడించండి">Attach a photo or sketch</h6>
+                      <p data-en="PNG, JPG, WEBP up to 16 MB" data-te="ఐచ్ఛికం — PNG, JPG, WEBP 16 MB వరకు">PNG, JPG, WEBP up to 16 MB</p>
+                    </div>
+                  </div>
+                  <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.webp" style="display:none;"/>
+                </div>
+
+                <div class="preview-strip mb-3" id="previewStrip">
+                  <img id="previewImg" src="" alt="Preview"/>
+                  <div class="preview-strip-info">
+                    <span data-en="Image attached" data-te="చిత్రం జోడించబడింది">Image attached</span>
+                    <span id="previewName">Ready for analysis</span>
+                  </div>
+                  <span class="material-icons-round" style="font-size:18px;color:var(--green);">check_circle</span>
+                </div>
+
+                <div class="alert-invalid-img mb-3" id="invalidImgAlert">
+                  <span class="material-icons-round">image_not_supported</span>
+                  <div>
+                    <h6 data-en="Invalid Image" data-te="చెల్లని చిత్రం">Invalid Image</h6>
+                    <p data-en="The uploaded image doesn't appear to be a product photo." data-te="అప్లోడ్ చేసిన చిత్రం ఉత్పత్తి ఫోటో కాదు.">The uploaded image doesn't appear to be a product photo. Please upload a clear photo of the product.</p>
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <button class="az-run-btn" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
+                    <span class="material-icons-round">analytics</span>
+                    <span data-en="Run Analysis" data-te="విశ్లేషణ అమలు చేయండి">Run Analysis</span>
+                  </button>
+                  <button class="az-run-btn" id="mockupBtn" onclick="runMockup()" style="flex:1;min-width:160px;background:var(--indigo);">
+                    <span class="material-icons-round">auto_fix_high</span>
+                    <span>Generate Mockup</span>
+                  </button>
+                </div>
+
+                <div class="progress-area mt-3" id="progressArea">
+                  <div class="progress-label" id="progressLabel">Checking against market data…</div>
+                  <div class="progress" style="height:5px;border-radius:3px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;background:var(--indigo);"></div>
+                  </div>
+                </div>
+                <div class="progress-area mt-3" id="mockupProgressArea">
+                  <div class="progress-label">Generating realistic mockup…</div>
+                  <div class="progress" style="height:5px;border-radius:3px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;background:var(--indigo);"></div>
+                  </div>
+                </div>
+                <div class="alert-error mt-3" id="errorArea">
+                  <span class="material-icons-round">error_outline</span>
+                  <span id="errorText"></span>
+                </div>
+                <div class="alert-error mt-3" id="mockupErrorArea">
+                  <span class="material-icons-round">error_outline</span>
+                  <span id="mockupErrorText"></span>
+                </div>
+
+              </div>
+            </div><!-- /form card -->
+
+            <!-- Empty state -->
+            <div class="results-empty-new" id="resultsEmpty">
+              <span class="material-icons-round">pending_actions</span>
+              <h5 data-en="Ready when you are" data-te="మీరు సిద్ధంగా ఉన్నప్పుడు సిద్ధం">Ready when you are</h5>
+              <p data-en="Fill in your product details above and click Run Analysis to see your results." data-te="పైన మీ ఉత్పత్తి వివరాలు పూరించి క్లిక్ చేయండి.">Fill in your product details above and click Run Analysis to see your results.</p>
+            </div>
+
+            <!-- Results -->
+            <div class="results-block" id="resultsBlock">
+
+              <!-- Decision hero -->
+              <div class="rating-hero" id="ratingHero">
+                <div class="rating-big">
+                  <div class="rating-num" id="ratingNum">—</div>
+                  <div class="rating-denom" id="ratingDenom">out of 100</div>
+                  <div class="rating-bar-wrap" style="width:84px;"><div class="rating-bar-fill" id="ratingBarFill" style="width:0%"></div></div>
+                </div>
+                <div class="rating-text">
+                  <div class="rating-decision-label" id="ratingLabel">DECISION</div>
+                  <div class="rating-verdict" id="ratingVerdict">—</div>
+                  <div class="rating-sub" id="ratingSub"></div>
+                </div>
+              </div>
+
+              <!-- Score Breakdown — interactive pie -->
+              <div class="res-card">
+                <div class="res-card-head">
+                  <span class="material-icons-round">pie_chart</span>
+                  <div>
+                    <div class="res-card-title" data-en="Score Breakdown" data-te="స్కోర్ వివరణ">Score Breakdown</div>
+                    <div class="res-card-subtitle">Click or hover a slice · Each dimension rated out of 20</div>
+                  </div>
+                </div>
+                <div class="res-card-body">
+                  <div class="score-pie-wrap">
+                    <div class="score-pie-chart" id="scorePieWrap">
+                      <svg id="scorePieChart" viewBox="0 0 200 200" width="200" height="200" style="overflow:visible;">
+                        <g id="scorePieSectors" transform="translate(100,100)"></g>
+                      </svg>
+                      <div id="scorePieTip" class="score-pie-tip"></div>
+                      <div class="score-pie-centre">
+                        <span class="score-pie-num" id="pieTotalNum">—</span>
+                        <span class="score-pie-sub">/ 100</span>
+                      </div>
+                    </div>
+                    <div class="score-legend">
+                      <div class="sl-row" data-key="demand">
+                        <span class="sl-dot" style="background:#1B5247;"></span>
+                        <span class="sl-name" data-en="Market Demand"    data-te="మార్కెట్ డిమాండ్">Market Demand</span>
+                        <span class="sl-val"  id="val-demand">—</span>
+                        <div class="sl-bar-wrap"><div class="sl-bar-fill" id="bar-demand" style="width:0%;background:#1B5247;"></div></div>
+                      </div>
+                      <div class="sl-row" data-key="unique">
+                        <span class="sl-dot" style="background:#2D8B6B;"></span>
+                        <span class="sl-name" data-en="Design Uniqueness" data-te="డిజైన్ విశిష్టత">Design Uniqueness</span>
+                        <span class="sl-val"  id="val-unique">—</span>
+                        <div class="sl-bar-wrap"><div class="sl-bar-fill" id="bar-unique" style="width:0%;background:#2D8B6B;"></div></div>
+                      </div>
+                      <div class="sl-row" data-key="price">
+                        <span class="sl-dot" style="background:#9E7A1A;"></span>
+                        <span class="sl-name" data-en="Price Fit"         data-te="ధర అనుకూలత">Price Fit</span>
+                        <span class="sl-val"  id="val-price">—</span>
+                        <div class="sl-bar-wrap"><div class="sl-bar-fill" id="bar-price" style="width:0%;background:#9E7A1A;"></div></div>
+                      </div>
+                      <div class="sl-row" data-key="material">
+                        <span class="sl-dot" style="background:#C4962A;"></span>
+                        <span class="sl-name" data-en="Material Appeal"   data-te="వస్తు ఆకర్షణ">Material Appeal</span>
+                        <span class="sl-val"  id="val-material">—</span>
+                        <div class="sl-bar-wrap"><div class="sl-bar-fill" id="bar-material" style="width:0%;background:#C4962A;"></div></div>
+                      </div>
+                      <div class="sl-row" data-key="trend">
+                        <span class="sl-dot" style="background:#5B3B8C;"></span>
+                        <span class="sl-name" data-en="Trend Alignment"   data-te="ట్రెండ్ అనుకూలత">Trend Alignment</span>
+                        <span class="sl-val"  id="val-trend">—</span>
+                        <div class="sl-bar-wrap"><div class="sl-bar-fill" id="bar-trend" style="width:0%;background:#5B3B8C;"></div></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="avg-row">
+                    <span class="avg-row-label">Total Score</span>
+                    <span class="avg-row-val" id="avgDisplay">— / 100</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product Analysis -->
+              <div class="res-card">
+                <div class="res-card-head"><span class="material-icons-round">style</span><div><div class="res-card-title">Product Analysis</div><div class="res-card-subtitle">What we identified from your description</div></div></div>
+                <div class="res-card-body"><p style="font-size:12.5px;color:var(--ink-mid);line-height:1.7;margin-bottom:10px;" id="designDesc"></p><div class="feat-tags" id="featTags"></div></div>
+              </div>
+
+              <!-- Market Insights -->
+              <div class="res-card">
+                <div class="res-card-head"><span class="material-icons-round">insights</span><div><div class="res-card-title">Market Insights</div><div class="res-card-subtitle">What the data says about your category</div></div></div>
+                <div class="res-card-body"><ul class="insight-list" id="marketList"></ul></div>
+              </div>
+
+              <!-- Recommendations -->
+              <div class="res-card">
+                <div class="res-card-head"><span class="material-icons-round" id="recsIcon">lightbulb</span><div><div class="res-card-title" id="recsLabel">Recommendations</div><div class="res-card-subtitle" id="recsSubtitle">Suggested next steps</div></div></div>
+                <div class="res-card-body"><ul class="insight-list" id="recsList"></ul></div>
+              </div>
+
+              <!-- Why this decision -->
+              <div class="res-card">
+                <div class="res-card-head"><span class="material-icons-round">comment</span><div><div class="res-card-title">Why This Decision?</div><div class="res-card-subtitle">The reasoning behind your result</div></div></div>
+                <div class="res-card-body"><p style="font-size:12.5px;color:var(--ink-mid);line-height:1.7;" id="reasonText"></p></div>
+              </div>
+
+              <!-- AI-Enhanced Tips (Draft → Critic) -->
+              <div class="res-card" id="genaiTipsCard" style="display:none;">
+                <div class="res-card-head">
+                  <span class="material-icons-round" style="color:#9E7A1A;">auto_awesome</span>
+                  <div>
+                    <div class="res-card-title">AI-Enhanced Tips</div>
+                    <div class="res-card-subtitle" id="genaiSubtitle">Draft · Critic refined insights</div>
+                  </div>
+                </div>
+                <div class="res-card-body">
+                  <div class="genai-tips-text" id="genaiTipsText"></div>
+                  <!-- Why these tips? collapsible -->
+                  <details id="genaiWhyDetails">
+                    <summary class="genai-why-toggle">
+                      <span class="material-icons-round" style="font-size:14px;">help_outline</span>
+                      Why these tips?
+                    </summary>
+                    <div style="margin-top:10px;">
+                      <div class="genai-score-row" id="genaiScoreRow"></div>
+                      <div class="genai-rubric-grid" id="genaiRubricGrid"></div>
+                      <div class="genai-grounding-box" id="genaiGroundingBox" style="display:none;"></div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+
+            </div><!-- /results-block -->
+
+            <!-- Mockup Result -->
+            <div class="res-card" id="mockupResultCard" style="display:none;margin-top:16px;">
+              <div class="res-card-head">
+                <span class="material-icons-round" style="color:var(--indigo);">auto_fix_high</span>
+                <div>
+                  <div class="res-card-title">Realistic Mockup</div>
+                  <div class="res-card-subtitle" id="mockupSubtitle">AI-enhanced from your sketch</div>
+                </div>
+              </div>
+              <div class="res-card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                  <div style="text-align:center;">
+                    <div style="font-size:11px;font-weight:600;color:var(--ink-lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Original Sketch</div>
+                    <img id="mockupSketchImg" src="" alt="Sketch" style="width:100%;border-radius:8px;border:1px solid var(--border);object-fit:contain;max-height:320px;"/>
+                  </div>
+                  <div style="text-align:center;">
+                    <div style="font-size:11px;font-weight:600;color:var(--ink-lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Generated Mockup</div>
+                    <img id="mockupResultImg" src="" alt="Mockup" style="width:100%;border-radius:8px;border:1px solid var(--border);object-fit:contain;max-height:320px;"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /main col -->
+        </div><!-- /row -->
+      </div><!-- /container -->
+    </div>
+  </div>
+
+
+    
+{% endblock %}

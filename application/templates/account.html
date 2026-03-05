@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- ACCOUNT -->
+        <div class="page" id="page-account">
+          <div class="account-wrap">
+            <div class="page-title">My Account</div>
+            <div class="page-subtitle">Manage your profile, preferences, and account settings.</div>
+            <div class="account-profile-card">
+        <div class="profile-avatar"><span class="material-icons-round">person</span></div>
+        <div><div class="profile-name">{{ user.email.split('@')[0] | title }}</div><div class="profile-role">Rivet Member</div><div class="profile-since">Member since {{ user.created_at.strftime('%B %Y') }}</div></div>
+            </div>
+            <div class="account-section" style="margin-bottom:16px;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border);">
+          <div style="padding:20px;text-align:center;border-right:1px solid var(--border);"><div class="stat-num">14</div><div class="stat-label">Analyses Run</div></div>
+          <div style="padding:20px;text-align:center;border-right:1px solid var(--border);"><div class="stat-num">8</div><div class="stat-label">Products Launched</div></div>
+          <div style="padding:20px;text-align:center;"><div class="stat-num">74</div><div class="stat-label">Avg Score</div></div>
+        </div>
+            </div>
+            <div class="account-sections">
+        <div class="account-section">
+          <div class="account-section-head"><span class="material-icons-round">person</span><span>Profile</span></div>
+          <div class="account-item"><div class="account-item-label">Username</div><div class="account-item-value">{{ user.email.split('@')[0] | title }}</div></div>
+          <div class="account-item"><div class="account-item-label">Email Address</div><div class="account-item-value">{{ user.email }}</div></div>
+          <div class="account-item"><div class="account-item-label">Location</div><div class="account-item-value">Varanasi, UP <span class="material-icons-round">chevron_right</span></div></div>
+        </div>
+        
+        <div class="account-section">
+          <div class="account-section-head"><span class="material-icons-round">shield</span><span>Security</span></div>
+          <div class="account-item"><div class="account-item-label">Password</div><div class="account-item-value">Change password <span class="material-icons-round">chevron_right</span></div></div>
+          <div class="account-item"><div class="account-item-label">Two-Step Verification</div><div class="account-item-value" style="color:var(--green);">Enabled <span class="material-icons-round">chevron_right</span></div></div>
+        </div>
+        <div class="account-section">
+          <a href="{{ url_for('auth.logout') }}" style="text-decoration:none;display:block;">
+            <div class="account-item"><div class="account-item-label" style="color:var(--red);">Logout</div><div class="account-item-value"><span class="material-icons-round" style="color:var(--red);">logout</span></div></div>
+          </a>
+        </div>
+            </div>
+          </div>
+        </div>
+
+        
+{% endblock %}

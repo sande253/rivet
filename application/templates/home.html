@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- ══════ HOME ══════ -->
+  <div class="page active" id="page-home">
+    <div class="home-hero">
+      <!-- FIX 1: Single centered inner wrapper, no margin-left hack -->
+      <div class="home-hero-inner">
+        <div class="home-hero-left">
+          <div class="home-kicker" data-en="Product Intelligence Platform" data-te="ఉత్పత్తి మేధో వేదిక">Product Intelligence Platform</div>
+          <h1 data-en="Should you <em>make</em> this product?" data-te="ఈ ఉత్పత్తిని <em>తయారు చేయాలా?</em>">Should you <em>make</em> this product?</h1>
+          <p class="home-hero-desc" data-en="Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers." data-te="మీ డిజైన్ అప్లోడ్ చేయండి. స్పష్టమైన సమాధానం పొందండి — నిజమైన మార్కెట్ డేటాతో.">Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers.</p>
+          <div class="hero-cta-row">
+            <a href="{{ url_for('pages.analyze') }}" class="btn-hero" style="text-decoration:none;">
+              <span class="material-icons-round">analytics</span>
+              <span data-en="Analyse a Product" data-te="ఉత్పత్తిని విశ్లేషించండి">Analyse a Product</span>
+            </a>
+            <a href="{{ url_for('pages.how') }}" class="btn-hero-ghost" style="text-decoration:none;">
+              <span class="material-icons-round" style="font-size:16px;">play_circle</span>
+              <span data-en="How it works" data-te="ఇది ఎలా పని చేస్తుంది">How it works</span>
+            </button>
+          </div>
+          <div class="hero-trust">
+            <span data-en="Trusted by 1,200+ artisans across India" data-te="భారతదేశంలో 1,200+ చేతివృత్తుల కారులకు నమ్మకమైనది">Trusted by 1,200+ artisans across India</span>
+          </div>
+        </div>
+        <!-- Hero image shown on wider screens -->
+        <div class="home-hero-right">
+          <img src="https://c.stocksy.com/a/Oyc400/za/1103128.jpg" alt="Kanjivaram Silk Saree"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX 2: Cards wrapper with symmetric padding -->
+    <div class="home-cards-wrap">
+      <div class="home-cards-head">
+        <h2 data-en="Everything you need to decide confidently" data-te="నమ్మకంగా నిర్ణయించుకోవడానికి మీకు అవసరమైన సమస్తం">Everything you need to decide confidently</h2>
+        <p data-en="Three tools. One clear answer." data-te="మూడు సాధనాలు. ఒక స్పష్టమైన సమాధానం.">Three tools. One clear answer.</p>
+      </div>
+      <div class="home-cards">
+        <a href="{{ url_for('pages.analyze') }}" class="home-card" style="text-decoration:none; display:block;">
+          <div class="card-icon-wrap"><span class="material-icons-round">image_search</span></div>
+          <h4 data-en="Analyse Your Design" data-te="మీ డిజైన్ విశ్లేషించండి">Analyse Your Design</h4>
+          <p data-en="Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds." data-te="మీ ఉత్పత్తిని వివరించండి లేదా అప్లోడ్ చేయండి. 30 సెకన్లలో నిర్ణయం పొందండి.">Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds.</p>
+        </a>
+        <a href="{{ url_for('pages.market') }}" class="home-card" style="text-decoration:none; display:block;">
+          <div class="card-icon-wrap"><span class="material-icons-round">bar_chart</span></div>
+          <h4 data-en="Market Intelligence" data-te="మార్కెట్ మేధస్సు">Market Intelligence</h4>
+          <p data-en="Explore pricing, competition, demand signals, and market gaps — all in one place." data-te="ధరలు, పోటీ, డిమాండ్ సంకేతాలు మరియు మార్కెట్ ఖాళీలను అన్వేషించండి.">Explore pricing, competition, demand signals, and market gaps — all in one place.</p>
+        </a>
+        <a href="{{ url_for('pages.how') }}" class="home-card" style="text-decoration:none; display:block;">
+          <div class="card-icon-wrap"><span class="material-icons-round">help_outline</span></div>
+          <h4 data-en="How It Works" data-te="ఇది ఎలా పని చేస్తుంది">How It Works</h4>
+          <p data-en="Understand the rating system and how your product gets scored — in plain language." data-te="రేటింగ్ సిస్టమ్ మరియు మీ ఉత్పత్తి ఎలా స్కోర్ పొందుతుందో అర్థం చేసుకోండి.">Understand the rating system and how your product gets scored — in plain language.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recent-section">
+      <div class="section-head">
+        <h3 data-en="Recent Analyses" data-te="ఇటీవలి విశ్లేషణలు">Recent Analyses</h3>
+        <a href="{{ url_for('pages.analyses') }}" class="link-btn" style="text-decoration:none;">
+          <span data-en="View all" data-te="అన్నీ చూడండి">View all</span>
+          <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
+        </a>
+      </div>
+      <a href="{{ url_for('pages.analyze') }}" class="analysis-row" style="text-decoration:none; display:flex;">
+        <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></a>
+        <div class="analysis-info">
+          <div class="analysis-title">Kanjivaram Silk Saree — Wedding Range</a>
+          <div class="analysis-meta">Analysed 2 days ago &nbsp;·&nbsp; Score: 82 / 100</a>
+        </div>
+        <span class="badge-decision badge-launch">Proceed</span>
+      </div>
+      <a href="{{ url_for('pages.analyze') }}" class="analysis-row" style="text-decoration:none; display:flex;">
+        <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
+        <div class="analysis-info">
+          <div class="analysis-title">Bridal Lehenga Choli — Embroidered Silk</div>
+          <div class="analysis-meta">Analysed 5 days ago &nbsp;·&nbsp; Score: 61 / 100</div>
+        </div>
+        <span class="badge-decision badge-modify">Adjust</span>
+      </div>
+      <a href="{{ url_for('pages.analyze') }}" class="analysis-row" style="text-decoration:none; display:flex;">
+        <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
+        <div class="analysis-info">
+          <div class="analysis-title">Anarkali Suit — Synthetic Georgette</div>
+          <div class="analysis-meta">Analysed 1 week ago &nbsp;·&nbsp; Score: 29 / 100</div>
+        </div>
+        <span class="badge-decision badge-stop">Stop</span>
+      </div>
+    </div>
+  </div>
+
+  
+{% endblock %}
