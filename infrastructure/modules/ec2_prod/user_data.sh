@@ -25,6 +25,10 @@ systemctl enable docker
 # Add ec2-user to docker group
 usermod -a -G docker ec2-user
 
+# Allow Docker containers to access EC2 metadata service
+iptables -t nat -A PREROUTING -p tcp -d 169.254.169.254 --dport 80 -j DNAT --to-destination 169.254.169.254:80
+iptables -t nat -A OUTPUT -p tcp -d 169.254.169.254 --dport 80 -j ACCEPT
+
 echo "✓ Docker installed and started"
 
 # ── Install AWS CLI v2 (if not present) ──────────────────────────────────────
