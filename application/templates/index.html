@@ -1804,7 +1804,7 @@ var T = {
   decision:        { en: 'DECISION',                    te: 'నిర్ణయం' },
   outOf100:        { en: 'out of 100',                  te: '100కి' },
   finalScore:      { en: 'Total Score',                 te: 'మొత్తం స్కోర్' },
-  launch_verdict:  { en: 'LAUNCH — Proceed to Production', te: 'ప్రారంభించండి — ఉత్పత్తికి కొనసాగించండి' },
+  launch_verdict:  { en: 'PROCEED — Ready for Production', te: 'కొనసాగించండి — ఉత్పత్తికి సిద్ధం' },
   launch_sub:      { en: 'Strong market fit. This product is ready to make.', te: 'బలమైన మార్కెట్ అనుకూలత.' },
   launch_recs:     { en: 'Product Strengths',           te: 'ఉత్పత్తి బలాలు' },
   launch_sub2:     { en: "What's working well for your product", te: 'మీ ఉత్పత్తి కోసం బాగా పనిచేస్తున్నది' },
@@ -1812,7 +1812,7 @@ var T = {
   modify_sub:      { en: 'This product has potential — with a few changes it can succeed.', te: 'ఈ ఉత్పత్తికి సామర్థ్యం ఉంది.' },
   modify_recs:     { en: 'What to Improve',             te: 'మెరుగుపర్చవలసినవి' },
   modify_sub2:     { en: 'Changes that could significantly improve your outcome', te: 'ఫలితాన్ని మెరుగుపరచగల మార్పులు' },
-  stop_verdict:    { en: 'DO NOT PRODUCE',              te: 'తయారు చేయవద్దు' },
+  stop_verdict:    { en: 'RECONSIDER — Production Not Advised', te: 'పునఃపరిశీలించండి — ఉత్పత్తి సిఫార్సు చేయబడలేదు' },
   stop_sub:        { en: 'Too much risk right now. Producing this could lead to financial loss.', te: 'ఇప్పుడు చాలా ప్రమాదం.' },
   stop_recs:       { en: 'Key Risk Factors',            te: 'ముఖ్య ప్రమాద కారకాలు' },
   stop_sub2:       { en: 'The main reasons why this product is high-risk', te: 'ఈ ఉత్పత్తి అధిక-ప్రమాదకరమైన ప్రధాన కారణాలు' },
@@ -1979,7 +1979,7 @@ function renderResults(data) {
   var total = data.total_score || (d + u + p + m + tr);
   var hero = document.getElementById('ratingHero');
   hero.className = 'rating-hero';
-  if (cls === 'LAUNCH') {
+  if (cls === 'PROCEED') {
     hero.classList.add('launch');
     document.getElementById('ratingVerdict').textContent = t('launch_verdict');
     document.getElementById('ratingSub').textContent     = t('launch_sub');

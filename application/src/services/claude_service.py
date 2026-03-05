@@ -63,9 +63,9 @@ SCORING FRAMEWORK (each dimension 0-20, total 0-100):
 5. trend_alignment: Alignment with current fashion trends and customer preferences (if not fashion, assess general aesthetic trends)
 
 CLASSIFICATION GUIDANCE:
-- 75-100: LAUNCH - Strong design with clear market potential
-- 50-74: MODIFY - Good foundation, specific improvements recommended  
-- 0-49: DO NOT PRODUCE - Significant concerns (use this for clearly non-fashion items like screenshots, but still provide scores and description)
+- 75-100: PROCEED - Ready for Production
+- 50-74: MODIFY - Adjust Before Producing  
+- 0-49: RECONSIDER - Production Not Advised
 
 IMPORTANT GUIDELINES:
 - Focus on what you CAN see in the design (patterns, style, borders, colors)
@@ -88,7 +88,7 @@ Respond ONLY with this exact JSON structure - no markdown, no extra text:
     "trend_alignment": <integer 0-20>
   }},
   "total_score": <integer 0-100>,
-  "classification": "LAUNCH" or "MODIFY" or "DO NOT PRODUCE",
+  "classification": "PROCEED" or "MODIFY" or "RECONSIDER",
   "classification_reasoning": "2-sentence explanation focusing on design strengths and market opportunities.",
   "market_insights": "1-sentence insight about how this design fits current market trends.",
   "market_points": [
