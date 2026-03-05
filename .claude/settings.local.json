@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(wc:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(aws autoscaling:*)",
+      "Bash(MSYS_NO_PATHCONV=1 aws logs:*)",
+      "Bash(aws ssm:*)",
+      "Bash(powershell:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 aws ec2:*)",
+      "Bash(# Check bash syntax on the script\nPYTHONIOENCODING=utf-8 PYTHONUTF8=1 aws ec2 describe-launch-template-versions \\\\\n  --launch-template-name \"rivet-prod-20260303105236302400000008\" \\\\\n  --versions 13 \\\\\n  --query 'LaunchTemplateVersions[0].LaunchTemplateData.UserData' \\\\\n  --output text 2>&1 | head -1 | base64 -d 2>/dev/null | bash -n 2>&1)"
     ]
   }
 }

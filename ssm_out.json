@@ -1,0 +1,22 @@
+{
+    "CommandId": "3c8a6357-53b0-485d-84c7-80da6ebab2a5",
+    "InstanceId": "i-0aa5a82b55ba653d9",
+    "Comment": "",
+    "DocumentName": "AWS-RunShellScript",
+    "DocumentVersion": "$DEFAULT",
+    "PluginName": "aws:runShellScript",
+    "ResponseCode": 0,
+    "ExecutionStartDateTime": "2026-03-04T20:15:31.928Z",
+    "ExecutionElapsedTime": "PT0.035S",
+    "ExecutionEndDateTime": "2026-03-04T20:15:31.928Z",
+    "Status": "Success",
+    "StatusDetails": "Success",
+    "StandardOutputContent": "CONTAINER ID   IMAGE                            COMMAND    CREATED          STATUS                      PORTS     NAMES\n5b44f49516f3   amazon/amazon-ecs-agent:latest   \"/agent\"   12 seconds ago   Exited (1) 11 seconds ago             ecs-agent\nCURL_RESULT\nHTTP_CODE=000END\nCreated symlink /etc/systemd/system/multi-user.target.wants/amazon-cloudwatch-agent.service → /etc/systemd/system/amazon-cloudwatch-agent.service.\n✓ CloudWatch Agent installed and started\nAuthenticating to ECR...\nWARNING! Your password will be stored unencrypted in /root/.docker/config.json.\nConfigure a credential helper to remove this warning. See\nhttps://docs.docker.com/engine/reference/commandline/login/#credentials-store\n\nLogin Succeeded\n✓ ECR authentication successful\n/var/lib/cloud/instance/scripts/part-001: line 173: syntax error near unexpected token `('\n",
+    "StandardOutputUrl": "",
+    "StandardErrorContent": "",
+    "StandardErrorUrl": "",
+    "CloudWatchOutputConfig": {
+        "CloudWatchLogGroupName": "",
+        "CloudWatchOutputEnabled": false
+    }
+}
