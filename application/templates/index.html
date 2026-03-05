@@ -160,22 +160,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 }
 
 .home-kicker {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center;
   background: rgba(236,230,208,0.15); border: 1px solid rgba(236,230,208,0.35);
   color: #ECE6D0; font-size: 11px; font-weight: 700; letter-spacing: 2px;
   text-transform: uppercase; padding: 6px 14px; border-radius: 20px;
   margin-bottom: 24px; width: fit-content;
   animation: fadeInUp 0.6s 0.1s both;
   box-shadow: 0 4px 15px rgba(236,230,208,0.2);
-}
-.home-kicker::before { 
-  content: ''; 
-  width: 6px; 
-  height: 6px; 
-  border-radius: 50%; 
-  background: #ECE6D0; 
-  animation: pulse 2s infinite, floatBadge 4s ease-in-out infinite; 
-  box-shadow: 0 0 10px rgba(236,230,208,0.8);
 }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 @keyframes fadeInUp {
