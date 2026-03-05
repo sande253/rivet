@@ -548,6 +548,18 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .btn-export { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1.5px solid var(--indigo); border-radius: var(--radius); background: transparent; color: var(--indigo); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: 'DM Sans',sans-serif; }
 .btn-export:hover { background: var(--indigo); color: white; }
 
+/* Floating results navigation */
+.results-nav { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); background: white; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px 8px; box-shadow: var(--shadow-lg); z-index: 100; display: none; max-width: 200px; }
+.results-nav.show { display: block; animation: slideInRight 0.3s ease; }
+.results-nav-title { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-lt); padding: 0 8px 8px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.results-nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: var(--ink-mid); cursor: pointer; transition: all .15s; text-decoration: none; margin-bottom: 4px; }
+.results-nav-item:hover { background: var(--indigo-light); color: var(--indigo); }
+.results-nav-item.active { background: var(--indigo); color: white; font-weight: 600; }
+.results-nav-item .material-icons-round { font-size: 16px; }
+.results-nav-close { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%; background: var(--cream); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
+.results-nav-close:hover { background: var(--red); color: white; }
+.results-nav-close .material-icons-round { font-size: 14px; }
+
 /* Comparison badge */
 .comparison-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 8px; }
 .comparison-badge.better { background: var(--green-bg); color: var(--green); }
@@ -954,6 +966,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   .home-cards-wrap { padding: 48px 20px 0; }
   .recent-section { padding: 0 20px 60px; }
   .market-wrap, .how-wrap, .account-wrap, .analyses-wrap { padding-left: 20px; padding-right: 20px; }
+  
+  /* Results navigation on mobile */
+  .results-nav { right: 10px; max-width: 160px; padding: 10px 6px; }
+  .results-nav-item { padding: 6px 8px; font-size: 11px; }
+  .results-nav-item .material-icons-round { font-size: 14px; }
+  .results-nav-item span:last-child { display: none; }
 }
 @media (max-width: 480px) {
   .footer-inner { grid-template-columns: 1fr; }
@@ -1409,7 +1427,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
               </div>
 
               <!-- Score Breakdown — interactive pie -->
-              <div class="res-card">
+              <div class="res-card" id="section-breakdown">
                 <div class="res-card-head">
                   <span class="material-icons-round">pie_chart</span>
                   <div style="flex:1;">
@@ -1470,25 +1488,25 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
               </div>
 
               <!-- Product Analysis -->
-              <div class="res-card">
+              <div class="res-card" id="section-product">
                 <div class="res-card-head"><span class="material-icons-round">style</span><div><div class="res-card-title">Product Analysis</div><div class="res-card-subtitle">What we identified from your description</div></div></div>
                 <div class="res-card-body"><p style="font-size:12.5px;color:var(--ink-mid);line-height:1.7;margin-bottom:10px;" id="designDesc"></p><div class="feat-tags" id="featTags"></div></div>
               </div>
 
               <!-- Market Insights -->
-              <div class="res-card">
+              <div class="res-card" id="section-market">
                 <div class="res-card-head"><span class="material-icons-round">insights</span><div><div class="res-card-title">Market Insights</div><div class="res-card-subtitle">What the data says about your category</div></div></div>
                 <div class="res-card-body"><ul class="insight-list" id="marketList"></ul></div>
               </div>
 
               <!-- Recommendations -->
-              <div class="res-card">
+              <div class="res-card" id="section-recommendations">
                 <div class="res-card-head"><span class="material-icons-round" id="recsIcon">lightbulb</span><div><div class="res-card-title" id="recsLabel">Recommendations</div><div class="res-card-subtitle" id="recsSubtitle">Suggested next steps</div></div></div>
                 <div class="res-card-body"><ul class="insight-list" id="recsList"></ul></div>
               </div>
 
               <!-- Why this decision -->
-              <div class="res-card">
+              <div class="res-card" id="section-reasoning">
                 <div class="res-card-head"><span class="material-icons-round">comment</span><div><div class="res-card-title">Why This Decision?</div><div class="res-card-subtitle">The reasoning behind your result</div></div></div>
                 <div class="res-card-body"><p style="font-size:12.5px;color:var(--ink-mid);line-height:1.7;" id="reasonText"></p></div>
               </div>
@@ -1520,6 +1538,34 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
               </div>
 
             </div><!-- /results-block -->
+
+            <!-- Floating Results Navigation -->
+            <div class="results-nav" id="resultsNav">
+              <div class="results-nav-close" onclick="toggleResultsNav()">
+                <span class="material-icons-round">close</span>
+              </div>
+              <div class="results-nav-title">Jump to</div>
+              <a href="#section-breakdown" class="results-nav-item" onclick="scrollToSection('section-breakdown')">
+                <span class="material-icons-round">pie_chart</span>
+                <span>Score Breakdown</span>
+              </a>
+              <a href="#section-product" class="results-nav-item" onclick="scrollToSection('section-product')">
+                <span class="material-icons-round">style</span>
+                <span>Product Analysis</span>
+              </a>
+              <a href="#section-market" class="results-nav-item" onclick="scrollToSection('section-market')">
+                <span class="material-icons-round">insights</span>
+                <span>Market Insights</span>
+              </a>
+              <a href="#section-recommendations" class="results-nav-item" onclick="scrollToSection('section-recommendations')">
+                <span class="material-icons-round">lightbulb</span>
+                <span>Recommendations</span>
+              </a>
+              <a href="#section-reasoning" class="results-nav-item" onclick="scrollToSection('section-reasoning')">
+                <span class="material-icons-round">comment</span>
+                <span>Reasoning</span>
+              </a>
+            </div>
 
             <!-- Mockup Result -->
             <div class="res-card" id="mockupResultCard" style="display:none;margin-top:16px;">
@@ -2057,6 +2103,67 @@ function scrollToResults() {
   }
 }
 
+// Scroll to section
+function scrollToSection(sectionId) {
+  var section = document.getElementById(sectionId);
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Update active state
+    document.querySelectorAll('.results-nav-item').forEach(function(item) {
+      item.classList.remove('active');
+    });
+    event.target.closest('.results-nav-item').classList.add('active');
+  }
+  return false;
+}
+
+// Toggle results navigation
+function toggleResultsNav() {
+  var nav = document.getElementById('resultsNav');
+  if (nav) {
+    nav.classList.toggle('show');
+  }
+}
+
+// Show/hide results navigation based on scroll
+function updateResultsNav() {
+  var resultsBlock = document.getElementById('resultsBlock');
+  var nav = document.getElementById('resultsNav');
+  if (!resultsBlock || !nav) return;
+  
+  var rect = resultsBlock.getBoundingClientRect();
+  var isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+  
+  if (isVisible && resultsBlock.classList.contains('show')) {
+    nav.classList.add('show');
+  } else {
+    nav.classList.remove('show');
+  }
+}
+
+// Highlight active section in navigation
+function highlightActiveSection() {
+  var sections = ['section-breakdown', 'section-product', 'section-market', 'section-recommendations', 'section-reasoning'];
+  var scrollPos = window.scrollY + 100;
+  
+  sections.forEach(function(sectionId) {
+    var section = document.getElementById(sectionId);
+    if (!section) return;
+    
+    var rect = section.getBoundingClientRect();
+    var isInView = rect.top <= 150 && rect.bottom >= 150;
+    
+    var navItem = document.querySelector('.results-nav-item[href="#' + sectionId + '"]');
+    if (navItem) {
+      if (isInView) {
+        navItem.classList.add('active');
+      } else {
+        navItem.classList.remove('active');
+      }
+    }
+  });
+}
+
 document.getElementById('uploadZone').addEventListener('click', function() { document.getElementById('fileInput').click(); });
 ['dragover','dragenter'].forEach(function(ev) {
   document.getElementById('uploadZone').addEventListener(ev, function(e) { e.preventDefault(); this.style.borderColor='var(--indigo)'; });
@@ -2229,6 +2336,12 @@ function renderResults(data) {
 
   document.getElementById('resultsEmpty').style.display = 'none';
   document.getElementById('resultsBlock').classList.add('show');
+  
+  // Show results navigation
+  setTimeout(function() {
+    var nav = document.getElementById('resultsNav');
+    if (nav) nav.classList.add('show');
+  }, 500);
 }
 
 function renderGenaiTips(data) {
@@ -2730,6 +2843,10 @@ window.addEventListener('scroll', function() {
   var atBottom  = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
   if (fabTop)    fabTop.classList.toggle('visible', scrolled);
   if (fabBottom) fabBottom.classList.toggle('visible', !atBottom);
+  
+  // Update results navigation
+  updateResultsNav();
+  highlightActiveSection();
 }, { passive: true });
 
 // Initialize the active page
