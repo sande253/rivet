@@ -490,6 +490,70 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .az-run-btn:hover { box-shadow: 0 8px 28px rgba(27,82,71,.45); transform: translateY(-1px); }
 .az-run-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
+/* Character counter */
+.char-counter { font-size: 10px; color: var(--ink-lt); text-align: right; margin-top: 3px; }
+.char-counter.warning { color: var(--orange); }
+.char-counter.error { color: var(--red); }
+
+/* Field validation */
+.az-field.valid { border-color: var(--green); }
+.az-field.invalid { border-color: var(--red); }
+.field-hint { font-size: 11px; color: var(--ink-lt); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+.field-hint .material-icons-round { font-size: 14px; }
+
+/* Tooltip */
+.tooltip-trigger { position: relative; display: inline-flex; align-items: center; cursor: help; }
+.tooltip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 8px 12px; border-radius: 6px; font-size: 11px; white-space: nowrap; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.tooltip-content::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--ink); }
+.tooltip-trigger:hover .tooltip-content { display: block; }
+
+/* Clear form button */
+.btn-clear { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1.5px solid var(--border); border-radius: var(--radius); background: transparent; color: var(--ink-mid); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: 'DM Sans',sans-serif; }
+.btn-clear:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+/* Enhanced progress with steps */
+.progress-steps { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.progress-step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; }
+.progress-step::after { content: ''; position: absolute; top: 12px; left: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0; }
+.progress-step:last-child::after { display: none; }
+.progress-step-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--ink-lt); z-index: 1; transition: all .3s; }
+.progress-step.active .progress-step-icon { background: var(--indigo); color: white; animation: pulse-ring 1.5s infinite; }
+.progress-step.complete .progress-step-icon { background: var(--green); color: white; }
+.progress-step-label { font-size: 10px; color: var(--ink-lt); text-align: center; }
+@keyframes pulse-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(27,82,71,0.4); } 50% { box-shadow: 0 0 0 8px rgba(27,82,71,0); } }
+
+/* Toast notifications */
+.toast-container { position: fixed; top: 80px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+.toast { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: var(--radius); background: white; box-shadow: var(--shadow-lg); min-width: 300px; animation: slideInRight 0.3s ease; }
+.toast.success { border-left: 4px solid var(--green); }
+.toast.error { border-left: 4px solid var(--red); }
+.toast.info { border-left: 4px solid var(--indigo); }
+.toast-icon { font-size: 20px; }
+.toast.success .toast-icon { color: var(--green); }
+.toast.error .toast-icon { color: var(--red); }
+.toast.info .toast-icon { color: var(--indigo); }
+.toast-message { flex: 1; font-size: 13px; color: var(--ink); }
+.toast-close { cursor: pointer; color: var(--ink-lt); font-size: 18px; transition: color .2s; }
+.toast-close:hover { color: var(--ink); }
+@keyframes slideInRight { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Skeleton loading */
+.skeleton { background: linear-gradient(90deg, var(--cream) 25%, var(--cream-dark) 50%, var(--cream) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skeleton-text { height: 12px; margin-bottom: 8px; }
+.skeleton-title { height: 20px; width: 60%; margin-bottom: 12px; }
+.skeleton-card { height: 120px; }
+
+/* Export button */
+.btn-export { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1.5px solid var(--indigo); border-radius: var(--radius); background: transparent; color: var(--indigo); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: 'DM Sans',sans-serif; }
+.btn-export:hover { background: var(--indigo); color: white; }
+
+/* Comparison badge */
+.comparison-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 8px; }
+.comparison-badge.better { background: var(--green-bg); color: var(--green); }
+.comparison-badge.worse { background: var(--red-bg); color: var(--red); }
+.comparison-badge .material-icons-round { font-size: 14px; }
+
 /* ── Empty state ─────────────────────── */
 .results-empty-new {
   background: var(--white); border: 1px solid var(--border);
@@ -562,26 +626,26 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
 /* ── Score breakdown — interactive pie ─ */
 .score-pie-wrap {
-  display: flex; align-items: center; gap: 24px;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 32px;
+  flex-wrap: wrap; justify-content: center;
 }
 .score-pie-chart {
   position: relative; flex-shrink: 0;
-  width: 200px; height: 200px;
+  width: 280px; height: 280px;
 }
-.score-pie-chart svg { display: block; filter: drop-shadow(0 3px 12px rgba(27,82,71,.14)); }
+.score-pie-chart svg { display: block; filter: drop-shadow(0 4px 16px rgba(27,82,71,.18)); }
 .score-pie-centre {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   pointer-events: none;
 }
-.score-pie-num   { font-family: 'DM Serif Display',serif; font-size: 36px; color: var(--ink); line-height: 1; }
-.score-pie-sub   { font-size: 9.5px; font-weight: 700; color: var(--ink-lt); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+.score-pie-num   { font-family: 'DM Serif Display',serif; font-size: 48px; color: var(--ink); line-height: 1; }
+.score-pie-sub   { font-size: 11px; font-weight: 700; color: var(--ink-lt); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
 .score-pie-tip {
   display: none; position: absolute;
   background: #0A1F17; color: #fff;
-  font-family: 'DM Sans',sans-serif; font-size: 11px; font-weight: 600;
-  padding: 5px 9px; border-radius: 6px; white-space: nowrap;
+  font-family: 'DM Sans',sans-serif; font-size: 12px; font-weight: 600;
+  padding: 6px 12px; border-radius: 6px; white-space: nowrap;
   pointer-events: none; z-index: 20;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
@@ -1175,13 +1239,19 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
                 <div class="mb-3">
                   <label class="az-label" data-en="PRODUCT DESCRIPTION" data-te="ఉత్పత్తి వివరణ">PRODUCT DESCRIPTION</label>
-                  <textarea class="az-field" id="productDesc" placeholder="E.g. A red Kanjivaram silk saree with gold zari border, meant for wedding wear…"></textarea>
+                  <textarea class="az-field" id="productDesc" placeholder="E.g. A red Kanjivaram silk saree with gold zari border, meant for wedding wear…" maxlength="500" oninput="updateCharCount(this)"></textarea>
+                  <div class="char-counter" id="descCharCounter">0 / 500 characters</div>
                 </div>
 
                 <div class="row g-3 mb-3">
                   <div class="col-sm-6">
-                    <!-- REPLACE the entire category col-sm-6 div content: -->
-                    <label class="az-label" data-en="CATEGORY" data-te="వర్గం">CATEGORY</label>
+                    <label class="az-label">
+                      CATEGORY
+                      <span class="tooltip-trigger">
+                        <span class="material-icons-round" style="font-size:12px;margin-left:4px;">help_outline</span>
+                        <span class="tooltip-content">Select the product category that best matches your item</span>
+                      </span>
+                    </label>
                     <div class="cat-wrap" id="categorySearchWrap" style="position:relative;">
                       <input type="text" class="az-field" id="categorySearchInput"
                         placeholder="Search or select category…"
@@ -1249,7 +1319,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </div>
                 </div>
 
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
                   <button class="az-run-btn" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
                     <span class="material-icons-round">analytics</span>
                     <span data-en="Run Analysis" data-te="విశ్లేషణ అమలు చేయండి">Run Analysis</span>
@@ -1258,9 +1328,31 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     <span class="material-icons-round">auto_fix_high</span>
                     <span>Generate Mockup</span>
                   </button>
+                  <button class="btn-clear" onclick="clearForm()" title="Clear all fields">
+                    <span class="material-icons-round" style="font-size:16px;">refresh</span>
+                    <span>Clear</span>
+                  </button>
                 </div>
 
                 <div class="progress-area mt-3" id="progressArea">
+                  <div class="progress-steps" id="progressSteps">
+                    <div class="progress-step" id="step1">
+                      <div class="progress-step-icon"><span class="material-icons-round" style="font-size:12px;">upload</span></div>
+                      <div class="progress-step-label">Upload</div>
+                    </div>
+                    <div class="progress-step" id="step2">
+                      <div class="progress-step-icon"><span class="material-icons-round" style="font-size:12px;">search</span></div>
+                      <div class="progress-step-label">Analyze</div>
+                    </div>
+                    <div class="progress-step" id="step3">
+                      <div class="progress-step-icon"><span class="material-icons-round" style="font-size:12px;">insights</span></div>
+                      <div class="progress-step-label">Score</div>
+                    </div>
+                    <div class="progress-step" id="step4">
+                      <div class="progress-step-icon"><span class="material-icons-round" style="font-size:12px;">check</span></div>
+                      <div class="progress-step-label">Complete</div>
+                    </div>
+                  </div>
                   <div class="progress-label" id="progressLabel">Checking against market data…</div>
                   <div class="progress" style="height:5px;border-radius:3px;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;background:var(--indigo);"></div>
@@ -1301,18 +1393,26 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   <div class="rating-denom" id="ratingDenom">out of 100</div>
                   <div class="rating-bar-wrap" style="width:84px;"><div class="rating-bar-fill" id="ratingBarFill" style="width:0%"></div></div>
                 </div>
-                <div class="rating-text">
+                <div class="rating-text" style="flex:1;">
                   <div class="rating-decision-label" id="ratingLabel">DECISION</div>
                   <div class="rating-verdict" id="ratingVerdict">—</div>
                   <div class="rating-sub" id="ratingSub"></div>
+                  <div class="comparison-badge" id="comparisonBadge" style="display:none;">
+                    <span class="material-icons-round">trending_up</span>
+                    <span id="comparisonText"></span>
+                  </div>
                 </div>
+                <button class="btn-export" onclick="exportResults()" id="exportBtn" style="display:none;">
+                  <span class="material-icons-round" style="font-size:18px;">download</span>
+                  <span>Export PDF</span>
+                </button>
               </div>
 
               <!-- Score Breakdown — interactive pie -->
               <div class="res-card">
                 <div class="res-card-head">
                   <span class="material-icons-round">pie_chart</span>
-                  <div>
+                  <div style="flex:1;">
                     <div class="res-card-title" data-en="Score Breakdown" data-te="స్కోర్ వివరణ">Score Breakdown</div>
                     <div class="res-card-subtitle">Click or hover a slice · Each dimension rated out of 20</div>
                   </div>
@@ -1881,6 +1981,82 @@ function toggleUserMenu() { document.getElementById('userBtn').classList.toggle(
 function closeUserMenu()  { document.getElementById('userBtn').classList.remove('open'); }
 document.addEventListener('click', function(e) { if (!e.target.closest('#userBtn')) closeUserMenu(); });
 
+// Character counter
+function updateCharCount(textarea) {
+  var count = textarea.value.length;
+  var max = textarea.maxLength;
+  var counter = document.getElementById('descCharCounter');
+  if (counter) {
+    counter.textContent = count + ' / ' + max + ' characters';
+    counter.classList.remove('warning', 'error');
+    if (count > max * 0.9) counter.classList.add('error');
+    else if (count > max * 0.7) counter.classList.add('warning');
+  }
+}
+
+// Clear form
+function clearForm() {
+  if (!confirm('Clear all form fields?')) return;
+  document.getElementById('productDesc').value = '';
+  document.getElementById('categorySearchInput').value = '';
+  document.getElementById('productCategory').value = 'saree';
+  document.getElementById('productPrice').value = '';
+  document.getElementById('productOccasion').value = '';
+  document.getElementById('productMaterial').value = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('previewStrip').classList.remove('show');
+  selectedFile = null;
+  updateCharCount(document.getElementById('productDesc'));
+  showToast('Form cleared', 'info');
+}
+
+// Toast notifications
+function showToast(message, type) {
+  var container = document.getElementById('toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+  
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  var icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+  toast.innerHTML = 
+    '<span class="material-icons-round toast-icon">' + icon + '</span>' +
+    '<span class="toast-message">' + message + '</span>' +
+    '<span class="material-icons-round toast-close" onclick="this.parentElement.remove()">close</span>';
+  
+  container.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 5000);
+}
+
+// Progress steps
+function updateProgressStep(step) {
+  for (var i = 1; i <= 4; i++) {
+    var el = document.getElementById('step' + i);
+    if (!el) continue;
+    el.classList.remove('active', 'complete');
+    if (i < step) el.classList.add('complete');
+    else if (i === step) el.classList.add('active');
+  }
+}
+
+// Export results
+function exportResults() {
+  showToast('Export feature coming soon!', 'info');
+  // TODO: Implement PDF export
+}
+
+// Smooth scroll to results
+function scrollToResults() {
+  var resultsBlock = document.getElementById('resultsBlock');
+  if (resultsBlock) {
+    resultsBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 document.getElementById('uploadZone').addEventListener('click', function() { document.getElementById('fileInput').click(); });
 ['dragover','dragenter'].forEach(function(ev) {
   document.getElementById('uploadZone').addEventListener(ev, function(e) { e.preventDefault(); this.style.borderColor='var(--indigo)'; });
@@ -1904,6 +2080,7 @@ function runAnalysis() {
   var desc     = document.getElementById('productDesc').value.trim();
   var category = document.getElementById('productCategory').value || 'saree';
   if (!desc && !selectedFile) {
+    showToast(t('noInput'), 'error');
     document.getElementById('errorText').textContent = t('noInput');
     document.getElementById('errorArea').classList.add('show');
     return;
@@ -1912,11 +2089,13 @@ function runAnalysis() {
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner-border spinner-border-sm" style="width:16px;height:16px;color:white;"></div>&nbsp;' + t('analysing');
   document.getElementById('progressArea').classList.add('show');
-  document.getElementById('progressLabel').textContent = t('checkingMarket');
+  updateProgressStep(1);
+  document.getElementById('progressLabel').textContent = 'Uploading data...';
   document.getElementById('errorArea').classList.remove('show');
   document.getElementById('invalidImgAlert').classList.remove('show');
   document.getElementById('resultsEmpty').style.display = 'none';
   document.getElementById('resultsBlock').classList.remove('show');
+  
   var fd = new FormData();
   if (selectedFile) fd.append('sketch', selectedFile);
   fd.append('description', desc);
@@ -1924,21 +2103,30 @@ function runAnalysis() {
   fd.append('price', document.getElementById('productPrice').value);
   fd.append('occasion', document.getElementById('productOccasion').value);
   fd.append('material', document.getElementById('productMaterial').value);
+  
+  setTimeout(function() { updateProgressStep(2); document.getElementById('progressLabel').textContent = 'Analyzing product...'; }, 500);
+  setTimeout(function() { updateProgressStep(3); document.getElementById('progressLabel').textContent = 'Calculating scores...'; }, 1500);
+  
   fetch('/analyze', { method: 'POST', body: fd })
     .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(r) {
+      updateProgressStep(4);
       if (!r.ok || r.data.error) throw new Error(r.data.error || 'Analysis failed. Please try again.');
       if (r.data.classification === 'INVALID' || r.data.invalid_image) {
         document.getElementById('invalidImgAlert').classList.add('show');
         document.getElementById('resultsEmpty').style.display = 'flex';
+        showToast('Invalid image detected', 'error');
       } else {
         renderResults(r.data);
+        showToast('Analysis complete!', 'success');
+        setTimeout(scrollToResults, 300);
       }
     })
     .catch(function(err) {
       document.getElementById('errorText').textContent = err.message;
       document.getElementById('errorArea').classList.add('show');
       document.getElementById('resultsEmpty').style.display = 'flex';
+      showToast(err.message, 'error');
     })
     .finally(function() {
       btn.disabled = false;
@@ -1994,6 +2182,24 @@ function renderResults(data) {
   document.getElementById('avgDisplay').textContent   = total + ' / 100';
   document.getElementById('ratingNum').textContent    = total;
   document.getElementById('pieTotalNum').textContent  = total;
+  
+  // Show export button
+  document.getElementById('exportBtn').style.display = 'inline-flex';
+  
+  // Show comparison with category average (simulated)
+  var categoryAvg = 68; // TODO: Get real category average
+  var compBadge = document.getElementById('comparisonBadge');
+  var compText = document.getElementById('comparisonText');
+  if (total > categoryAvg) {
+    compBadge.className = 'comparison-badge better';
+    compText.textContent = (total - categoryAvg) + ' points above category average';
+    compBadge.style.display = 'inline-flex';
+  } else if (total < categoryAvg) {
+    compBadge.className = 'comparison-badge worse';
+    compText.textContent = (categoryAvg - total) + ' points below category average';
+    compBadge.style.display = 'inline-flex';
+  }
+  
   setTimeout(function() {
     document.getElementById('ratingBarFill').style.width = (total / 100 * 100) + '%';
     setDim('demand',   d,  20);
@@ -2123,7 +2329,7 @@ function drawScorePie(scores) {
   if (!g) return;
   g.innerHTML = '';
   var tip = document.getElementById('scorePieTip');
-  var rOuter = 88, rInner = 50, gap = 3;
+  var rOuter = 120, rInner = 70, gap = 3;
   var total = 0;
   SCORE_SLICES.forEach(function(s) { total += (scores[s.key] || 0); });
   if (total === 0) total = 100;
