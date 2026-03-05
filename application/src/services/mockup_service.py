@@ -274,13 +274,15 @@ def generate_mockup(
     """
     uid = uuid.uuid4().hex
     prompt = _build_prompt(category, description)
-    is_production = os.environ.get("ENVIRONMENT", "local").lower() == "production"
+    env = os.environ.get("ENVIRONMENT", "local").lower()
+    is_production = env in ("production", "prod")
 
     log.info(
-        "Generating mockup [mode=%s uid=%s category=%s]",
+        "Generating mockup [mode=%s uid=%s category=%s env=%s]",
         "production" if is_production else "local",
         uid,
         category,
+        env,
     )
     log.debug("Prompt: %s", prompt)
 
