@@ -23,22 +23,10 @@ log = logging.getLogger(__name__)
 _BEDROCK_DEFAULT_MODEL = "amazon.titan-image-generator-v2:0"
 
 _CATEGORY_CONTEXT: dict[str, str] = {
-    "saree": (
-        "Indian saree with realistic silk fabric texture, elegant draping, "
-        "ornate woven border, graceful pleats, vibrant rich colors"
-    ),
-    "lehenga": (
-        "Indian lehenga choli with realistic embroidery, rich brocade fabric, "
-        "graceful flared skirt, dupatta, vibrant colors"
-    ),
-    "salwar_suit": (
-        "Indian salwar suit with realistic fabric texture, delicate embroidery, "
-        "traditional silhouette, matching dupatta"
-    ),
-    "kurti": (
-        "Indian kurti with realistic cotton or rayon fabric, printed or embroidered "
-        "details, clean tailored cut"
-    ),
+    "saree": "Indian saree, silk fabric, elegant draping, ornate border, vibrant colors",
+    "lehenga": "Indian lehenga choli, embroidery, brocade, flared skirt, dupatta",
+    "salwar_suit": "Indian salwar suit, embroidered fabric, traditional silhouette",
+    "kurti": "Indian kurti, cotton fabric, printed details, tailored cut",
 }
 
 
@@ -49,36 +37,23 @@ _CATEGORY_CONTEXT: dict[str, str] = {
 def _build_prompt(category: str, description: str) -> str:
     base = _CATEGORY_CONTEXT.get(
         category,
-        "Indian ethnic wear garment with realistic fabric texture and traditional details",
+        "Indian ethnic wear, realistic fabric",
     )
-    extra = f", {description}" if description else ""
+    extra = f", {description[:100]}" if description else ""
+    # Keep under 512 chars for Bedrock Titan limit
     return (
-        f"Professional fashion product photography of {base}{extra}. "
-        "Beautiful Indian woman model wearing the outfit, full body portrait shot, "
-        "standing elegantly in a photography studio, "
-        "professional studio lighting, soft diffused light, gentle shadows, "
-        "pure white seamless background, "
-        "photorealistic skin texture, natural hair, expressive face, "
-        "ultra-realistic fabric with visible weave pattern, sheen and texture, "
-        "natural fabric draping with realistic folds and weight, "
-        "vivid saturated colors, rich deep tones, "
-        "high resolution DSLR photography, sharp focus, "
-        "magazine quality fashion editorial shoot, "
-        "professional color grading, commercial product photography"
+        f"Professional fashion photo: {base}{extra}. "
+        "Indian woman model, full body, studio lighting, white background, "
+        "photorealistic fabric texture, vivid colors, DSLR quality"
     )
 
 
 def _build_negative_prompt() -> str:
+    # Keep under 512 chars for Bedrock Titan limit
     return (
-        "sketch, drawing, line art, pencil, outline, black and white, monochrome, "
-        "cartoon, illustration, anime, painting, digital art, watercolor, "
-        "blurry, low quality, pixelated, grainy, noisy, "
-        "watermark, text, logo, signature, "
-        "deformed, distorted, disfigured, ugly, bad anatomy, "
-        "cropped, cut off, out of frame, partial body, "
-        "mannequin, headless, faceless, plastic, doll-like, "
-        "dark background, colored background, gradient background, "
-        "overexposed, underexposed, washed out"
+        "sketch, drawing, cartoon, illustration, blurry, low quality, "
+        "watermark, text, deformed, ugly, cropped, mannequin, "
+        "dark background, colored background"
     )
 
 
