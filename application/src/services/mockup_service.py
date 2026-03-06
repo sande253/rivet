@@ -6,8 +6,9 @@ Local mode  (ENVIRONMENT != 'production'):
 
 Production mode (ENVIRONMENT=production):
     Amazon Bedrock Titan Image Generator v2 — IMAGE_VARIATION task.
-    similarityStrength is configurable (default 0.3) — balances sketch fidelity
-    vs photorealism. IAM-role credentials — no hardcoded keys.
+    similarityStrength is configurable (default 0.65) — preserves garment
+    silhouette and pose from sketch while adding photorealism.
+    IAM-role credentials — no hardcoded keys.
     Uploads sketch + generated mockup to S3 via presigned URLs.
     Returns https://… presigned S3 URLs.
 """
@@ -53,9 +54,22 @@ _CATEGORY_CONTEXT: Final[dict[str, str]] = {
         "Person wearing an Indian kurti: knee-length straight-cut tunic top, "
         "subtle embroidery at neckline and hem, worn with leggings or jeans"
     ),
+    "kurta": (
+        "Indian man wearing a traditional kurta with dhoti pants: "
+        "long straight-cut kurta tunic with embroidery at collar and cuffs, "
+        "loose pleated dhoti-style pants, formal shoes, male model, full body"
+    ),
+    "kurta_pyjama": (
+        "Indian man wearing kurta pyjama: long straight-cut kurta, "
+        "matching straight-leg pyjama pants, male model, full body"
+    ),
+    "sherwani": (
+        "Indian man wearing a sherwani: long embroidered coat-style jacket "
+        "with mandarin collar, churidar pants, groom or formal wear, male model, full body"
+    ),
 }
 
-_NEGATIVE_PROMPT: Final = (
+_NEGATIVE_PROMPT_BASE: Final = (
     "sketch, line drawing, cartoon, illustration, watercolor, anime, "
     "low quality, blurry, out of focus, grainy, noisy, artifacts, "
     "watermark, text, logo, signature, deformed body, extra limbs, "
@@ -64,6 +78,20 @@ _NEGATIVE_PROMPT: Final = (
     "dark background, patterned background, gradient background, "
     "garment confusion, wrong clothing type"
 )
+
+_NEGATIVE_PROMPT_MENSWEAR: Final = (
+    _NEGATIVE_PROMPT_BASE + ", "
+    "woman, female, saree, lehenga, dupatta, pallu, blouse, skirt, "
+    "women's clothing, feminine garment"
+)
+
+_NEGATIVE_PROMPT_WOMENSWEAR: Final = (
+    _NEGATIVE_PROMPT_BASE + ", "
+    "man, male, kurta, dhoti, sherwani, men's clothing"
+)
+
+# Menswear categories — used to select the right negative prompt
+_MENSWEAR_CATEGORIES: Final = frozenset({"kurta", "kurta_pyjama", "sherwani"})
 
 # ---------------------------------------------------------------------------
 # Config dataclass — centralises all tunable parameters
@@ -86,9 +114,10 @@ class MockupConfig:
         default_factory=lambda: os.environ.get("S3_BUCKET", "")
     )
     # 0.2 = max photorealism (loose sketch structure)
-    # 0.5 = balanced; 0.8 = close to sketch (less photorealistic)
+    # 0.5 = balanced; 0.65 = preserves garment silhouette (recommended)
+    # 0.8 = very close to sketch (less photorealistic)
     similarity_strength: float = field(
-        default_factory=lambda: float(os.environ.get("SIMILARITY_STRENGTH", "0.3"))
+        default_factory=lambda: float(os.environ.get("SIMILARITY_STRENGTH", "0.65"))
     )
     cfg_scale: float = field(
         default_factory=lambda: float(os.environ.get("CFG_SCALE", "10.0"))
@@ -106,6 +135,15 @@ class MockupConfig:
 # ---------------------------------------------------------------------------
 # Prompt builder
 # ---------------------------------------------------------------------------
+
+def _get_negative_prompt(category: str) -> str:
+    """Return the appropriate negative prompt based on garment gender category."""
+    if category in _MENSWEAR_CATEGORIES:
+        return _NEGATIVE_PROMPT_MENSWEAR
+    if category in ("saree", "lehenga", "salwar_suit"):
+        return _NEGATIVE_PROMPT_WOMENSWEAR
+    return _NEGATIVE_PROMPT_BASE
+
 
 def _build_prompt(category: str, description: str) -> str:
     """
@@ -222,17 +260,17 @@ def _prepare_sketch_b64(sketch_path: str) -> str:
     return b64
 
 
-def _bedrock_generate(prompt: str, sketch_path: str, cfg: MockupConfig) -> bytes:
+def _bedrock_generate(prompt: str, sketch_path: str, cfg: MockupConfig, category: str) -> bytes:
     """
     Call Bedrock Titan IMAGE_VARIATION and return raw PNG bytes.
 
     similarityStrength (cfg.similarity_strength):
         0.2  → maximum photorealism, loosely follows sketch pose/layout
-        0.3  → good balance (default)
-        0.5+ → stays closer to sketch structure, less photorealistic
+        0.65 → preserves garment silhouette and pose (recommended default)
+        0.8+ → stays very close to sketch structure, less photorealistic
     """
     sketch_b64 = _prepare_sketch_b64(sketch_path)
-    negative_prompt = _NEGATIVE_PROMPT
+    negative_prompt = _get_negative_prompt(category)
 
     body = {
         "taskType": "IMAGE_VARIATION",
@@ -376,7 +414,7 @@ def generate_mockup(
 
     try:
         if config.is_production:
-            mockup_bytes = _bedrock_generate(prompt, sketch_path, config)
+            mockup_bytes = _bedrock_generate(prompt, sketch_path, config, category)
             sketch_url, mockup_url = _save_production(sketch_path, mockup_bytes, uid, config)
         else:
             sketch_url, mockup_url = _save_local(sketch_path, upload_folder, uid)
