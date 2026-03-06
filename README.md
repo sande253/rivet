@@ -1,22 +1,25 @@
-# Rivet — AI-Powered Product Viability Assessment for Indian Ethnic Wear
+# Rivet — AI-Powered Product Intelligence Platform for Indian Ethnic Wear
 
-> **Transform design sketches into market-ready products in minutes using AI analysis and photorealistic mockups.**
+> **Transform design sketches into market-ready products with AI analysis, photorealistic mockups, and data-driven insights.**
+
+[![Production](https://img.shields.io/badge/status-live-success)](http://rivet-prod-alb-1684600916.us-east-1.elb.amazonaws.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## 🎯 The Problem
 
-Fashion brands launching ethnic wear face a critical challenge:
-- Inventory decisions based on guesswork, not data
-- High cost of unsold stock (₹50K–₹500K per failed SKU)
-- Manual market research is slow and subjective
-- No quick way to evaluate design viability before production
+Fashion brands and artisans launching ethnic wear face critical challenges:
+- **Inventory Risk**: ₹50K–₹500K lost per failed SKU due to guesswork
+- **Slow Market Research**: Manual analysis is time-consuming and subjective
+- **Design Uncertainty**: No quick way to validate viability before production
+- **Visualization Gap**: Hard to communicate design vision to buyers/manufacturers
 
 ## ✨ The Solution
 
-**Rivet** is an AI-powered tool that analyzes product sketches against real market data to **predict viability and reduce inventory risk by 40%+**.
+**Rivet** combines AI vision analysis with real market data to predict product viability and generate photorealistic mockups—reducing inventory risk by 40%+ and accelerating time-to-market.
 
-**Upload a sketch → Get instant analysis + photorealistic mockup → Launch confidently**
+**Upload a sketch → Get instant analysis + realistic mockup → Launch confidently**
 
 ---
 
@@ -24,12 +27,12 @@ Fashion brands launching ethnic wear face a critical challenge:
 
 ```
 ┌─────────────────┐
-│   User Upload   │  (PNG, JPG, WEBP)
+│   User Upload   │  (PNG, JPG, WEBP sketch)
 └────────┬────────┘
          │
          ▼
 ┌──────────────────────────┐
-│  Claude Vision Analysis  │  (Vision: detect style, features, score)
+│  Claude Vision Analysis  │  (Detect style, features, score)
 │  • Market demand (0-20)  │
 │  • Uniqueness (0-20)     │
 │  • Price fit (0-20)      │
@@ -49,7 +52,7 @@ Fashion brands launching ethnic wear face a critical challenge:
     │                  │            │
     ▼                  ▼            ▼
 ┌─────────────────────────────────────────┐
-│  GenAI Tips (Haiku → Sonnet Critique)   │  (Only if MODIFY+)
+│  GenAI Tips (Haiku → Sonnet Critique)   │
 │  • Draft 3-4 actionable tips            │
 │  • Critic evaluates quality             │
 │  • Score ≥75 = return to user           │
@@ -57,10 +60,10 @@ Fashion brands launching ethnic wear face a critical challenge:
          │
          ▼
 ┌──────────────────────────┐
-│  Generate Mockup         │  (Sketch → Realistic product photo)
-│  • Local: PIL enhance    │
-│  • Prod: Bedrock Titan   │
-│  • Upload to S3 / serve  │
+│  Bedrock Mockup Gen      │  (IMAGE_VARIATION)
+│  • Sketch → Realistic    │
+│  • Category-aware        │
+│  • S3 storage            │
 └──────────────────────────┘
 ```
 
@@ -68,31 +71,40 @@ Fashion brands launching ethnic wear face a critical challenge:
 
 ## 🚀 Features
 
-### Core Analysis
-- **Vision-Powered Classification**: Claude analyzes sketches against 1000+ real market products
+### 🎨 AI-Powered Analysis
+- **Vision Classification**: Claude analyzes sketches against 1000+ real products
 - **5-Dimension Scoring**: Market demand, uniqueness, price fit, material, trends
-- **Instant Decision**: LAUNCH / MODIFY / DO NOT PRODUCE (within 2-3 seconds)
+- **Instant Decision**: LAUNCH / MODIFY / DO NOT PRODUCE (2-3 seconds)
+- **Grounded Recommendations**: Tips anchored in actual market data
 
-### GenAI Improvement Tips
-- **Two-Stage Pipeline**: Draft generation → Critic evaluation
-- **Quality Threshold**: Only tips scoring ≥75/100 returned
-- **Grounded Context**: Recommendations anchored in real market data
+### 🖼️ Photorealistic Mockup Generation
+- **Bedrock Titan v2**: IMAGE_VARIATION for sketch-to-photo transformation
+- **Category-Specific**: Saree, Lehenga, Salwar Suit, Kurti, Kurta, Sherwani
+- **Gender-Aware**: Male/female models based on garment type
+- **Anti-Confusion**: Strong negative prompts prevent category mixing
+- **Fullscreen View**: Click to expand images in modal
 
-### Mockup Generation
-- **Sketch → Realistic Photo**: Bedrock IMAGE_VARIATION or PIL enhancement
-- **Category-Aware**: Saree, Lehenga, Salwar Suit, Kurti
-- **Production Ready**: S3 integration for scalability
-
-### Resilience
+### 🛡️ Production-Grade Resilience
+- **Rate Limiting**: 10 analyses/hour, 5 mockups/hour per IP
 - **Circuit Breaker**: Auto-fallback if GenAI fails 5× in 60s
 - **Caching**: 5-min TTL on GenAI responses
-- **Safety Checks**: Profanity filter, PII removal, input validation
+- **Safety Filters**: Profanity detection, PII removal, input validation
+- **Cost Control**: Rate limits prevent API abuse
 
-### User Experience
-- **Bilingual UI**: English & Telugu
-- **Authentication**: Login/signup with secure sessions
+### 🌐 User Experience
+- **Bilingual UI**: English & Telugu (Hindi coming soon)
+- **Authentication**: Secure login/signup with bcrypt
 - **Admin Dashboard**: Proposal management + analytics
-- **Professional Styling**: Material Design, responsive layout
+- **Responsive Design**: Material Design, mobile-friendly
+- **Required Fields**: All form inputs validated
+
+### ☁️ AWS Infrastructure
+- **Auto-Scaling**: EC2 instances with ALB
+- **RDS PostgreSQL**: User data with automated backups
+- **S3 Storage**: Mockup images with presigned URLs
+- **Secrets Manager**: Secure credential storage
+- **CloudWatch**: Logging and monitoring
+- **GitHub Actions**: CI/CD with automated deployments
 
 ---
 
@@ -100,46 +112,50 @@ Fashion brands launching ethnic wear face a critical challenge:
 
 ### Prerequisites
 - Python 3.11+
-- `uv` package manager (or pip)
-- Docker (optional, recommended for prod)
+- Docker (optional, recommended)
+- AWS account (for production features)
 
 ### Local Development
 
 ```bash
-# 1. Clone & navigate
-cd application
+# 1. Clone repository
+git clone https://github.com/sande253/rivet.git
+cd rivet/application
 
-# 2. Copy .env template
+# 2. Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Configure environment
 cp .env.example .env
+# Edit .env with your API keys
 
-# 3. Add your API keys to .env
-ANTHROPIC_API_KEY=sk-ant-...
-FLASK_DEBUG=1
-FLASK_ENV=development
-
-# 4. Install dependencies
-uv pip install -r requirements.txt
-
-# 5. Run Flask dev server
+# 5. Run development server
 flask run
 # → http://localhost:5000
 ```
 
-### First Run
-1. **Sign up** with any email/password
-2. **Upload a product sketch** (PNG, JPG, WEBP)
-3. **Select category** (Saree, Lehenga, etc.)
-4. **Click "Run Analysis"** → See instant results
-5. **(Optional) Generate Mockup** → See realistic product photo
+### Docker Deployment
 
-### Docker (Production-like)
 ```bash
 cd application
-docker build -t rivet .
-docker run -p 5000:5000 \
-  -e ANTHROPIC_API_KEY=sk-ant-... \
-  -e FLASK_ENV=production \
-  rivet
+docker-compose up
+# → http://localhost:5000
+```
+
+### Production Deployment
+
+```bash
+# Automated via GitHub Actions on push to main
+git push origin main
+
+# Manual deployment
+cd infrastructure/environments/prod
+terraform init
+terraform apply
 ```
 
 ---
@@ -148,22 +164,32 @@ docker run -p 5000:5000 \
 
 ### Environment Variables
 
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `ANTHROPIC_API_KEY` | Claude API access | (required) |
-| `FLASK_ENV` | Environment mode | `development` |
-| `DRAFT_MODEL_ID` | Fast tip generation | `claude-haiku-4-5-20251001` |
-| `CRITIC_MODEL_ID` | Quality evaluation | `claude-sonnet-4-6` |
-| `DATABASE_URL` | SQLite or PostgreSQL | `sqlite:///instance/rivet.db` |
-| `GENAI_CACHE_TTL` | Cache duration (seconds) | `300` |
-| `ENVIRONMENT` | `local` or `production` | `local` |
+| Variable | Purpose | Default | Required |
+|----------|---------|---------|----------|
+| `ANTHROPIC_API_KEY` | Claude API access | - | No (Bedrock fallback) |
+| `USE_BEDROCK` | Use AWS Bedrock instead of Anthropic | `false` | No |
+| `ENVIRONMENT` | `local`, `prod`, `production` | `local` | Yes |
+| `DATABASE_URL` | PostgreSQL connection | SQLite | No |
+| `S3_BUCKET` | Image storage bucket | - | Prod only |
+| `AWS_REGION` | AWS region | `us-east-1` | Prod only |
+| `FLASK_SECRET_KEY` | Session encryption | - | Yes |
+| `DRAFT_MODEL_ID` | Fast tip generation | `claude-haiku-4-5` | No |
+| `CRITIC_MODEL_ID` | Quality evaluation | `claude-sonnet-4-6` | No |
+| `BEDROCK_IMAGE_MODEL_ID` | Mockup generation | `amazon.titan-image-generator-v2:0` | No |
 
-**Production (AWS Bedrock + S3):**
+### AWS Bedrock Setup
+
 ```bash
-ENVIRONMENT=production
-AWS_REGION=ap-south-1
-S3_BUCKET=my-bucket
-BEDROCK_IMAGE_MODEL_ID=amazon.titan-image-generator-v2:0
+# Enable Bedrock models in AWS Console
+# Required models:
+# - Claude 3.5 Sonnet v2
+# - Claude 3.5 Haiku
+# - Titan Image Generator v2
+
+# IAM role needs:
+# - bedrock:InvokeModel
+# - s3:PutObject, s3:GetObject
+# - secretsmanager:GetSecretValue
 ```
 
 ---
@@ -183,9 +209,12 @@ BEDROCK_IMAGE_MODEL_ID=amazon.titan-image-generator-v2:0
     "trend_alignment": 13
   },
   "detected_style": "Kanjivaram Silk Saree with Gold Border",
-  "detected_features": ["silk texture", "gold zari", "traditional weave", "rich colors"],
-  "genai_tips": "1. Source premium mulberry silk...\n2. Price at ₹1,200–₹1,500...",
+  "detected_features": ["silk texture", "gold zari", "traditional weave"],
+  "genai_tips": "1. Source premium mulberry silk from Kanchipuram...\n2. Price at ₹1,200–₹1,500 for optimal market fit...",
   "genai_score": 78,
+  "genai_model": "claude-sonnet-4-6",
+  "genai_latency_ms": 2340,
+  "sketch_url": "https://bucket.s3.amazonaws.com/uploads/sketches/abc123.png",
   "mockup_url": "https://bucket.s3.amazonaws.com/uploads/mockups/abc123.png"
 }
 ```
@@ -200,11 +229,14 @@ cd application
 # Run all tests
 pytest
 
-# Run specific test file
+# Run with coverage
+pytest --cov=src tests/
+
+# Run specific test
 pytest tests/test_genai.py -v
 
-# Coverage report
-pytest --cov=src tests/
+# Test categories
+pytest -k "test_market" -v
 ```
 
 ---
@@ -212,81 +244,147 @@ pytest --cov=src tests/
 ## 📁 Project Structure
 
 ```
-c:\rivet_proto\
+rivet/
 ├── application/
 │   ├── src/
-│   │   ├── routes/           # API endpoints (analysis, admin, auth)
-│   │   ├── services/         # Core logic (genai, mockup, market, cache)
-│   │   ├── models/           # Database (User)
-│   │   ├── config.py         # Flask config
-│   │   └── app.py            # App factory
-│   ├── templates/            # HTML (bilingual)
-│   ├── static/               # CSS, JS, uploads
+│   │   ├── routes/           # API endpoints
+│   │   │   ├── analysis.py   # /analyze, /generate-mockup
+│   │   │   ├── admin.py      # Admin dashboard
+│   │   │   └── auth.py       # Login/signup
+│   │   ├── services/         # Business logic
+│   │   │   ├── claude_service.py    # Vision analysis
+│   │   │   ├── genai.py             # Draft/Critic pipeline
+│   │   │   ├── mockup_service.py    # Image generation
+│   │   │   ├── market_service.py    # CSV data loading
+│   │   │   ├── cache_service.py     # In-memory cache
+│   │   │   ├── circuit_breaker.py   # Resilience
+│   │   │   └── safety.py            # Content filtering
+│   │   ├── models/           # Database models
+│   │   ├── core/             # Extensions (db, limiter)
+│   │   ├── config.py         # Flask configuration
+│   │   └── app.py            # Application factory
+│   ├── templates/            # Jinja2 templates
+│   ├── static/               # CSS, JS, images
 │   ├── tests/                # Pytest suite
+│   ├── data/                 # Market CSVs
 │   ├── requirements.txt      # Python dependencies
-│   ├── Dockerfile            # Container image
-│   └── .env.example          # Configuration template
+│   ├── Dockerfile            # Production image
+│   └── docker-compose.yml    # Local development
 │
 ├── infrastructure/           # Terraform IaC
 │   ├── modules/
-│   │   ├── compute/          # ECS, ALB
-│   │   ├── networking/       # VPC, subnets
-│   │   ├── storage/          # RDS, S3
-│   │   └── secrets/          # Secrets Manager
-│   ├── environments/
-│   │   ├── dev/
-│   │   └── prod/
-│   └── README.md
+│   │   ├── ec2_prod/         # Auto-scaling EC2
+│   │   ├── networking/       # VPC, subnets, ALB
+│   │   ├── database/         # RDS PostgreSQL
+│   │   ├── storage/          # S3 buckets
+│   │   ├── secrets/          # Secrets Manager
+│   │   └── bedrock/          # Bedrock permissions
+│   └── environments/
+│       └── prod/             # Production config
 │
-└── README.md                 # (This file)
+├── .github/
+│   └── workflows/
+│       └── deploy.yml        # CI/CD pipeline
+│
+└── README.md                 # This file
 ```
 
 ---
 
-## 🎯 Hackathon Highlights
+## 🎯 Key Achievements
 
-- **Complete End-to-End**: From sketch upload to mockup generation in one flow
-- **Multi-Stage GenAI**: Draft → Critic pipeline for quality assurance
-- **Real Market Data**: 1000+ product CSVs for grounded analysis
-- **Production Infrastructure**: Full Terraform + Docker setup (not typical for hackathons)
-- **Resilience Patterns**: Circuit breaker, caching, safety filters
-- **Bilingual Support**: English + Telugu UI + **Hindi( in future)**
+### Technical Excellence
+- **Multi-Stage GenAI**: Draft → Critic pipeline with quality gates
+- **Production Infrastructure**: Full Terraform + Docker + CI/CD
+- **Resilience Patterns**: Circuit breaker, rate limiting, caching
+- **Cost Optimization**: Rate limits reduced costs from $20/day to $5-10/day
+- **Security**: Bcrypt passwords, IAM roles, no hardcoded secrets
+
+### User Experience
+- **Bilingual Support**: English + Telugu
+- **Fullscreen Images**: Click-to-expand modal
+- **Required Fields**: Form validation prevents incomplete submissions
+- **Responsive Design**: Works on mobile, tablet, desktop
+
+### AI Innovation
+- **Category-Aware Mockups**: Gender-specific models, anti-confusion prompts
+- **Grounded Analysis**: Real market data (1000+ products)
+- **Quality Assurance**: Critic model ensures tip quality ≥75/100
 
 ---
 
 ## 🚫 Known Limitations
 
-- Local mockup generation (dev mode) is PIL-based simulation
-- Market data is static CSVs (could benefit from live data integration)
-- Image generation requires AWS Bedrock in production
-- Admin features are minimal (proposal viewing only)
+- **Static Market Data**: CSVs updated manually (live integration planned)
+- **Rate Limits**: 10 analyses/hour may be restrictive for power users
+- **Image Size**: 512x512 due to Bedrock Titan constraints
+- **Category Confusion**: Kurti sometimes generates as saree (improved with negative prompts)
 
 ---
 
-## 🔮 Future Enhancements
+## 🔮 Roadmap
 
-- [ ] Live market data ingestion (e.g., daily Shopify scrape)
-- [ ] User behavior analytics (which tips led to successful launches?)
-- [ ] A/B testing interface (test multiple design variations)
-- [ ] Pricing recommendations (ML-based price optimization)
-- [ ] Batch analysis (process 100 sketches per job)
-- [ ] Custom rubrics by brand (e.g., "luxury" vs "budget")
+### Q2 2026
+- [ ] Live market data integration (Shopify/Amazon scraping)
+- [ ] Batch analysis (100 sketches per job)
+- [ ] Custom rubrics (luxury vs budget brands)
+- [ ] Hindi language support
+
+### Q3 2026
+- [ ] ML-based price optimization
+- [ ] A/B testing interface (compare design variations)
+- [ ] User behavior analytics (track successful launches)
+- [ ] Mobile app (React Native)
+
+### Q4 2026
+- [ ] Marketplace integration (direct listing to Shopify)
+- [ ] Fabric supplier recommendations
+- [ ] Trend forecasting (predict next season's winners)
+
+---
+
+## 💰 Cost Breakdown
+
+### Current Production Costs (~$10/day)
+- **EC2**: $2.90/day (t3.medium)
+- **RDS**: $0.78/day (db.t4g.micro)
+- **ALB**: $2.50/day
+- **Bedrock API**: $3-5/day (with rate limiting)
+- **S3**: $0.10/day
+
+### Cost Optimizations Applied
+- Removed dev environment (-$35/month)
+- Implemented rate limiting (-50% API costs)
+- Deleted NAT Gateway (-$32/month)
+- Released unused Elastic IPs (-$3.60/month)
 
 ---
 
 ## 📄 License
 
-MIT License — See LICENSE file for details.
+MIT License — See [LICENSE](LICENSE) for details.
 
 ---
 
-## 👨‍💻 Team
+## 👨‍💻 Author
 
-Built for the **AI for Bharat Hackathon** (March 2026)
+**Sandeep Reddy**
+- GitHub: [@sande253](https://github.com/sande253)
+- Built for AI for Bharat Hackathon (March 2026)
 
-**Stack**: Flask, PostgreSQL, Claude API, AWS Bedrock, Terraform, Docker
+**Tech Stack**: Flask, PostgreSQL, Claude API, AWS Bedrock, Terraform, Docker, GitHub Actions
 
 ---
 
-#   T e s t   t r i g g e r  
- 
+## 🙏 Acknowledgments
+
+- **Anthropic** for Claude API
+- **AWS** for Bedrock and infrastructure
+- **AI for Bharat** for the hackathon opportunity
+- **Indian artisan community** for inspiration
+
+---
+
+**Production URL**: http://rivet-prod-alb-1684600916.us-east-1.elb.amazonaws.com/
+
+**Repository**: https://github.com/sande253/rivet
