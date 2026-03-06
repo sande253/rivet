@@ -2045,13 +2045,13 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             <button class="filter-chip" onclick="filterMarket(this,'kurti')">Kurtis</button>
           </div>
         </div>
-        <div style="overflow-x:auto;">
+        <div style="overflow-x:auto;max-height:600px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);">
           <table class="market-table" id="marketTable">
-            <thead>
+            <thead style="position:sticky;top:0;z-index:10;background:var(--cream);">
               <tr>
           <th>Product</th><th>Category</th><th>Price / MRP</th><th>Discount</th><th>Rating</th><th>Reviews</th>
               </tr>
-              <tr class="table-filter-row">
+              <tr class="table-filter-row" style="position:sticky;top:42px;z-index:10;background:var(--cream);">
           <th><input type="text" id="tfProduct" placeholder="Search…" oninput="applyTableFilters()"/></th>
           <th><select id="tfCategory" onchange="applyTableFilters()"><option value="">All</option><option value="saree">Saree</option><option value="lehenga">Lehenga</option><option value="salwar">Salwar Suit</option><option value="kurti">Kurti</option></select></th>
           <th><select id="tfPrice" onchange="applyTableFilters()"><option value="">Any price</option><option value="0-500">Under ₹500</option><option value="500-1000">₹500–₹1,000</option><option value="1000-1500">₹1,000–₹1,500</option><option value="1500-9999">₹1,500+</option></select></th>
@@ -2079,13 +2079,15 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           </div>
           <div class="items-per-page">
             <label for="itemsPerPageSelect" class="items-per-page-label">Show:</label>
-            <select id="itemsPerPageSelect" class="items-per-page-select" onchange="changeItemsPerPage(this.value)">
+            <select id="itemsPerPageSelect" class="items-per-page-select" onchange="changeItemsPerPage(this.value)" style="width:80px;">
               <option value="8" selected>8</option>
               <option value="12">12</option>
               <option value="16">16</option>
               <option value="20">20</option>
               <option value="24">24</option>
+              <option value="custom">Custom</option>
             </select>
+            <input type="number" id="customRowsInput" class="items-per-page-select" placeholder="Enter #" min="1" max="1000" style="display:none;width:80px;" onchange="changeItemsPerPage(this.value)" onkeypress="if(event.key==='Enter') changeItemsPerPage(this.value)"/>
           </div>
         </div>
             </div>
@@ -2322,8 +2324,42 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
       }
 
       function changeItemsPerPage(value) {
-        mPageSize = parseInt(value);
+        var select = document.getElementById('itemsPerPageSelect');
+        var customInput = document.getElementById('customRowsInput');
+        
+        if (value === 'custom') {
+          // Show custom input
+          customInput.style.display = 'inline-block';
+          customInput.focus();
+          return;
+        }
+        
+        // Hide custom input if showing
+        customInput.style.display = 'none';
+        
+        var numValue = parseInt(value);
+        if (isNaN(numValue) || numValue < 1) {
+          alert('Please enter a valid number (1-1000)');
+          select.value = mPageSize;
+          return;
+        }
+        
+        if (numValue > 1000) {
+          alert('Maximum 1000 rows allowed');
+          numValue = 1000;
+        }
+        
+        mPageSize = numValue;
         marketPage = 1;
+        
+        // Update select to show custom value if not in options
+        var optionExists = Array.from(select.options).some(opt => opt.value === value);
+        if (!optionExists && value !== 'custom') {
+          select.value = 'custom';
+          customInput.value = numValue;
+          customInput.style.display = 'inline-block';
+        }
+        
         renderMarketPage();
         updatePaginationControls();
       }
