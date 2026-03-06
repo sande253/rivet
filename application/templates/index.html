@@ -1589,7 +1589,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
                 <div class="mb-3">
                   <label class="az-label" data-en="PRODUCT DESCRIPTION" data-te="ఉత్పత్తి వివరణ">PRODUCT DESCRIPTION</label>
-                  <textarea class="az-field" id="productDesc" placeholder="E.g. A red Kanjivaram silk saree with gold zari border, meant for wedding wear…" maxlength="500" oninput="updateCharCount(this)"></textarea>
+                  <textarea class="az-field" id="productDesc" placeholder="E.g. A red Kanjivaram silk saree with gold zari border, meant for wedding wear…" maxlength="500" oninput="updateCharCount(this)" required></textarea>
                   <div class="char-counter" id="descCharCounter">0 / 500 characters</div>
                 </div>
 
@@ -1608,7 +1608,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                         autocomplete="off"
                         readonly
                         onclick="toggleCategoryDropdown()"
-                        style="cursor:pointer;padding-right:36px;"/>
+                        style="cursor:pointer;padding-right:36px;"
+                        required/>
                       <span class="material-icons-round" id="catChevron"
                         style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--ink-lt);pointer-events:none;transition:transform .2s;">
                         expand_more
@@ -1619,12 +1620,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </div>
                   <div class="col-sm-6">
                     <label class="az-label" data-en="TARGET PRICE (₹)" data-te="లక్ష్య ధర (₹)">TARGET PRICE (₹)</label>
-                    <input type="text" class="az-field" id="productPrice" placeholder="e.g. 1499" inputmode="numeric" oninput="sanitizePriceInput(this)"/>
+                    <input type="text" class="az-field" id="productPrice" placeholder="e.g. 1499" inputmode="numeric" oninput="sanitizePriceInput(this)" required/>
                     <div id="priceError" style="font-size:10.5px;color:var(--red);margin-top:3px;display:none;">Please enter a valid price</div>
                   </div>
                   <div class="col-sm-6">
                     <label class="az-label" data-en="OCCASION" data-te="సందర్భం">OCCASION</label>
-                    <select class="az-field" id="productOccasion">
+                    <select class="az-field" id="productOccasion" required>
                       <option value="">Select occasion…</option>
                       <option value="Wedding">Wedding</option>
                       <option value="Festival">Festival / Puja</option>
@@ -1637,7 +1638,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                    <label class="az-label" data-en="PRIMARY MATERIAL" data-te="ప్రాథమిక వస్తువు">PRIMARY MATERIAL</label>
                    <input type="text" class="az-field" id="productMaterial" 
                      placeholder="e.g. Pure Silk, Cotton, Georgette…"
-                    autocomplete="off"/>
+                    autocomplete="off"
+                    required/>
                   </div>
                 </div>
 
@@ -1649,7 +1651,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                       <p data-en="PNG, JPG, WEBP up to 16 MB" data-te="ఐచ్ఛికం — PNG, JPG, WEBP 16 MB వరకు">PNG, JPG, WEBP up to 16 MB</p>
                     </div>
                   </div>
-                  <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.webp" style="display:none;"/>
+                  <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.webp" style="display:none;" required/>
                 </div>
 
                 <div class="preview-strip mb-3" id="previewStrip">
