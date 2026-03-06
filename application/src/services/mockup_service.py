@@ -51,8 +51,9 @@ _CATEGORY_CONTEXT: Final[dict[str, str]] = {
         "knee-length straight-cut kameez tunic, matching dupatta"
     ),
     "kurti": (
-        "Person wearing an Indian kurti: knee-length straight-cut tunic top, "
-        "subtle embroidery at neckline and hem, worn with leggings or jeans"
+        "Person wearing an Indian kurti tunic: ONLY a knee-length straight-cut tunic top, "
+        "NOT a saree, NO draping, NO pallu, simple tunic dress, "
+        "subtle embroidery at neckline, worn with leggings or jeans"
     ),
     "kurta": (
         "Indian man wearing a traditional kurta with dhoti pants: "
@@ -88,6 +89,14 @@ _NEGATIVE_PROMPT_MENSWEAR: Final = (
 _NEGATIVE_PROMPT_WOMENSWEAR: Final = (
     _NEGATIVE_PROMPT_BASE + ", "
     "man, male, kurta, dhoti, sherwani, men's clothing"
+)
+
+# Anti-saree negative prompt for kurti (most confused category)
+_NEGATIVE_PROMPT_KURTI: Final = (
+    _NEGATIVE_PROMPT_BASE + ", "
+    "saree, draped fabric, pallu, pleated saree, saree draping, "
+    "6-yard fabric, petticoat, saree blouse, traditional saree, "
+    "man, male, dhoti, sherwani, men's clothing"
 )
 
 # Menswear categories — used to select the right negative prompt
@@ -140,6 +149,8 @@ def _get_negative_prompt(category: str) -> str:
     """Return the appropriate negative prompt based on garment gender category."""
     if category in _MENSWEAR_CATEGORIES:
         return _NEGATIVE_PROMPT_MENSWEAR
+    if category == "kurti":
+        return _NEGATIVE_PROMPT_KURTI  # Special anti-saree prompt
     if category in ("saree", "lehenga", "salwar_suit"):
         return _NEGATIVE_PROMPT_WOMENSWEAR
     return _NEGATIVE_PROMPT_BASE
