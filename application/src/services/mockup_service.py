@@ -51,9 +51,10 @@ _CATEGORY_CONTEXT: Final[dict[str, str]] = {
         "knee-length straight-cut kameez tunic, matching dupatta"
     ),
     "kurti": (
-        "Person wearing an Indian kurti tunic: ONLY a knee-length straight-cut tunic top, "
-        "NOT a saree, NO draping, NO pallu, simple tunic dress, "
-        "subtle embroidery at neckline, worn with leggings or jeans"
+        "Indian woman wearing ONLY a kurti tunic top with pants: "
+        "straight knee-length tunic top, NO saree, NO draping, NO pallu over shoulder, "
+        "simple embroidered tunic worn with churidar pants or leggings, "
+        "standing straight, NOT wearing a saree"
     ),
     "kurta": (
         "Indian man wearing a traditional kurta with dhoti pants: "
@@ -94,8 +95,10 @@ _NEGATIVE_PROMPT_WOMENSWEAR: Final = (
 # Anti-saree negative prompt for kurti (most confused category)
 _NEGATIVE_PROMPT_KURTI: Final = (
     _NEGATIVE_PROMPT_BASE + ", "
-    "saree, draped fabric, pallu, pleated saree, saree draping, "
-    "6-yard fabric, petticoat, saree blouse, traditional saree, "
+    "saree, sari, draped saree, draped fabric, pallu over shoulder, pallu draping, "
+    "pleated saree, saree pleats, 6-yard fabric, 6-yard drape, "
+    "petticoat, saree blouse, traditional saree, silk saree, "
+    "saree border, saree pallu, draped garment, wrapped fabric, "
     "man, male, dhoti, sherwani, men's clothing"
 )
 
