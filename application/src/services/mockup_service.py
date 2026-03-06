@@ -183,10 +183,13 @@ def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
     result = json.loads(response["body"].read())
 
     if "error" in result:
-        raise RuntimeError(f"Bedrock returned error: {result['error']}")
+        error_msg = result.get("error", "Unknown error")
+        log.error("Bedrock error response: %s", result)
+        raise RuntimeError(f"Bedrock returned error: {error_msg}")
 
     if not result.get("images"):
-        raise RuntimeError(f"Bedrock returned no images. Keys: {list(result.keys())}")
+        log.error("Bedrock response missing images. Full response: %s", result)
+        raise RuntimeError(f"Bedrock returned no images. Response keys: {list(result.keys())}, Full response: {json.dumps(result)}")
 
     log.info("Bedrock IMAGE_VARIATION succeeded.")
     return base64.standard_b64decode(result["images"][0])
