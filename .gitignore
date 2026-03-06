@@ -75,6 +75,9 @@ logs/
 *credentials*.csv
 *accessKeys*.csv
 rivet_adm_*.csv
+ecr-password.txt
+policy.json
+ssm_out.json
 
 # Large files
 *.msi
