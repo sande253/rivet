@@ -23,10 +23,10 @@ log = logging.getLogger(__name__)
 _BEDROCK_DEFAULT_MODEL = "amazon.titan-image-generator-v2:0"
 
 _CATEGORY_CONTEXT: dict[str, str] = {
-    "saree": "Indian saree, silk fabric, elegant draping, ornate border, vibrant colors",
-    "lehenga": "Indian lehenga choli, embroidery, brocade, flared skirt, dupatta",
-    "salwar_suit": "Indian salwar suit, embroidered fabric, traditional silhouette",
-    "kurti": "Indian kurti, cotton fabric, printed details, tailored cut",
+    "saree": "Indian saree: 6-yard draped fabric, pleated front, pallu over shoulder, blouse",
+    "lehenga": "Indian lehenga: long flared skirt, cropped choli top, dupatta scarf",
+    "salwar_suit": "Indian salwar kameez: loose pants, long tunic top, dupatta",
+    "kurti": "Indian kurti: knee-length tunic dress, straight cut, no draping",
 }
 
 
@@ -37,14 +37,15 @@ _CATEGORY_CONTEXT: dict[str, str] = {
 def _build_prompt(category: str, description: str) -> str:
     base = _CATEGORY_CONTEXT.get(
         category,
-        "Indian ethnic wear, realistic fabric",
+        "Indian ethnic wear",
     )
-    extra = f", {description[:100]}" if description else ""
+    extra = f". {description[:80]}" if description else ""
     # Keep under 512 chars for Bedrock Titan limit
+    # Be very specific about garment type to avoid confusion
     return (
-        f"Professional fashion photo: {base}{extra}. "
-        "Indian woman model, full body, studio lighting, white background, "
-        "photorealistic fabric texture, vivid colors, DSLR quality"
+        f"{base}{extra}. "
+        "Fashion model wearing this specific garment type, "
+        "full body studio photo, white background, realistic fabric, vivid colors"
     )
 
 
