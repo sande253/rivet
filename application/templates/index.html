@@ -2221,8 +2221,26 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
       var currentLang = 'en';
 
       function getFilteredMarket() {
-        if (activeFilter === 'all') return rawMarket;
-        return rawMarket.filter(function(p) { return p.cat === activeFilter; });
+        var productQ  = (document.getElementById('tfProduct')?.value  || '').toLowerCase();
+        var catQ      = (document.getElementById('tfCategory')?.value || '').toLowerCase();
+        var priceQ    = document.getElementById('tfPrice')?.value || '';
+        var discountQ = parseFloat(document.getElementById('tfDiscount')?.value) || 0;
+        var ratingQ   = parseFloat(document.getElementById('tfRating')?.value) || 0;
+        
+        return rawMarket.filter(function(item) {
+          var discount = item.mrp > item.price ? Math.round((1 - item.price / item.mrp) * 100) : 0;
+          
+          if (productQ && !item.title.toLowerCase().includes(productQ)) return false;
+          if (catQ && item.cat !== catQ) return false;
+          if (priceQ) {
+            var parts = priceQ.split('-').map(Number);
+            if (item.price < parts[0] || item.price > parts[1]) return false;
+          }
+          if (discountQ && discount < discountQ) return false;
+          if (ratingQ && (!item.rating || item.rating < ratingQ)) return false;
+          
+          return true;
+        });
       }
 
       function goToMarketPage(pageNum) {
@@ -2289,6 +2307,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         var tbody = document.getElementById('marketTbody');
         tbody.innerHTML = '';
         allRenderedRows = [];
+        
+        if (items.length === 0) {
+          var emptyRow = document.createElement('tr');
+          emptyRow.innerHTML = '<td colspan="6" style="text-align:center;padding:40px;color:var(--ink-lt);font-size:14px;">No products match your filters.</td>';
+          tbody.appendChild(emptyRow);
+          return;
+        }
+        
         items.forEach(function(item) {
           var discount = item.mrp > item.price ? Math.round((1 - item.price / item.mrp) * 100) : 0;
           var tr = document.createElement('tr');
@@ -3120,12 +3146,7 @@ function renderStars(rating) {
   }
   return html + '<span class="star-count">' + rating + '</span></div>';
 }
-var CAT_LABEL = { saree:'Saree', lehenga:'Lehenga Choli', salwar:'Salwar Suit', kurti:'Kurti' };
-
-function getFilteredMarket() {
-  if (activeFilter === 'all') return rawMarket;
-  return rawMarket.filter(function(p) { return p.cat === activeFilter; });
-}
+var CAT_LABEL = { saree:'Saree', lehenga:'Lehenga Choli', salwar_suit:'Salwar Suit', kurti:'Kurti' };
 
 function applyTableFilters() {
   var productQ  = (document.getElementById('tfProduct')?.value  || '').toLowerCase();
@@ -3133,28 +3154,32 @@ function applyTableFilters() {
   var priceQ    = document.getElementById('tfPrice')?.value || '';
   var discountQ = parseFloat(document.getElementById('tfDiscount')?.value) || 0;
   var ratingQ   = parseFloat(document.getElementById('tfRating')?.value) || 0;
-  var visibleCount = 0;
-  allRenderedRows.forEach(function(r) {
-    var item = r.item;
+  
+  // Re-render the page with filters applied
+  renderMarketPage();
+}
+
+function getFilteredMarket() {
+  var productQ  = (document.getElementById('tfProduct')?.value  || '').toLowerCase();
+  var catQ      = (document.getElementById('tfCategory')?.value || '').toLowerCase();
+  var priceQ    = document.getElementById('tfPrice')?.value || '';
+  var discountQ = parseFloat(document.getElementById('tfDiscount')?.value) || 0;
+  var ratingQ   = parseFloat(document.getElementById('tfRating')?.value) || 0;
+  
+  return rawMarket.filter(function(item) {
     var discount = item.mrp > item.price ? Math.round((1 - item.price / item.mrp) * 100) : 0;
-    var show = true;
-    if (productQ && !item.title.toLowerCase().includes(productQ)) show = false;
-    if (catQ     && item.cat !== catQ) show = false;
+    
+    if (productQ && !item.title.toLowerCase().includes(productQ)) return false;
+    if (catQ && item.cat !== catQ) return false;
     if (priceQ) {
       var parts = priceQ.split('-').map(Number);
-      if (item.price < parts[0] || item.price > parts[1]) show = false;
+      if (item.price < parts[0] || item.price > parts[1]) return false;
     }
-    if (discountQ && discount < discountQ) show = false;
-    if (ratingQ   && (!item.rating || item.rating < ratingQ)) show = false;
-    r.tr.style.display = show ? '' : 'none';
-    if (show) visibleCount++;
+    if (discountQ && discount < discountQ) return false;
+    if (ratingQ && (!item.rating || item.rating < ratingQ)) return false;
+    
+    return true;
   });
-  if (visibleCount === 0) {
-    var tbody = document.getElementById('marketTbody');
-    var emptyRow = document.createElement('tr');
-    emptyRow.innerHTML = '<td colspan="6" style="text-align:center;padding:20px;color:var(--ink-lt);">No products match your filters.</td>';
-    tbody.appendChild(emptyRow);
-  }
 }
 
 function initMarket() {
