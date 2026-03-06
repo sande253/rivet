@@ -123,18 +123,18 @@ def _bedrock_client():
 
 def _prepare_sketch_b64(sketch_path: str) -> str:
     """
-    Resize sketch to 768x1024 (Titan-compatible: multiples of 64, 320–1408)
+    Resize sketch to 512x512 (Titan v2 supports 256-2048, multiples of 64)
     and return as base64 PNG string.
     """
     from PIL import Image  # type: ignore[import]
 
     with Image.open(sketch_path) as img:
-        img = img.convert("RGB").resize((768, 1024), Image.LANCZOS)
+        img = img.convert("RGB").resize((512, 512), Image.LANCZOS)
         buf = io.BytesIO()
         img.save(buf, format="PNG")
 
     b64 = base64.standard_b64encode(buf.getvalue()).decode("utf-8")
-    log.debug("Sketch prepared for Bedrock: 768×1024, b64_len=%d", len(b64))
+    log.debug("Sketch prepared for Bedrock: 512×512, b64_len=%d", len(b64))
     return b64
 
 
@@ -159,14 +159,14 @@ def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
-            "width": 768,
-            "height": 1024,
+            "width": 512,
+            "height": 512,
             "cfgScale": 10.0,
             "seed": 42,
         },
     }
 
-    log.info("Invoking Bedrock IMAGE_VARIATION [model=%s size=768x1024 similarity=0.2]", model_id)
+    log.info("Invoking Bedrock IMAGE_VARIATION [model=%s size=512x512 similarity=0.2]", model_id)
     client = _bedrock_client()
 
     try:
