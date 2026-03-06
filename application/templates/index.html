@@ -2610,14 +2610,38 @@ function handleFile(file) {
 }
 
 function runAnalysis() {
-  var desc     = document.getElementById('productDesc').value.trim();
+  // Validate all required fields
+  var desc = document.getElementById('productDesc').value.trim();
+  var price = document.getElementById('productPrice').value.trim();
+  var occasion = document.getElementById('productOccasion').value;
+  var material = document.getElementById('productMaterial').value.trim();
   var category = document.getElementById('productCategory').value || 'saree';
-  if (!desc && !selectedFile) {
-    showToast(t('noInput'), 'error');
-    document.getElementById('errorText').textContent = t('noInput');
-    document.getElementById('errorArea').classList.add('show');
+  
+  if (!desc) {
+    showToast('Please enter a product description', 'error');
+    document.getElementById('productDesc').focus();
     return;
   }
+  if (!price) {
+    showToast('Please enter a target price', 'error');
+    document.getElementById('productPrice').focus();
+    return;
+  }
+  if (!occasion) {
+    showToast('Please select an occasion', 'error');
+    document.getElementById('productOccasion').focus();
+    return;
+  }
+  if (!material) {
+    showToast('Please enter the primary material', 'error');
+    document.getElementById('productMaterial').focus();
+    return;
+  }
+  if (!selectedFile) {
+    showToast('Please upload a photo or sketch', 'error');
+    return;
+  }
+  
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner-border spinner-border-sm" style="width:16px;height:16px;color:white;"></div>&nbsp;' + t('analysing');
@@ -2633,9 +2657,9 @@ function runAnalysis() {
   if (selectedFile) fd.append('sketch', selectedFile);
   fd.append('description', desc);
   fd.append('category', category);
-  fd.append('price', document.getElementById('productPrice').value);
-  fd.append('occasion', document.getElementById('productOccasion').value);
-  fd.append('material', document.getElementById('productMaterial').value);
+  fd.append('price', price);
+  fd.append('occasion', occasion);
+  fd.append('material', material);
   
   setTimeout(function() { updateProgressStep(2); document.getElementById('progressLabel').textContent = 'Analyzing product...'; }, 500);
   setTimeout(function() { updateProgressStep(3); document.getElementById('progressLabel').textContent = 'Calculating scores...'; }, 1500);
@@ -2818,8 +2842,35 @@ function renderGenaiTips(data) {
 }
 
 function runMockup() {
+  // Validate all required fields
+  var desc = document.getElementById('productDesc').value.trim();
+  var price = document.getElementById('productPrice').value.trim();
+  var occasion = document.getElementById('productOccasion').value;
+  var material = document.getElementById('productMaterial').value.trim();
   var category = document.getElementById('productCategory').value || 'saree';
+  
+  if (!desc) {
+    showToast('Please enter a product description', 'error');
+    document.getElementById('productDesc').focus();
+    return;
+  }
+  if (!price) {
+    showToast('Please enter a target price', 'error');
+    document.getElementById('productPrice').focus();
+    return;
+  }
+  if (!occasion) {
+    showToast('Please select an occasion', 'error');
+    document.getElementById('productOccasion').focus();
+    return;
+  }
+  if (!material) {
+    showToast('Please enter the primary material', 'error');
+    document.getElementById('productMaterial').focus();
+    return;
+  }
   if (!selectedFile) {
+    showToast('Please upload a photo or sketch', 'error');
     document.getElementById('mockupErrorText').textContent = 'Please upload a sketch image first.';
     document.getElementById('mockupErrorArea').classList.add('show');
     return;

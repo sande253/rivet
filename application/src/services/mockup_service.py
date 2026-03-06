@@ -93,12 +93,11 @@ _NEGATIVE_PROMPT_WOMENSWEAR: Final = (
 
 # Anti-saree negative prompt for kurti (most confused category)
 _NEGATIVE_PROMPT_KURTI: Final = (
-    _NEGATIVE_PROMPT_BASE + ", "
-    "saree, sari, draped saree, draped fabric, pallu over shoulder, pallu draping, "
-    "pleated saree, saree pleats, 6-yard fabric, 6-yard drape, "
-    "petticoat, saree blouse, traditional saree, silk saree, "
-    "saree border, saree pallu, draped garment, wrapped fabric, "
-    "man, male, dhoti, sherwani, men's clothing"
+    "sketch, cartoon, blurry, watermark, deformed, mannequin, "
+    "dark background, "
+    "saree, sari, draped fabric, pallu, pleated saree, 6-yard drape, "
+    "petticoat, saree blouse, saree border, wrapped fabric, "
+    "man, male, dhoti, sherwani"
 )
 
 # Menswear categories — used to select the right negative prompt
