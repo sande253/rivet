@@ -6,7 +6,7 @@ from flask import Flask
 from dotenv import load_dotenv
 
 from .config import config
-from .core.extensions import db, login_manager, bcrypt
+from .core.extensions import db, login_manager, bcrypt, limiter
 
 log = logging.getLogger(__name__)
 
@@ -64,6 +64,7 @@ def _configure_logging(app: Flask) -> None:
 def _init_extensions(app: Flask) -> None:
     db.init_app(app)
     bcrypt.init_app(app)
+    limiter.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"           # type: ignore[assignment]
     login_manager.login_message = "Please log in to access this page."

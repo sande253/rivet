@@ -17,6 +17,7 @@ from werkzeug.utils import secure_filename
 
 from ..services.claude_service import analyze_sketch_with_claude
 from ..services.market_service import build_context, load_df
+from ..core.extensions import limiter
 
 analysis_bp = Blueprint("analysis", __name__)
 log = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ def _allowed_file(filename: str) -> bool:
 
 @analysis_bp.route("/analyze", methods=["POST"])
 @login_required
+@limiter.limit("10 per hour")  # Limit expensive AI analysis
 def analyze():
     if "sketch" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
@@ -238,6 +240,7 @@ def analyze_stream():
 
 @analysis_bp.route("/generate-mockup", methods=["POST"])
 @login_required
+@limiter.limit("5 per hour")  # Limit expensive image generation
 def generate_mockup():
     """Generate a realistic mockup image from an uploaded sketch.
 
