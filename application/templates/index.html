@@ -2042,13 +2042,13 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           </h6>
           <span style="font-size:12px;color:var(--ink-lt);" id="tableCount">28 products</span>
         </div>
-        <div style="overflow-x:auto;max-height:600px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);">
+        <div style="overflow-x:auto;">
           <table class="market-table" id="marketTable">
-            <thead style="position:sticky;top:0;z-index:10;background:var(--cream);">
+            <thead>
               <tr>
           <th>Product</th><th>Category</th><th>Price / MRP</th><th>Discount</th><th>Rating</th><th>Reviews</th>
               </tr>
-              <tr class="table-filter-row" style="position:sticky;top:42px;z-index:10;background:var(--cream);">
+              <tr class="table-filter-row">
           <th><input type="text" id="tfProduct" placeholder="Search…" oninput="applyTableFilters()"/></th>
           <th><select id="tfCategory" onchange="applyTableFilters()"><option value="lehenga">Lehenga</option><option value="kurti">Kurti</option><option value="saree">Saree</option><option value="salwar_suit">Salwar Suit</option><option value="">All</option></select></th>
           <th><select id="tfPrice" onchange="applyTableFilters()"><option value="">Any price</option><option value="0-500">Under ₹500</option><option value="500-1000">₹500–₹1,000</option><option value="1000-1500">₹1,000–₹1,500</option><option value="1500-9999">₹1,500+</option></select></th>
@@ -2061,25 +2061,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           </table>
         </div>
         <div class="loading-spinner" id="marketSpinner"><div class="spinner-border spinner-border-sm" role="status" style="color:var(--indigo);"></div>&nbsp;<span>Loading…</span></div>
-        <div class="pagination-wrap" id="paginationWrap">
-          <div class="pagination-info">
-            <span>Showing <strong id="showingStart">1</strong>-<strong id="showingEnd">8</strong> of <strong id="totalItems">28</strong></span>
-          </div>
-          <div class="pagination-controls">
-            <button class="pagination-btn" id="prevPageBtn" onclick="goToMarketPage(marketPage - 1)" disabled>
-              <span class="material-icons-round">chevron_left</span>
-            </button>
-            <div id="pageNumbers" style="display:flex;gap:4px;"></div>
-            <button class="pagination-btn" id="nextPageBtn" onclick="goToMarketPage(marketPage + 1)">
-              <span class="material-icons-round">chevron_right</span>
-            </button>
-          </div>
-          <div class="items-per-page">
-            <label for="customRowsInput" class="items-per-page-label">Show:</label>
-            <input type="number" id="customRowsInput" class="items-per-page-select" placeholder="8" value="8" min="1" max="1000" style="width:80px;" onchange="changeItemsPerPage(this.value)" onkeypress="if(event.key==='Enter') changeItemsPerPage(this.value)"/>
-            <span class="items-per-page-label" style="font-size:12px;color:var(--ink-lt);">rows</span>
-          </div>
-        </div>
             </div>
           </div>
         </div>
@@ -2301,21 +2282,20 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
       }
 
       function renderMarketPage() {
-        var data  = getFilteredMarket();
-        var start = (marketPage - 1) * mPageSize;
-        var items = data.slice(start, start + mPageSize);
+        var data = getFilteredMarket();
         var tbody = document.getElementById('marketTbody');
         tbody.innerHTML = '';
         allRenderedRows = [];
         
-        if (items.length === 0) {
+        if (data.length === 0) {
           var emptyRow = document.createElement('tr');
           emptyRow.innerHTML = '<td colspan="6" style="text-align:center;padding:40px;color:var(--ink-lt);font-size:14px;">No products match your filters.</td>';
           tbody.appendChild(emptyRow);
           return;
         }
         
-        items.forEach(function(item) {
+        // Show all products without pagination
+        data.forEach(function(item) {
           var discount = item.mrp > item.price ? Math.round((1 - item.price / item.mrp) * 100) : 0;
           var tr = document.createElement('tr');
           tr.innerHTML =
@@ -2328,6 +2308,9 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           tbody.appendChild(tr);
           allRenderedRows.push({ tr: tr, item: item });
         });
+        
+        // Update count
+        document.getElementById('tableCount').textContent = data.length + ' products';
       }
 
       function filterMarket(el, filter) {
