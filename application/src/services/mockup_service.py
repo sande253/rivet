@@ -182,7 +182,8 @@ def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
 
     result = json.loads(response["body"].read())
 
-    if "error" in result:
+    # Check for actual error (not null/None)
+    if result.get("error"):
         error_msg = result.get("error", "Unknown error")
         log.error("Bedrock error response: %s", result)
         raise RuntimeError(f"Bedrock returned error: {error_msg}")
