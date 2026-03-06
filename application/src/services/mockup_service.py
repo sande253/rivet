@@ -6,28 +6,101 @@ Local mode  (ENVIRONMENT != 'production'):
 
 Production mode (ENVIRONMENT=production):
     Amazon Bedrock Titan Image Generator v2 — IMAGE_VARIATION task.
-    similarityStrength=0.2 → loosely follows sketch structure, maximum photorealism.
-    IAM-role credentials — no hardcoded keys.
-    Uploads sketch + generated mockup to S3.
-    Returns https://… public S3 URLs.
+    similarityStrength is configurable (default 0.3) — balances sketch fidelity
+    vs photorealism. IAM-role credentials — no hardcoded keys.
+    Uploads sketch + generated mockup to S3 via presigned URLs.
+    Returns https://… presigned S3 URLs.
 """
+
+from __future__ import annotations
+
 import base64
 import io
 import json
 import logging
 import os
 import uuid
+from dataclasses import dataclass, field
+from typing import Final
 
 log = logging.getLogger(__name__)
 
-_BEDROCK_DEFAULT_MODEL = "amazon.titan-image-generator-v2:0"
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
 
-_CATEGORY_CONTEXT: dict[str, str] = {
-    "saree": "Indian saree: 6-yard draped fabric, pleated front, pallu over shoulder, blouse",
-    "lehenga": "Indian lehenga: long flared skirt, cropped choli top, dupatta scarf",
-    "salwar_suit": "Indian salwar kameez: loose pants, long tunic top, dupatta",
-    "kurti": "Indian kurti: knee-length tunic dress, straight cut, no draping",
+_BEDROCK_DEFAULT_MODEL: Final = "amazon.titan-image-generator-v2:0"
+_IMAGE_SIZE: Final = 512          # Titan v2 constraint: 256–2048, multiples of 64
+_PRESIGNED_URL_TTL: Final = 3600  # seconds
+
+# Per-category base prompts — tightly scoped to avoid garment confusion
+_CATEGORY_CONTEXT: Final[dict[str, str]] = {
+    "saree": (
+        "Indian woman wearing a traditional silk saree: 6-yard draped fabric, "
+        "pleated front pallu draped over left shoulder, matching silk blouse, "
+        "visible petticoat hem, intricate zari border"
+    ),
+    "lehenga": (
+        "Indian woman wearing a bridal lehenga choli: heavily embroidered "
+        "full-length flared skirt, cropped choli blouse, sheer dupatta scarf "
+        "draped over head or shoulders"
+    ),
+    "salwar_suit": (
+        "Indian woman wearing salwar kameez: fitted churidar pants, "
+        "knee-length straight-cut kameez tunic, matching dupatta"
+    ),
+    "kurti": (
+        "Person wearing an Indian kurti: knee-length straight-cut tunic top, "
+        "subtle embroidery at neckline and hem, worn with leggings or jeans"
+    ),
 }
+
+_NEGATIVE_PROMPT: Final = (
+    "sketch, line drawing, cartoon, illustration, watercolor, anime, "
+    "low quality, blurry, out of focus, grainy, noisy, artifacts, "
+    "watermark, text, logo, signature, deformed body, extra limbs, "
+    "missing limbs, disfigured, ugly face, bad anatomy, "
+    "mannequin, doll, plastic skin, "
+    "dark background, patterned background, gradient background, "
+    "garment confusion, wrong clothing type"
+)
+
+# ---------------------------------------------------------------------------
+# Config dataclass — centralises all tunable parameters
+# ---------------------------------------------------------------------------
+
+@dataclass
+class MockupConfig:
+    """Runtime configuration for mockup generation."""
+
+    environment: str = field(
+        default_factory=lambda: os.environ.get("ENVIRONMENT", "local").lower()
+    )
+    bedrock_model_id: str = field(
+        default_factory=lambda: os.environ.get("BEDROCK_IMAGE_MODEL_ID", _BEDROCK_DEFAULT_MODEL)
+    )
+    aws_region: str = field(
+        default_factory=lambda: os.environ.get("AWS_REGION", "us-east-1")
+    )
+    s3_bucket: str = field(
+        default_factory=lambda: os.environ.get("S3_BUCKET", "")
+    )
+    # 0.2 = max photorealism (loose sketch structure)
+    # 0.5 = balanced; 0.8 = close to sketch (less photorealistic)
+    similarity_strength: float = field(
+        default_factory=lambda: float(os.environ.get("SIMILARITY_STRENGTH", "0.3"))
+    )
+    cfg_scale: float = field(
+        default_factory=lambda: float(os.environ.get("CFG_SCALE", "10.0"))
+    )
+    seed: int = field(
+        default_factory=lambda: int(os.environ.get("GENERATION_SEED", "0"))
+        # seed=0 means random; deterministic results: set a fixed integer
+    )
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment in ("production", "prod")
 
 
 # ---------------------------------------------------------------------------
@@ -35,27 +108,29 @@ _CATEGORY_CONTEXT: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 def _build_prompt(category: str, description: str) -> str:
-    base = _CATEGORY_CONTEXT.get(
-        category,
-        "Indian ethnic wear",
-    )
-    extra = f". {description[:80]}" if description else ""
-    # Keep under 512 chars for Bedrock Titan limit
-    # Be very specific about garment type to avoid confusion
-    return (
+    """
+    Compose a Bedrock-safe (<512 chars) generation prompt.
+
+    The category base anchors the garment type; the trimmed description
+    adds product-specific detail (colour, print, embroidery, occasion, etc.).
+    """
+    base = _CATEGORY_CONTEXT.get(category, "Person wearing Indian ethnic wear")
+    # Reserve ~100 chars for suffix; description trimmed to fit
+    description = description.strip()
+    max_desc = 512 - len(base) - 80
+    if description:
+        extra = f". {description[:max(0, max_desc)]}"
+    else:
+        extra = ""
+
+    prompt = (
         f"{base}{extra}. "
-        "Fashion model wearing this specific garment type, "
-        "full body studio photo, white background, realistic fabric, vivid colors"
+        "Fashion editorial photography, full body shot, "
+        "even studio lighting, pure white seamless background, "
+        "hyper-realistic fabric texture, 8K detail"
     )
-
-
-def _build_negative_prompt() -> str:
-    # Keep under 512 chars for Bedrock Titan limit
-    return (
-        "sketch, drawing, cartoon, illustration, blurry, low quality, "
-        "watermark, text, deformed, ugly, cropped, mannequin, "
-        "dark background, colored background"
-    )
+    # Hard cap — Titan v2 rejects prompts > 512 chars
+    return prompt[:512]
 
 
 # ---------------------------------------------------------------------------
@@ -63,18 +138,22 @@ def _build_negative_prompt() -> str:
 # ---------------------------------------------------------------------------
 
 def _pil_enhance(src_path: str, dest_path: str) -> None:
+    """Apply contrast/colour/sharpness pipeline to simulate a rendered mockup."""
     from PIL import Image, ImageEnhance, ImageFilter  # type: ignore[import]
 
     with Image.open(src_path) as img:
-        img = img.convert("RGB")
-        img = ImageEnhance.Contrast(img).enhance(1.3)
-        img = ImageEnhance.Color(img).enhance(1.2)
-        img = ImageEnhance.Sharpness(img).enhance(1.4)
-        img = img.filter(ImageFilter.SMOOTH)
-        img.save(dest_path, "PNG")
+        img = img.convert("RGB").resize((_IMAGE_SIZE, _IMAGE_SIZE), Image.LANCZOS)
+        img = ImageEnhance.Contrast(img).enhance(1.4)
+        img = ImageEnhance.Color(img).enhance(1.3)
+        img = ImageEnhance.Brightness(img).enhance(1.05)
+        img = ImageEnhance.Sharpness(img).enhance(1.6)
+        img = img.filter(ImageFilter.SMOOTH_MORE)
+        img.save(dest_path, "PNG", optimize=True)
 
 
-def _save_local(sketch_path: str, upload_folder: str, uid: str) -> tuple[str, str]:
+def _save_local(
+    sketch_path: str, upload_folder: str, uid: str
+) -> tuple[str, str]:
     from PIL import Image  # type: ignore[import]
 
     sketches_dir = os.path.join(upload_folder, "sketches")
@@ -82,149 +161,168 @@ def _save_local(sketch_path: str, upload_folder: str, uid: str) -> tuple[str, st
     os.makedirs(sketches_dir, exist_ok=True)
     os.makedirs(mockups_dir, exist_ok=True)
 
-    sketch_filename = f"{uid}.png"
-    mockup_filename = f"{uid}_mockup.png"
-    sketch_dest = os.path.join(sketches_dir, sketch_filename)
-    mockup_dest = os.path.join(mockups_dir, mockup_filename)
+    sketch_dest = os.path.join(sketches_dir, f"{uid}.png")
+    mockup_dest = os.path.join(mockups_dir, f"{uid}_mockup.png")
 
     try:
         with Image.open(sketch_path) as img:
-            img.convert("RGB").save(sketch_dest, "PNG")
-    except Exception as e:
-        raise RuntimeError(f"Failed to process sketch image: {e}") from e
+            img.convert("RGB").resize((_IMAGE_SIZE, _IMAGE_SIZE), Image.LANCZOS).save(
+                sketch_dest, "PNG"
+            )
+    except Exception as exc:
+        raise RuntimeError(f"Failed to process sketch image: {exc}") from exc
 
     try:
         _pil_enhance(sketch_path, mockup_dest)
-    except Exception as e:
-        raise RuntimeError(f"Failed to generate mockup: {e}") from e
+    except Exception as exc:
+        raise RuntimeError(f"Failed to generate local mockup: {exc}") from exc
 
-    log.warning("LOCAL MODE: PIL-enhanced sketch only. Set ENVIRONMENT=production for Bedrock.")
+    log.warning(
+        "LOCAL MODE: PIL-enhanced sketch only — not AI-generated. "
+        "Set ENVIRONMENT=production to enable Bedrock."
+    )
 
     rel = upload_folder.replace("\\", "/")
     url_base = ("/" + rel) if rel.startswith("static/") else ("/static/" + rel)
-    return f"{url_base}/sketches/{sketch_filename}", f"{url_base}/mockups/{mockup_filename}"
+    return f"{url_base}/sketches/{uid}.png", f"{url_base}/mockups/{uid}_mockup.png"
 
 
 # ---------------------------------------------------------------------------
 # Production mode — Amazon Bedrock + S3
 # ---------------------------------------------------------------------------
 
-def _bedrock_client():
+def _bedrock_client(region: str):
     import boto3  # type: ignore[import]
     import botocore.config  # type: ignore[import]
 
-    region = os.environ.get("AWS_REGION", "us-east-1")
     cfg = botocore.config.Config(
         read_timeout=120,
         connect_timeout=15,
-        retries={"max_attempts": 2},
+        retries={"max_attempts": 2, "mode": "standard"},
     )
     return boto3.client("bedrock-runtime", region_name=region, config=cfg)
 
 
 def _prepare_sketch_b64(sketch_path: str) -> str:
     """
-    Resize sketch to 512x512 (Titan v2 supports 256-2048, multiples of 64)
-    and return as base64 PNG string.
+    Resize sketch to _IMAGE_SIZE × _IMAGE_SIZE and return as a base64 PNG string.
+
+    Titan v2 IMAGE_VARIATION requires the reference image to be the same
+    dimensions as the requested output.
     """
     from PIL import Image  # type: ignore[import]
 
     with Image.open(sketch_path) as img:
-        img = img.convert("RGB").resize((512, 512), Image.LANCZOS)
+        img = img.convert("RGB").resize((_IMAGE_SIZE, _IMAGE_SIZE), Image.LANCZOS)
         buf = io.BytesIO()
         img.save(buf, format="PNG")
 
     b64 = base64.standard_b64encode(buf.getvalue()).decode("utf-8")
-    log.debug("Sketch prepared for Bedrock: 512×512, b64_len=%d", len(b64))
+    log.debug("Sketch prepared for Bedrock: %dx%d, b64_len=%d", _IMAGE_SIZE, _IMAGE_SIZE, len(b64))
     return b64
 
 
-def _bedrock_generate(prompt: str, sketch_path: str, model_id: str) -> bytes:
+def _bedrock_generate(prompt: str, sketch_path: str, cfg: MockupConfig) -> bytes:
     """
-    Call Bedrock Titan IMAGE_VARIATION.
+    Call Bedrock Titan IMAGE_VARIATION and return raw PNG bytes.
 
-    The sketch is passed as images[0] — Titan uses it as a structural/
-    compositional guide.  similarityStrength=0.2 gives maximum photorealism
-    while loosely preserving the garment pose and layout from the sketch.
-    Increase to 0.4–0.5 to stay closer to the sketch structure.
+    similarityStrength (cfg.similarity_strength):
+        0.2  → maximum photorealism, loosely follows sketch pose/layout
+        0.3  → good balance (default)
+        0.5+ → stays closer to sketch structure, less photorealistic
     """
     sketch_b64 = _prepare_sketch_b64(sketch_path)
+    negative_prompt = _NEGATIVE_PROMPT
 
     body = {
         "taskType": "IMAGE_VARIATION",
         "imageVariationParams": {
             "text": prompt,
-            "negativeText": _build_negative_prompt(),
+            "negativeText": negative_prompt,
             "images": [sketch_b64],
-            "similarityStrength": 0.2,   # 0.2 = loose structure, max photorealism
+            "similarityStrength": cfg.similarity_strength,
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
-            "width": 512,
-            "height": 512,
-            "cfgScale": 10.0,
-            "seed": 42,
+            "width": _IMAGE_SIZE,
+            "height": _IMAGE_SIZE,
+            "cfgScale": cfg.cfg_scale,
+            "seed": cfg.seed,
         },
     }
 
-    log.info("Invoking Bedrock IMAGE_VARIATION [model=%s size=512x512 similarity=0.2]", model_id)
-    client = _bedrock_client()
+    log.info(
+        "Invoking Bedrock IMAGE_VARIATION [model=%s size=%dx%d similarity=%.2f seed=%d]",
+        cfg.bedrock_model_id,
+        _IMAGE_SIZE,
+        _IMAGE_SIZE,
+        cfg.similarity_strength,
+        cfg.seed,
+    )
+
+    client = _bedrock_client(cfg.aws_region)
 
     try:
         response = client.invoke_model(
-            modelId=model_id,
+            modelId=cfg.bedrock_model_id,
             contentType="application/json",
             accept="application/json",
             body=json.dumps(body),
         )
-    except Exception as e:
-        log.error("Bedrock invoke_model failed: %s", e)
-        raise RuntimeError(f"Bedrock API call failed: {e}") from e
+    except Exception as exc:
+        log.error("Bedrock invoke_model failed: %s", exc)
+        raise RuntimeError(f"Bedrock API call failed: {exc}") from exc
 
     result = json.loads(response["body"].read())
 
-    # Check for actual error (not null/None)
-    if result.get("error"):
-        error_msg = result.get("error", "Unknown error")
+    error = result.get("error")
+    if error:
         log.error("Bedrock error response: %s", result)
-        raise RuntimeError(f"Bedrock returned error: {error_msg}")
+        raise RuntimeError(f"Bedrock returned an error: {error}")
 
-    if not result.get("images"):
-        log.error("Bedrock response missing images. Full response: %s", result)
-        raise RuntimeError(f"Bedrock returned no images. Response keys: {list(result.keys())}, Full response: {json.dumps(result)}")
+    images = result.get("images")
+    if not images:
+        log.error("Bedrock response missing 'images'. Response keys: %s", list(result.keys()))
+        raise RuntimeError(
+            f"Bedrock returned no images. Response keys: {list(result.keys())}"
+        )
 
     log.info("Bedrock IMAGE_VARIATION succeeded.")
-    return base64.standard_b64decode(result["images"][0])
+    return base64.standard_b64decode(images[0])
 
 
 def _s3_upload(data: bytes, bucket: str, key: str, region: str) -> str:
+    """Upload bytes to S3 and return a presigned GET URL."""
     import boto3  # type: ignore[import]
 
     s3 = boto3.client("s3", region_name=region)
     s3.put_object(Bucket=bucket, Key=key, Body=data, ContentType="image/png")
-    
-    # Generate presigned URL (valid for 1 hour)
     url = s3.generate_presigned_url(
-        'get_object',
-        Params={'Bucket': bucket, 'Key': key},
-        ExpiresIn=3600
+        "get_object",
+        Params={"Bucket": bucket, "Key": key},
+        ExpiresIn=_PRESIGNED_URL_TTL,
     )
-    log.info("Uploaded to S3 with presigned URL: %s", key)
+    log.info("S3 upload complete [key=%s ttl=%ds]", key, _PRESIGNED_URL_TTL)
     return url
 
 
-def _save_production(sketch_path: str, mockup_bytes: bytes, uid: str) -> tuple[str, str]:
-    bucket = os.environ.get("S3_BUCKET", "")
-    if not bucket:
-        raise RuntimeError("S3_BUCKET environment variable is not set")
+def _save_production(
+    sketch_path: str, mockup_bytes: bytes, uid: str, cfg: MockupConfig
+) -> tuple[str, str]:
+    if not cfg.s3_bucket:
+        raise RuntimeError(
+            "S3_BUCKET environment variable is required in production mode."
+        )
 
-    region = os.environ.get("AWS_REGION", "us-east-1")
+    with open(sketch_path, "rb") as fh:
+        sketch_bytes = fh.read()
 
-    with open(sketch_path, "rb") as f:
-        sketch_bytes = f.read()
-
-    sketch_url = _s3_upload(sketch_bytes, bucket, f"uploads/sketches/{uid}.png", region)
-    mockup_url = _s3_upload(mockup_bytes, bucket, f"uploads/mockups/{uid}.png", region)
+    sketch_url = _s3_upload(
+        sketch_bytes, cfg.s3_bucket, f"uploads/sketches/{uid}.png", cfg.aws_region
+    )
+    mockup_url = _s3_upload(
+        mockup_bytes, cfg.s3_bucket, f"uploads/mockups/{uid}.png", cfg.aws_region
+    )
     return sketch_url, mockup_url
 
 
@@ -237,46 +335,61 @@ def generate_mockup(
     category: str,
     description: str,
     upload_folder: str,
+    *,
+    config: MockupConfig | None = None,
 ) -> dict:
-    """Generate a realistic mockup from a sketch image.
+    """Generate a realistic mockup from a fashion sketch image.
 
     Args:
         sketch_path:   Absolute or CWD-relative path to the uploaded sketch file.
-        category:      One of saree | lehenga | salwar_suit | kurti.
-        description:   Optional free-text product description.
-        upload_folder: Flask UPLOAD_FOLDER config value (used in local mode).
+        category:      One of: saree | lehenga | salwar_suit | kurti.
+        description:   Free-text product description (colour, fabric, embroidery…).
+        upload_folder: Flask UPLOAD_FOLDER value (used only in local mode).
+        config:        Optional MockupConfig override; defaults read from env vars.
 
     Returns:
-        {"sketch_url": str, "mockup_url": str, "status": "success"}
+        {
+            "sketch_url":  str,   # URL of the stored sketch
+            "mockup_url":  str,   # URL of the generated mockup
+            "status":      "success",
+            "mode":        "production" | "local",
+            "uid":         str,
+        }
 
     Raises:
-        RuntimeError / Exception on any failure.
+        RuntimeError on any failure (caller should surface as HTTP 500).
     """
+    if config is None:
+        config = MockupConfig()
+
     uid = uuid.uuid4().hex
     prompt = _build_prompt(category, description)
-    env = os.environ.get("ENVIRONMENT", "local").lower()
-    is_production = env in ("production", "prod")
+    mode = "production" if config.is_production else "local"
 
     log.info(
-        "Generating mockup [mode=%s uid=%s category=%s env=%s]",
-        "production" if is_production else "local",
+        "Generating mockup [mode=%s uid=%s category=%s]",
+        mode,
         uid,
         category,
-        env,
     )
-    log.debug("Prompt: %s", prompt)
+    log.debug("Prompt (%d chars): %s", len(prompt), prompt)
 
     try:
-        if is_production:
-            model_id = os.environ.get("BEDROCK_IMAGE_MODEL_ID", _BEDROCK_DEFAULT_MODEL)
-            mockup_bytes = _bedrock_generate(prompt, sketch_path, model_id)
-            sketch_url, mockup_url = _save_production(sketch_path, mockup_bytes, uid)
+        if config.is_production:
+            mockup_bytes = _bedrock_generate(prompt, sketch_path, config)
+            sketch_url, mockup_url = _save_production(sketch_path, mockup_bytes, uid, config)
         else:
             sketch_url, mockup_url = _save_local(sketch_path, upload_folder, uid)
 
-        log.info("Mockup done [sketch=%s mockup=%s]", sketch_url, mockup_url)
-        return {"sketch_url": sketch_url, "mockup_url": mockup_url, "status": "success"}
+        log.info("Mockup complete [sketch=%s mockup=%s]", sketch_url, mockup_url)
+        return {
+            "sketch_url": sketch_url,
+            "mockup_url": mockup_url,
+            "status": "success",
+            "mode": mode,
+            "uid": uid,
+        }
 
-    except Exception as e:
-        log.error("Mockup generation failed: %s", e, exc_info=True)
+    except Exception as exc:
+        log.error("Mockup generation failed [uid=%s]: %s", uid, exc, exc_info=True)
         raise
