@@ -1092,13 +1092,20 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .pagination-info strong { color: var(--ink); font-weight: 600; }
 .items-per-page { display: flex; align-items: center; gap: 8px; }
 .items-per-page-label { font-size: 13px; color: var(--ink-mid); white-space: nowrap; }
-.market-table { width: 100%; border-collapse: collapse; }
-.market-table th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-lt); background: var(--cream); border-bottom: 2px solid var(--border); white-space: nowrap; }
-.market-table td { padding: 14px 16px; border-bottom: 1px solid var(--cream); font-size: 13px; color: var(--ink); vertical-align: middle; }
-.market-table tr:last-child td { border-bottom: none; }
-.market-table tbody tr { transition: all .2s; cursor: pointer; }
-.market-table tbody tr:hover { background: var(--indigo-light); transform: translateX(4px); }
-.market-table tbody tr:hover td { border-bottom-color: transparent; }
+.market-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.market-table th { padding: 14px 16px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink); background: var(--indigo-light); border-bottom: 2px solid var(--indigo); white-space: nowrap; }
+.market-table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--ink); vertical-align: middle; background: var(--white); }
+.market-table tbody tr { transition: all .2s; }
+.market-table tbody tr:hover { background: var(--cream); box-shadow: 0 2px 8px rgba(27,82,71,0.08); }
+.market-table tbody tr:hover td { border-bottom-color: var(--cream); }
+.market-table tbody tr:hover td:first-child { border-left: 3px solid var(--indigo); }
+.market-table .product-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; line-height: 1.4; }
+.market-table .product-brand { font-size: 12px; color: var(--ink-lt); }
+.market-table .price-current { font-size: 16px; font-weight: 700; color: var(--indigo); }
+.market-table .price-mrp { font-size: 13px; color: var(--ink-lt); text-decoration: line-through; margin-left: 6px; }
+.market-table .discount-badge { display: inline-block; padding: 4px 10px; background: var(--green-bg); color: var(--green); border-radius: 4px; font-size: 12px; font-weight: 600; }
+.market-table .category-badge { display: inline-block; padding: 6px 12px; background: var(--indigo-light); color: var(--indigo); border-radius: 6px; font-size: 12px; font-weight: 500; }
+.market-table .review-count { font-size: 12px; color: var(--ink-lt); margin-left: 6px; }
 .items-per-page-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--ink); background: var(--white); font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .18s; }
 .items-per-page-select:hover, .items-per-page-select:focus { border-color: var(--indigo); box-shadow: 0 0 0 2px rgba(27,82,71,0.1); outline: none; }
 .brand-sub { font-size: 11px; color: var(--ink-lt); }
@@ -2286,12 +2293,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           var discount = item.mrp > item.price ? Math.round((1 - item.price / item.mrp) * 100) : 0;
           var tr = document.createElement('tr');
           tr.innerHTML =
-            '<td><div style="font-weight:600;">' + item.title + '</div><div class="brand-sub">' + item.brand + '</div></td>' +
-            '<td>' + (CAT_LABEL[item.cat] || item.cat) + '</td>' +
-            '<td><div class="price-merged"><span class="price-main">₹' + item.price.toLocaleString('en-IN') + '</span><span class="price-mrp">₹' + item.mrp.toLocaleString('en-IN') + '</span></div></td>' +
-            '<td>' + (discount > 0 ? '<span class="discount-badge">' + discount + '% off</span>' : '—') + '</td>' +
+            '<td><div class="product-title">' + item.title + '</div><div class="product-brand">' + item.brand + '</div></td>' +
+            '<td><span class="category-badge">' + (CAT_LABEL[item.cat] || item.cat) + '</span></td>' +
+            '<td><span class="price-current">₹' + item.price.toLocaleString('en-IN') + '</span><span class="price-mrp">₹' + item.mrp.toLocaleString('en-IN') + '</span></td>' +
+            '<td>' + (discount > 0 ? '<span class="discount-badge">' + discount + '% off</span>' : '<span style="color:var(--ink-lt);">—</span>') + '</td>' +
             '<td>' + renderStars(item.rating) + '</td>' +
-            '<td>' + (item.reviews ? item.reviews.toLocaleString('en-IN') : '—') + '</td>';
+            '<td><span style="font-weight:600;">' + (item.reviews ? item.reviews.toLocaleString('en-IN') : '—') + '</span></td>';
           tbody.appendChild(tr);
           allRenderedRows.push({ tr: tr, item: item });
         });
