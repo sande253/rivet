@@ -54,7 +54,6 @@ _CATEGORY_CONTEXT: Final[dict[str, str]] = {
         "Indian woman wearing ONLY a kurti tunic top with pants: "
         "straight knee-length tunic top, NO saree, NO draping, NO pallu over shoulder, "
         "simple embroidered tunic worn with churidar pants or leggings, "
-        "standing straight, NOT wearing a saree"
     ),
     "kurta": (
         "Indian man wearing a traditional kurta with dhoti pants: "
