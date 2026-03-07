@@ -1091,7 +1091,10 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .summary-sub { font-size: 11px; color: var(--ink-lt); margin-top: 3px; }
 .market-insights-row { 
   position: relative;
-  margin-bottom: 28px; 
+  margin-bottom: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 
 /* Market insight panels */
@@ -1356,6 +1359,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   /* analyze page responsive handled by Bootstrap grid */
   .scoring-grid-new { grid-template-columns: repeat(3, 1fr); }
   .market-hero-banner { grid-template-columns: 1fr 1fr 1fr; }
+  .market-insights-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
   .home-cards { grid-template-columns: 1fr; }
