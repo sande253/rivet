@@ -847,6 +847,36 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .results-block { display: none; }
 .results-block.show { display: block; }
 
+/* Two-column results layout */
+.results-container {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.results-left {
+  position: sticky;
+  top: calc(var(--nav-h) + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.results-right {
+  min-height: 100vh;
+}
+
+@media (max-width: 1024px) {
+  .results-container {
+    grid-template-columns: 1fr;
+  }
+  .results-left {
+    position: relative;
+    top: 0;
+  }
+}
+
 /* Results tabs */
 .results-tabs {
   display: flex;
@@ -1799,9 +1829,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
             <!-- Results -->
             <div class="results-block" id="resultsBlock">
-
-              <!-- Decision hero (always visible) -->
-              <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
+              
+              <div class="results-container">
+                <!-- LEFT: Sticky Score Panel -->
+                <div class="results-left">
+                  <!-- Decision hero -->
+                  <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
                 <div class="rating-big">
                   <div class="rating-num" id="ratingNum">—</div>
                   <div class="rating-denom" id="ratingDenom">out of 100</div>
@@ -1821,7 +1854,61 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   <span>Export PDF</span>
                 </button>
               </div>
+              
+              <!-- Score Breakdown Pie (in left sticky panel) -->
+              <div class="res-card" id="section-breakdown" style="margin-top:0;">
+                <div class="res-card-head">
+                  <span class="material-icons-round">pie_chart</span>
+                  <div style="flex:1;">
+                    <div class="res-card-title" style="font-size:12px;">Score Breakdown</div>
+                  </div>
+                </div>
+                <div class="res-card-body" style="padding:12px;">
+                  <div class="score-pie-wrap" style="flex-direction:column;gap:16px;">
+                    <div class="score-pie-chart" id="scorePieWrap" style="width:100%;">
+                      <svg id="scorePieChart" viewBox="0 0 280 280" width="240" height="240" style="overflow:visible;display:block;margin:0 auto;">
+                        <g id="scorePieSectors" transform="translate(140,140)"></g>
+                      </svg>
+                      <div id="scorePieTip" class="score-pie-tip"></div>
+                      <div class="score-pie-centre">
+                        <span class="score-pie-num" id="pieTotalNum">—</span>
+                        <span class="score-pie-sub">/ 100</span>
+                      </div>
+                    </div>
+                    <div class="score-legend" style="width:100%;">
+                      <div class="sl-row" data-key="demand">
+                        <span class="sl-dot" style="background:#1B5247;"></span>
+                        <span class="sl-name" style="font-size:10px;">Market Demand</span>
+                        <span class="sl-val" id="val-demand">—</span>
+                      </div>
+                      <div class="sl-row" data-key="unique">
+                        <span class="sl-dot" style="background:#2D8B6B;"></span>
+                        <span class="sl-name" style="font-size:10px;">Design Uniqueness</span>
+                        <span class="sl-val" id="val-unique">—</span>
+                      </div>
+                      <div class="sl-row" data-key="price">
+                        <span class="sl-dot" style="background:#9E7A1A;"></span>
+                        <span class="sl-name" style="font-size:10px;">Price Fit</span>
+                        <span class="sl-val" id="val-price">—</span>
+                      </div>
+                      <div class="sl-row" data-key="material">
+                        <span class="sl-dot" style="background:#C4962A;"></span>
+                        <span class="sl-name" style="font-size:10px;">Material Appeal</span>
+                        <span class="sl-val" id="val-material">—</span>
+                      </div>
+                      <div class="sl-row" data-key="trend">
+                        <span class="sl-dot" style="background:#5B3B8C;"></span>
+                        <span class="sl-name" style="font-size:10px;">Trend Alignment</span>
+                        <span class="sl-val" id="val-trend">—</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div><!-- /results-left -->
 
+              <!-- RIGHT: Scrollable Details -->
+              <div class="results-right">
               <!-- Results Tabs -->
               <div class="results-tabs">
                 <button class="results-tab active" onclick="switchResultsTab('overview')" id="tab-overview">
@@ -1947,8 +2034,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
               <!-- Tab: Score Details -->
               <div class="results-tab-content" id="content-breakdown">
-              <!-- Score Breakdown — interactive pie -->
-              <div class="res-card animate-on-scroll fade-in-left" id="section-breakdown">
+              
+              <div style="background:var(--indigo-light);padding:16px;border-radius:var(--radius);margin-bottom:16px;text-align:center;">
+                <div style="font-size:13px;color:var(--indigo);margin-bottom:8px;">Your score is visible in the left panel</div>
+                <div style="font-size:11px;color:var(--ink-lt);">Scroll through the details below while keeping your score in view</div>
+              </div>
+              
+              <!-- Product Analysis -->
+              <div class="res-card animate-on-scroll fade-in-right" id="section-product">
                 <div class="res-card-head">
                   <span class="material-icons-round">pie_chart</span>
                   <div style="flex:1;">
@@ -2061,6 +2154,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
               </div>
               </div><!-- /content-insights -->
+              </div><!-- /results-right -->
+              </div><!-- /results-container -->
 
             </div><!-- /results-block -->
 
