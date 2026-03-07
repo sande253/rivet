@@ -142,6 +142,31 @@ def analyze():
                         demand_prediction["units_max"])
         except Exception as exc:
             log.warning("Demand prediction failed: %s", exc)
+        
+        # ── Design Optimizer ───────────────────────────────────────────────
+        try:
+            from ..services.design_optimizer import generate_optimizations
+            
+            occasion = request.form.get("occasion", "").strip()
+            material = request.form.get("material", "").strip()
+            price_float = float(price) if price and price.replace('.', '').isdigit() else 0
+            
+            if price_float > 0:
+                optimizations = generate_optimizations(
+                    category=category,
+                    price=price_float,
+                    total_score=result.get("total_score", 50),
+                    scores=result.get("scores", {}),
+                    description=description,
+                    occasion=occasion,
+                    material=material,
+                    classification=result.get("classification", "MODIFY"),
+                )
+                result["optimizations"] = optimizations
+                log.info("Generated %d optimization suggestions", 
+                        len(optimizations.get("suggestions", [])))
+        except Exception as exc:
+            log.warning("Design optimization failed: %s", exc)
 
         # ── GenAI Draft → Critic loop ─────────────────────────────────────
         if current_app.config.get("GENAI_ENABLED", True):

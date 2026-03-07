@@ -1828,6 +1828,52 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
               </div>
 
+              <!-- AI Design Optimizer Card -->
+              <div class="res-card animate-on-scroll scale-in" id="designOptimizerCard" style="display:none;border-left:3px solid var(--saffron);">
+                <div class="res-card-head">
+                  <span class="material-icons-round">auto_fix_high</span>
+                  <div style="flex:1;">
+                    <div class="res-card-title">🎨 AI Design Optimizer</div>
+                    <div class="res-card-subtitle">Actionable improvements with quantified impact</div>
+                  </div>
+                </div>
+                <div class="res-card-body">
+                  <div style="background:var(--cream);padding:14px;border-radius:var(--radius);margin-bottom:16px;border:1px solid var(--border);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                      <span style="font-size:12px;font-weight:600;color:var(--ink-mid);">Current Score</span>
+                      <span style="font-size:20px;font-weight:700;color:var(--ink);font-family:'DM Serif Display',serif;" id="optCurrentScore">—</span>
+                    </div>
+                    <div id="optCanReachProceed" style="display:none;font-size:11px;color:var(--green);font-weight:600;padding:6px 10px;background:var(--green-bg);border-radius:6px;text-align:center;">
+                      ✓ You can reach PROCEED with these changes!
+                    </div>
+                  </div>
+                  
+                  <div id="optimizationSuggestions" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;"></div>
+                  
+                  <div id="bestCombination" style="display:none;background:linear-gradient(135deg,rgba(27,82,71,0.08),rgba(45,139,107,0.08));padding:16px;border-radius:var(--radius);border:2px solid var(--indigo);">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                      <span class="material-icons-round" style="color:var(--indigo);font-size:20px;">stars</span>
+                      <span style="font-size:13px;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:1px;">Best Combination</span>
+                    </div>
+                    <div id="bestComboChanges" style="font-size:12px;color:var(--ink-mid);margin-bottom:12px;line-height:1.6;"></div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+                      <div>
+                        <div style="font-size:10px;color:var(--ink-lt);margin-bottom:4px;">New Score</div>
+                        <div style="font-size:22px;font-weight:700;color:var(--indigo);font-family:'DM Serif Display',serif;" id="bestComboScore">—</div>
+                      </div>
+                      <div>
+                        <div style="font-size:10px;color:var(--ink-lt);margin-bottom:4px;">Impact</div>
+                        <div style="font-size:16px;font-weight:700;color:var(--green);" id="bestComboImpact">—</div>
+                      </div>
+                      <div>
+                        <div style="font-size:10px;color:var(--ink-lt);margin-bottom:4px;">Demand</div>
+                        <div style="font-size:14px;font-weight:600;color:var(--ink);" id="bestComboDemand">—</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Score Breakdown — interactive pie -->
               <div class="res-card animate-on-scroll fade-in-left" id="section-breakdown">
                 <div class="res-card-head">
@@ -2925,6 +2971,11 @@ function renderResults(data) {
     if (data.demand_prediction) {
       renderDemandPrediction(data.demand_prediction);
     }
+    
+    // Render design optimizer if available
+    if (data.optimizations) {
+      renderDesignOptimizer(data.optimizations);
+    }
     drawScorePie({ demand: d, unique: u, price: p, material: m, trend: tr });
   }, 80);
   var designText = currentLang === 'te' ? translateToTelugu(data.design_description || '') : (data.design_description || '');
@@ -3196,6 +3247,100 @@ function renderDemandPrediction(prediction) {
     li.innerHTML = '<span class="material-icons-round" style="font-size:14px;color:var(--green);margin-top:2px;">check_circle</span><span>' + rec + '</span>';
     recsList.appendChild(li);
   });
+}
+
+function renderDesignOptimizer(optimizations) {
+  var card = document.getElementById('designOptimizerCard');
+  if (!card) return;
+  
+  // Show the card
+  card.style.display = 'block';
+  
+  // Current score
+  document.getElementById('optCurrentScore').textContent = optimizations.current_score;
+  
+  // Can reach proceed indicator
+  if (optimizations.can_reach_proceed) {
+    document.getElementById('optCanReachProceed').style.display = 'block';
+  }
+  
+  // Render suggestions
+  var suggestionsContainer = document.getElementById('optimizationSuggestions');
+  suggestionsContainer.innerHTML = '';
+  
+  (optimizations.suggestions || []).forEach(function(suggestion, index) {
+    var priorityColor = {
+      'high': 'var(--red)',
+      'medium': 'var(--saffron)',
+      'low': 'var(--ink-lt)'
+    }[suggestion.priority];
+    
+    var priorityBg = {
+      'high': 'var(--red-bg)',
+      'medium': 'var(--orange-bg)',
+      'low': 'var(--cream)'
+    }[suggestion.priority];
+    
+    var classColor = {
+      'PROCEED': 'var(--green)',
+      'MODIFY': 'var(--saffron)',
+      'RECONSIDER': 'var(--red)'
+    }[suggestion.new_classification];
+    
+    var suggestionCard = document.createElement('div');
+    suggestionCard.style.cssText = 'background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;transition:all 0.2s;cursor:pointer;';
+    suggestionCard.onmouseenter = function() {
+      this.style.borderColor = priorityColor;
+      this.style.boxShadow = '0 4px 12px rgba(27,82,71,0.1)';
+    };
+    suggestionCard.onmouseleave = function() {
+      this.style.borderColor = 'var(--border)';
+      this.style.boxShadow = 'none';
+    };
+    
+    suggestionCard.innerHTML = 
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;">' + suggestion.title + '</div>' +
+          '<div style="font-size:11px;color:var(--ink-mid);line-height:1.5;">' + suggestion.description + '</div>' +
+        '</div>' +
+        '<div style="background:' + priorityBg + ';color:' + priorityColor + ';font-size:9px;font-weight:700;padding:4px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;margin-left:10px;">' + suggestion.priority + '</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;padding-top:10px;border-top:1px solid var(--cream);">' +
+        '<div>' +
+          '<div style="font-size:9px;color:var(--ink-lt);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">Impact</div>' +
+          '<div style="font-size:16px;font-weight:700;color:' + classColor + ';">+' + suggestion.impact_points + ' pts</div>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:9px;color:var(--ink-lt);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">New Score</div>' +
+          '<div style="font-size:16px;font-weight:700;color:' + classColor + ';">' + suggestion.new_score + '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:9px;color:var(--ink-lt);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">Cost</div>' +
+          '<div style="font-size:11px;font-weight:600;color:var(--ink);">' + suggestion.cost_impact + '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:9px;color:var(--ink-lt);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">Demand</div>' +
+          '<div style="font-size:11px;font-weight:600;color:var(--green);">' + suggestion.demand_impact + '</div>' +
+        '</div>' +
+      '</div>';
+    
+    suggestionsContainer.appendChild(suggestionCard);
+  });
+  
+  // Render best combination
+  if (optimizations.best_combination && optimizations.best_combination.changes.length > 0) {
+    document.getElementById('bestCombination').style.display = 'block';
+    
+    var changesText = optimizations.best_combination.changes.map(function(change, i) {
+      return (i + 1) + '. ' + change;
+    }).join('<br>');
+    document.getElementById('bestComboChanges').innerHTML = changesText;
+    
+    document.getElementById('bestComboScore').textContent = optimizations.best_combination.new_score;
+    document.getElementById('bestComboImpact').textContent = '+' + optimizations.best_combination.total_impact + ' points';
+    document.getElementById('bestComboDemand').textContent = optimizations.best_combination.total_demand_impact;
+  }
 }
 
 function fillInsightList(id, items) {
