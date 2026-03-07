@@ -1072,7 +1072,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   margin-bottom: 28px; 
 }
 
-/* Stacked card scroll effect */
+/* Stacked card scroll effect - overlapping deck */
 .insight-panel { 
   background: var(--white); 
   border: 1px solid var(--border); 
@@ -1080,15 +1080,15 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   overflow: hidden; 
   box-shadow: var(--shadow);
   position: sticky;
-  margin-bottom: 20px;
+  margin-bottom: -280px; /* Negative margin creates overlap */
   transition: all .3s cubic-bezier(.4,0,.2,1); 
 }
 
-/* Stack cards with decreasing top positions */
-.insight-panel:nth-child(1) { top: 80px; z-index: 4; }
+/* Stack cards at same position with decreasing z-index */
+.insight-panel:nth-child(1) { top: 100px; z-index: 4; }
 .insight-panel:nth-child(2) { top: 100px; z-index: 3; }
-.insight-panel:nth-child(3) { top: 120px; z-index: 2; }
-.insight-panel:nth-child(4) { top: 140px; z-index: 1; }
+.insight-panel:nth-child(3) { top: 100px; z-index: 2; }
+.insight-panel:nth-child(4) { top: 100px; z-index: 1; margin-bottom: 20px; } /* Last card normal margin */
 
 .insight-panel:hover { 
   box-shadow: 0 15px 40px rgba(27,82,71,0.15), 0 5px 15px rgba(27,82,71,0.1); 
@@ -1343,7 +1343,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   .scoring-grid-new { grid-template-columns: repeat(3, 1fr); }
   .market-insights-row .insight-panel { 
     position: relative; 
-    top: 0 !important; 
+    top: 0 !important;
+    margin-bottom: 20px !important; /* Reset overlap on mobile */
   }
   .market-hero-banner { grid-template-columns: 1fr 1fr 1fr; }
 }
