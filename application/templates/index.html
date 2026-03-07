@@ -930,21 +930,35 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   overflow: hidden; box-shadow: var(--shadow);
 }
 
-/* Stacked scroll effect for Market Insights tab cards */
+/* Stacked scroll effect for Market Insights tab cards - only first 3 cards */
 #content-insights {
   position: relative;
-  padding-bottom: 400px;
+  padding-bottom: 200px; /* Reduced padding */
 }
 
 #content-insights .res-card {
-  position: sticky;
+  position: relative; /* Default to relative */
   margin-bottom: 20px;
 }
 
-#content-insights .res-card:nth-child(1) { top: 80px; z-index: 4; }
-#content-insights .res-card:nth-child(2) { top: 80px; z-index: 3; }
-#content-insights .res-card:nth-child(3) { top: 80px; z-index: 2; }
-#content-insights .res-card:nth-child(4) { top: 80px; z-index: 1; }
+/* Only make first 3 cards sticky */
+#content-insights .res-card:nth-child(1),
+#content-insights .res-card:nth-child(2),
+#content-insights .res-card:nth-child(3) {
+  position: sticky;
+}
+
+#content-insights .res-card:nth-child(1) { top: 80px; z-index: 3; }
+#content-insights .res-card:nth-child(2) { top: 80px; z-index: 2; }
+#content-insights .res-card:nth-child(3) { top: 80px; z-index: 1; }
+
+/* 4th card (AI-Enhanced Tips) stays relative, not sticky */
+#content-insights .res-card:nth-child(4) { 
+  position: relative;
+  top: 0;
+  z-index: 0;
+  margin-top: 20px;
+}
 
 #content-insights .res-card:hover {
   transform: translateY(-4px) scale(1.01);
