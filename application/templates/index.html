@@ -929,37 +929,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   border-radius: var(--radius-lg); margin-bottom: 14px;
   overflow: hidden; box-shadow: var(--shadow);
 }
-
-/* Stacked scroll effect for Market Insights tab cards */
-#content-insights {
-  position: relative;
-  min-height: 100vh; /* Ensure enough scroll space */
-}
-
-#content-insights .res-card {
-  position: sticky;
-  top: 100px; /* Higher top value to keep cards more centered */
-  margin-bottom: 500px; /* Even larger margin for more dramatic effect */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Last card should have normal margin */
-#content-insights .res-card:last-child {
-  margin-bottom: 20px;
-}
-
-/* Stagger the z-index for proper layering */
-#content-insights .res-card:nth-child(1) { z-index: 4; }
-#content-insights .res-card:nth-child(2) { z-index: 3; }
-#content-insights .res-card:nth-child(3) { z-index: 2; }
-#content-insights .res-card:nth-child(4) { z-index: 1; }
-
-/* Enhanced hover effect */
-#content-insights .res-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 25px 60px rgba(27,82,71,0.2), 0 10px 25px rgba(27,82,71,0.15);
-  z-index: 10 !important;
-}
 .res-card-head {
   padding: 13px 18px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 10px;
@@ -1391,13 +1360,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   .home-cards-wrap { padding: 48px 20px 0; }
   .recent-section { padding: 0 20px 60px; }
   .market-wrap, .how-wrap, .account-wrap, .analyses-wrap { padding-left: 20px; padding-right: 20px; }
-  
-  /* Disable stacked cards on mobile */
-  #content-insights .res-card {
-    position: relative !important;
-    top: 0 !important;
-    margin-bottom: 14px !important;
-  }
   
   /* Results navigation on mobile */
   .results-nav { right: 10px; max-width: 160px; padding: 10px 6px; }
