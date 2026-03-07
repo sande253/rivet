@@ -54,6 +54,9 @@ class Config:
         "lehenga":     "Lehenga_choli.csv",
         "salwar_suit": "salwar_suits.csv",
         "kurti":       "W_kurti.csv",
+        "kurta":       "kurta.csv",
+        "kurta_pyjama": "kurta_pyjama.csv",
+        "sherwani":    "sherwani.csv",
     }
 
     CATEGORY_LABELS: dict = {
@@ -61,6 +64,9 @@ class Config:
         "lehenga":     "Lehenga Choli",
         "salwar_suit": "Salwar Suit",
         "kurti":       "Kurti",
+        "kurta":       "Kurta",
+        "kurta_pyjama": "Kurta Pyjama",
+        "sherwani":    "Sherwani",
     }
 
     ALLOWED_EXTENSIONS: set = {"png", "jpg", "jpeg", "gif", "webp"}

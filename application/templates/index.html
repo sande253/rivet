@@ -2050,7 +2050,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
               </tr>
               <tr class="table-filter-row">
           <th><input type="text" id="tfProduct" placeholder="Search…" oninput="applyTableFilters()"/></th>
-          <th><select id="tfCategory" onchange="applyTableFilters()"><option value="lehenga">Lehenga</option><option value="kurti">Kurti</option><option value="saree">Saree</option><option value="salwar_suit">Salwar Suit</option><option value="">All</option></select></th>
+          <th><select id="tfCategory" onchange="applyTableFilters()"><option value="lehenga">Lehenga</option><option value="kurti">Kurti</option><option value="kurta">Kurta</option><option value="kurta_pyjama">Kurta Pyjama</option><option value="sherwani">Sherwani</option><option value="saree">Saree</option><option value="salwar_suit">Salwar Suit</option><option value="">All</option></select></th>
           <th><select id="tfPrice" onchange="applyTableFilters()"><option value="">Any price</option><option value="0-500">Under ₹500</option><option value="500-1000">₹500–₹1,000</option><option value="1000-1500">₹1,000–₹1,500</option><option value="1500-9999">₹1,500+</option></select></th>
           <th><select id="tfDiscount" onchange="applyTableFilters()"><option value="">Any</option><option value="50">50%+ off</option><option value="70">70%+ off</option><option value="80">80%+ off</option></select></th>
           <th><select id="tfRating" onchange="applyTableFilters()"><option value="">Any</option><option value="4">4★ &amp; above</option><option value="4.5">4.5★ &amp; above</option></select></th>
@@ -2988,10 +2988,13 @@ function fillInsightList(id, items) {
 var catOpen = false;
 
 var CATEGORY_GROUPS = [
-  { group: 'Sarees', id: 'saree', items: ['Kanjivaram Saree','Banarasi Saree','Cotton Saree','Silk Saree','Handloom Saree','Designer Saree','Casual Saree','Paithani Saree','Chanderi Saree','Jamdani Saree','Kota Doria Saree','Ikat Saree','Pochampally Saree','Bandhani Saree','Tant Saree','Bomkai Saree','Muga Silk Saree','Sambalpuri Saree'] },
   { group: 'Lehenga Choli', id: 'lehenga', items: ['Lehenga Choli','Bridal Lehenga','Party Lehenga','Festive Lehenga','Designer Lehenga','Flared Lehenga','A-Line Lehenga','Sharara Lehenga','Gharara Set'] },
-  { group: 'Salwar Suits', id: 'salwar_suit', items: ['Salwar Kameez','Anarkali Suit','Churidar Suit','Palazzo Suit','Sharara Set','Pant Suit','Cotton Suit','Silk Suit','Printed Salwar Suit','Embroidered Salwar Suit','Punjabi Suit'] },
   { group: 'Kurtis', id: 'kurti', items: ['Kurti','Printed Kurti','Embroidered Kurti','Cotton Kurti','Rayon Kurti','Straight Kurti','A-Line Kurti','Kurta Set','Flared Kurti','Asymmetric Kurti','Kaftan Kurti'] },
+  { group: 'Kurta', id: 'kurta', items: ['Kurta','Traditional Kurta','Embroidered Kurta','Cotton Kurta','Silk Kurta','Festive Kurta','Wedding Kurta'] },
+  { group: 'Kurta Pyjama', id: 'kurta_pyjama', items: ['Kurta Pyjama','Cotton Kurta Pyjama','Silk Kurta Pyjama','Festive Kurta Pyjama','Wedding Kurta Pyjama'] },
+  { group: 'Sherwani', id: 'sherwani', items: ['Sherwani','Wedding Sherwani','Embroidered Sherwani','Designer Sherwani','Indo-Western Sherwani'] },
+  { group: 'Sarees', id: 'saree', items: ['Kanjivaram Saree','Banarasi Saree','Cotton Saree','Silk Saree','Handloom Saree','Designer Saree','Casual Saree','Paithani Saree','Chanderi Saree','Jamdani Saree','Kota Doria Saree','Ikat Saree','Pochampally Saree','Bandhani Saree','Tant Saree','Bomkai Saree','Muga Silk Saree','Sambalpuri Saree'] },
+  { group: 'Salwar Suits', id: 'salwar_suit', items: ['Salwar Kameez','Anarkali Suit','Churidar Suit','Palazzo Suit','Sharara Set','Pant Suit','Cotton Suit','Silk Suit','Printed Salwar Suit','Embroidered Salwar Suit','Punjabi Suit'] },
 ];
 
 var CATEGORY_ID_MAP = {};
@@ -3180,7 +3183,7 @@ function renderStars(rating) {
   }
   return html + '<span class="star-count">' + rating + '</span></div>';
 }
-var CAT_LABEL = { saree:'Saree', lehenga:'Lehenga Choli', salwar_suit:'Salwar Suit', kurti:'Kurti' };
+var CAT_LABEL = { saree:'Saree', lehenga:'Lehenga Choli', salwar_suit:'Salwar Suit', kurti:'Kurti', kurta:'Kurta', kurta_pyjama:'Kurta Pyjama', sherwani:'Sherwani' };
 
 function applyTableFilters() {
   var productQ  = (document.getElementById('tfProduct')?.value  || '').toLowerCase();
