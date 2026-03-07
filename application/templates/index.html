@@ -103,128 +103,184 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 }
 
 /* ══════════════════════════════════════
-   EMOTIONAL HERO: THE HUMAN PROBLEM
+   FIX 1 — HOME HERO: TRUE CENTERED
 ══════════════════════════════════════ */
 .home-hero {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--cream);
+  background: linear-gradient(135deg, #0A1F17 0%, #1B5247 50%, #256B56 100%);
   position: relative;
   overflow: hidden;
-  padding: 120px 40px 80px;
-  min-height: 70vh;
+  padding: 80px 40px;
+  min-height: 600px;
 }
 
+/* Animated background layers - simplified */
+.home-hero::before {
+  content: '';
+  position: absolute; 
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(236,230,208,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(45,139,107,0.3) 0%, transparent 60%);
+  pointer-events: none;
+  animation: gradientShift 20s ease infinite;
+  opacity: 0.6;
+}
+
+/* Floating geometric shapes - simplified */
+.home-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(236,230,208,0.06) 0%, transparent 25%);
+  animation: float 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Parallax layers - removed for cleaner look */
+
+/* Inner wrapper: max-width container, no manual left margin */
 .home-hero-inner {
   position: relative; z-index: 2;
   width: 100%;
-  max-width: 900px;
-  text-align: center;
+  max-width: 1100px;
+  display: flex;
+  align-items: center;
+  gap: 64px;
 }
 
-.home-hero-problem {
+.home-hero-left {
+  flex: 1;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-kicker {
+  display: inline-flex; align-items: center;
+  background: rgba(236,230,208,0.15); border: 1px solid rgba(236,230,208,0.35);
+  color: #ECE6D0; font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 6px 14px; border-radius: 20px;
+  margin-bottom: 24px; width: fit-content;
+  animation: fadeInUp 0.6s 0.1s both;
+  box-shadow: 0 4px 15px rgba(236,230,208,0.2);
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.home-hero h1 {
   font-family: 'DM Serif Display', serif;
-  font-size: clamp(42px, 6vw, 72px);
-  font-weight: 400; 
-  color: var(--ink);
-  line-height: 1.15; 
-  margin-bottom: 48px; 
-  letter-spacing: -2px;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 400; color: #FFFFFF;
+  line-height: 1.1; margin-bottom: 20px; letter-spacing: -1.5px;
+  animation: fadeInUp 0.6s 0.2s both;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3), 0 4px 40px rgba(10,31,23,0.4);
 }
-
-.home-hero-solution {
-  font-family: 'DM Serif Display', serif;
-  font-size: clamp(24px, 3.5vw, 38px);
-  font-weight: 400;
-  color: var(--indigo);
-  line-height: 1.3;
-  margin-bottom: 56px;
-  letter-spacing: -0.5px;
+.home-hero h1 em { 
+  font-style: italic; 
+  color: #ECE6D0; 
+  text-shadow: 0 0 30px rgba(236,230,208,0.4), 0 2px 20px rgba(0,0,0,0.3);
 }
-
-.hero-cta-row { 
-  display: flex; 
-  gap: 16px; 
-  align-items: center; 
-  justify-content: center;
-  flex-wrap: wrap; 
+.home-hero-desc {
+  font-size: 17px; color: rgba(255,255,255,0.75);
+  line-height: 1.75; margin-bottom: 40px; max-width: 480px;
+  animation: fadeInUp 0.6s 0.3s both;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.2);
 }
-
+.hero-cta-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; animation: fadeInUp 0.6s 0.4s both; }
 .btn-hero {
   display: inline-flex; align-items: center; gap: 10px;
-  background: var(--indigo);
-  color: white; font-size: 16px; font-weight: 600;
-  padding: 20px 40px; border-radius: 10px; border: none; cursor: pointer;
-  box-shadow: 0 8px 32px rgba(27,82,71,0.3); 
+  background: linear-gradient(135deg, #ECE6D0, #F5F2EA); 
+  color: #0D2E22; font-size: 15px; font-weight: 700;
+  padding: 15px 30px; border-radius: 10px; border: none; cursor: pointer;
+  box-shadow: 0 6px 30px rgba(236,230,208,0.4), 0 2px 10px rgba(0,0,0,0.2); 
   transition: all .25s;
   font-family: 'DM Sans', sans-serif;
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+.btn-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  transition: left 0.5s;
+}
+.btn-hero:hover::before {
+  left: 100%;
 }
 .btn-hero:hover { 
-  background: var(--indigo-dark);
+  background: linear-gradient(135deg, #F5F2EA, #FFFFFF); 
   transform: translateY(-3px); 
-  box-shadow: 0 12px 40px rgba(27,82,71,0.4); 
-  color: white; 
+  box-shadow: 0 12px 40px rgba(236,230,208,0.5), 0 4px 15px rgba(0,0,0,0.25); 
+  color: #0D2E22; 
   text-decoration: none; 
 }
-
+.btn-hero .material-icons-round { font-size: 20px; transition: transform .25s; }
+.btn-hero:hover .material-icons-round { transform: translateX(3px); }
 .btn-hero-ghost {
   display: inline-flex; align-items: center; gap: 8px;
-  background: transparent; color: var(--ink-mid); font-size: 15px; font-weight: 600;
-  padding: 18px 32px; border-radius: 10px; border: 2px solid var(--border); cursor: pointer;
+  background: transparent; color: rgba(236,230,208,0.85); font-size: 15px; font-weight: 600;
+  padding: 14px 26px; border-radius: 10px; border: 1.5px solid rgba(236,230,208,0.35); cursor: pointer;
   transition: all .25s; font-family: 'DM Sans', sans-serif;
   text-decoration: none;
 }
-.btn-hero-ghost:hover { 
-  border-color: var(--indigo); 
-  color: var(--indigo); 
-  background: var(--indigo-light); 
-  text-decoration: none; 
+.btn-hero-ghost:hover { border-color: #ECE6D0; color: #ECE6D0; background: rgba(236,230,208,0.08); transform: translateY(-2px); text-decoration: none; }
+.hero-trust { margin-top: 36px; font-size: 12px; color: rgba(236,230,208,0.4); letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; animation: fadeInUp 0.6s 0.5s both; }
+.hero-trust::before { content: ''; width: 32px; height: 1px; background: rgba(236,230,208,0.2); }
+
+/* Hero right image panel */
+.home-hero-right {
+  flex-shrink: 0;
+  width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInUp 0.7s 0.35s both;
+  position: relative;
 }
 
-/* Emotional stat bar */
-.emotional-stats {
-  background: linear-gradient(135deg, #0A1F17 0%, #1B5247 100%);
-  padding: 48px 40px 40px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 48px;
-  max-width: 1200px;
-  margin: 0 auto;
+/* Decorative frame around image */
+.home-hero-right::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  background: linear-gradient(135deg, rgba(236,230,208,0.3), rgba(45,139,107,0.3));
+  border-radius: calc(var(--radius-lg) + 4px);
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.4s;
 }
 
-.emotional-stat {
-  text-align: center;
-  padding: 0 20px;
+.home-hero-right:hover::before {
+  opacity: 1;
 }
 
-.emotional-stat-number {
-  font-family: 'DM Serif Display', serif;
-  font-size: 42px;
-  color: #ECE6D0;
-  line-height: 1;
-  margin-bottom: 16px;
-  display: block;
+.home-hero-right img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(10,31,23,0.3), 0 8px 30px rgba(10,31,23,0.2);
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease, filter 0.4s ease;
+  filter: brightness(0.85) contrast(1.05) saturate(1.1);
+  position: relative;
+  z-index: 1;
 }
 
-.emotional-stat-label {
-  font-size: 15px;
-  color: rgba(255,255,255,0.75);
-  line-height: 1.6;
-  font-weight: 400;
-}
-
-.emotional-stats-scale {
-  grid-column: 1 / -1;
-  text-align: center;
-  font-size: 14px;
-  color: rgba(255,255,255,0.5);
-  margin-top: 24px;
-  padding-top: 32px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  font-weight: 400;
-  letter-spacing: 0.2px;
+.home-hero-right img:hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 30px 80px rgba(10, 31, 23, 0.35), 0 12px 40px rgba(10, 31, 23, 0.25);
+  filter: brightness(0.9) contrast(1.08) saturate(1.15);
 }
 
 /* ══════════════════════════════════════
@@ -246,7 +302,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   gap: 20px;
   margin-bottom: 72px;
 }
-/* Feature cards - establish hierarchy with first card dominant */
 .home-card {
   background: var(--white);
   border-radius: var(--radius-lg);
@@ -254,47 +309,67 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: all .25s ease;
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+  position: relative; overflow: hidden;
   text-decoration: none;
   color: inherit;
   display: block;
 }
+.home-card::before {
+  content: ''; position: absolute; inset: 0; opacity: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(27,82,71,0.08) 0%, transparent 70%);
+  transition: opacity 0.4s;
+}
+.home-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--indigo), var(--indigo-mid), #2D8B6B);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+}
 .home-card:hover { 
-  box-shadow: 0 8px 24px rgba(27,82,71,0.12); 
-  transform: translateY(-2px); 
-  border-color: rgba(27,82,71,0.2); 
+  box-shadow: 0 12px 35px rgba(27,82,71,0.15), 0 6px 18px rgba(27,82,71,0.1); 
+  transform: translateY(-4px); 
+  border-color: rgba(27,82,71,0.25); 
 }
-.home-card:first-child {
-  border: 2px solid var(--indigo);
-  box-shadow: 0 8px 32px rgba(27,82,71,0.2);
-  background: linear-gradient(135deg, rgba(27,82,71,0.02), var(--white));
-}
-.home-card:first-child:hover {
-  box-shadow: 0 12px 40px rgba(27,82,71,0.25);
-  transform: translateY(-4px);
-}
+.home-card:hover::before { opacity: 1; }
+.home-card:hover::after { transform: scaleX(1); }
 .card-icon-wrap {
   width: 56px; height: 56px; border-radius: 14px;
   background: linear-gradient(135deg, var(--indigo-light), #c8e0d8);
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 20px; box-shadow: 0 2px 8px rgba(27,82,71,0.15);
+  transition: transform .3s ease, box-shadow .3s ease;
 }
-.home-card:first-child .card-icon-wrap {
-  width: 64px; height: 64px;
-  background: var(--indigo);
-}
+.home-card:hover .card-icon-wrap { transform: scale(1.05); box-shadow: 0 4px 15px rgba(27,82,71,0.2); }
 .card-icon-wrap .material-icons-round { font-size: 28px; color: var(--indigo); }
-.home-card:first-child .card-icon-wrap .material-icons-round { 
-  font-size: 32px; 
-  color: white; 
-}
 .home-card h4 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
-.home-card:first-child h4 { font-size: 18px; color: var(--indigo); }
 .home-card p { font-size: 13px; color: var(--ink-lt); line-height: 1.7; }
-.home-card:first-child p { font-size: 14px; }
 
-/* CTA section */
+/* Recent analyses */
 .recent-section { max-width: 1060px; margin: 0 auto; padding: 0 32px 80px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.section-head h3 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--ink); }
+.link-btn { font-size: 13px; font-weight: 600; color: var(--indigo); border: none; background: none; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+.link-btn:hover { color: var(--indigo-dark); text-decoration: none; }
+.analysis-row {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+  margin-bottom: 10px; transition: all .25s cubic-bezier(.4,0,.2,1); cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+.analysis-row:hover { box-shadow: var(--shadow-md); border-color: rgba(27,82,71,0.25); transform: translateX(6px); text-decoration: none; }
+.analysis-thumb { width: 46px; height: 46px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--indigo-light), #c8e0d8); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .25s; }
+.analysis-row:hover .analysis-thumb { transform: scale(1.1); }
+.analysis-thumb .material-icons-round { font-size: 22px; color: var(--indigo); }
+.analysis-info { flex: 1; }
+.analysis-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+.analysis-meta { font-size: 12px; color: var(--ink-lt); margin-top: 3px; }
+.badge-decision { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; white-space: nowrap; letter-spacing: 0.3px; }
+.badge-launch { background: var(--green-bg); color: var(--green); }
+.badge-modify { background: var(--orange-bg); color: var(--orange); }
+.badge-stop   { background: var(--red-bg); color: var(--red); }
 
 /* ══════════════════════════════════════
    ANALYZE PAGE — BOOTSTRAP GRID REBUILD
@@ -562,22 +637,179 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .skeleton-title { height: 20px; width: 60%; margin-bottom: 12px; }
 .skeleton-card { height: 120px; }
 
-/* ESSENTIAL ANIMATIONS ONLY - Keep it professional and fast */
+/* Scroll-triggered animations */
+.animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.animate-on-scroll.animated { opacity: 1; transform: translateY(0); }
+.animate-on-scroll.delay-1 { transition-delay: 0.1s; }
+.animate-on-scroll.delay-2 { transition-delay: 0.2s; }
+.animate-on-scroll.delay-3 { transition-delay: 0.3s; }
+.animate-on-scroll.delay-4 { transition-delay: 0.4s; }
 
-/* Page transitions */
-.animate-on-scroll { opacity: 1; }
-.scale-in { opacity: 1; }
-.fade-in-left { opacity: 1; }
-.fade-in-right { opacity: 1; }
-.stagger-item { opacity: 1; }
+/* Fade in from left */
+.fade-in-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in-left.animated { opacity: 1; transform: translateX(0); }
 
-/* Score counter animation - KEEP */
-@keyframes countUp {
-  0% { opacity: 0; transform: translateY(30px) scale(0.8); }
-  60% { transform: translateY(-5px) scale(1.05); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+/* Fade in from right */
+.fade-in-right { opacity: 0; transform: translateX(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in-right.animated { opacity: 1; transform: translateX(0); }
+
+/* Scale in animation */
+.scale-in { opacity: 0; transform: scale(0.9); transition: opacity 0.5s ease, transform 0.5s ease; }
+.scale-in.animated { opacity: 1; transform: scale(1); }
+
+/* Ripple effect for buttons */
+.ripple { position: relative; overflow: hidden; }
+.ripple::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: rgba(255,255,255,0.5); transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+.ripple:active::after { width: 300px; height: 300px; }
+
+/* Floating animation */
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.float { animation: float 3s ease-in-out infinite; }
+
+/* Bounce animation */
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.bounce-on-hover:hover { animation: bounce 0.5s ease; }
+
+/* Glow effect */
+@keyframes glow { 0%, 100% { box-shadow: 0 0 5px rgba(27,82,71,0.2); } 50% { box-shadow: 0 0 20px rgba(27,82,71,0.4), 0 0 30px rgba(27,82,71,0.2); } }
+.glow { animation: glow 2s ease-in-out infinite; }
+
+/* Rotate on hover */
+.rotate-on-hover { transition: transform 0.3s ease; }
+.rotate-on-hover:hover { transform: rotate(5deg) scale(1.05); }
+
+/* Slide up animation */
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.slide-up { animation: slideUp 0.5s ease forwards; }
+
+/* Stagger animation for lists */
+.stagger-item { opacity: 0; animation: slideUp 0.5s ease forwards; }
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+.stagger-item:nth-child(6) { animation-delay: 0.6s; }
+
+/* Gradient animation for hero */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+}
+
+/* Pulse glow effect */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(27,82,71,0.3); }
+  50% { box-shadow: 0 0 40px rgba(27,82,71,0.6), 0 0 60px rgba(27,82,71,0.3); }
+}
+
+.pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
+
+/* Number counter animation */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .count-up { animation: countUp 0.6s ease-out; }
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Floating badge animation */
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(2deg); }
+  75% { transform: translateY(-5px) rotate(-2deg); }
+}
+
+.float-badge { animation: floatBadge 4s ease-in-out infinite; }
+
+/* Card lift on hover */
+.card-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(10,31,23,0.15), 0 10px 20px rgba(10,31,23,0.1);
+}
+
+/* Icon bounce */
+@keyframes iconBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.icon-bounce:hover .material-icons-round {
+  animation: iconBounce 0.5s ease;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #1B5247, #2D8B6B, #9E7A1A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Shine effect on hover */
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.shine-effect:hover::after {
+  animation: shine 0.8s;
+}
+
+/* Breathing animation */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.breathe { animation: breathe 4s ease-in-out infinite; }
+
+/* Wiggle on hover */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+.wiggle:hover { animation: wiggle 0.5s ease; }
 
 /* Export button */
 .btn-export { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1.5px solid var(--indigo); border-radius: var(--radius); background: transparent; color: var(--indigo); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: 'DM Sans',sans-serif; }
@@ -595,45 +827,11 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .results-nav-close:hover { background: var(--red); color: white; }
 .results-nav-close .material-icons-round { font-size: 14px; }
 
-/* Action strip below decision hero */
-.action-strip {
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  width: 100%;
-}
-.action-strip-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid var(--border);
-  background: var(--white);
-  color: var(--ink-mid);
-  text-decoration: none;
-}
-.action-strip-btn:hover {
-  background: var(--indigo);
-  color: white;
-  border-color: var(--indigo);
-  transform: translateY(-2px);
-  text-decoration: none;
-}
-.action-strip-btn .material-icons-round {
-  font-size: 16px;
-}
-
-/* Comparison badge - hidden by default */
-.comparison-badge { display: none; }
+/* Comparison badge */
+.comparison-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 8px; }
+.comparison-badge.better { background: var(--green-bg); color: var(--green); }
+.comparison-badge.worse { background: var(--red-bg); color: var(--red); }
+.comparison-badge .material-icons-round { font-size: 14px; }
 
 /* ── Empty state ─────────────────────── */
 .results-empty-new {
@@ -648,36 +846,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 /* ── Results ─────────────────────────── */
 .results-block { display: none; }
 .results-block.show { display: block; }
-
-/* Two-column results layout */
-.results-container {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 28px;
-  align-items: start;
-}
-
-.results-left {
-  position: sticky;
-  top: calc(var(--nav-h) + 20px);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.results-right {
-  min-height: 100vh;
-}
-
-@media (max-width: 1024px) {
-  .results-container {
-    grid-template-columns: 1fr;
-  }
-  .results-left {
-    position: relative;
-    top: 0;
-  }
-}
 
 /* Results tabs */
 .results-tabs {
@@ -724,42 +892,36 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   display: block;
 }
 
-/* Decision hero - cleaner centered layout */
+/* Decision hero */
 .rating-hero {
   background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 24px;
-  display: flex; flex-direction: column; align-items: center;
-  box-shadow: var(--shadow-md); border-top: 4px solid transparent;
+  border-radius: var(--radius-lg); padding: 20px 22px;
+  display: flex; align-items: center; gap: 20px;
+  box-shadow: var(--shadow-md); border-left: 5px solid transparent;
   margin-bottom: 14px; overflow: hidden; position: relative;
-  text-align: center;
 }
-.rating-hero.launch { border-top-color: var(--green); background: linear-gradient(180deg, rgba(27,82,71,0.03), var(--white)); }
-.rating-hero.modify { border-top-color: var(--saffron); background: linear-gradient(180deg, rgba(158,122,26,0.03), var(--white)); }
-.rating-hero.stop   { border-top-color: var(--red); background: linear-gradient(180deg, rgba(139,32,32,0.03), var(--white)); }
-.rating-big { text-align: center; margin-bottom: 16px; }
-.rating-num { 
-  font-family: 'DM Serif Display',serif; 
-  font-size: 64px; 
-  line-height: 1; 
-  font-weight: 400;
-  animation: countUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
+.rating-hero::before { content:''; position:absolute; top:0; right:0; width:160px; height:100%; background:linear-gradient(90deg,transparent,rgba(228,239,235,.3)); pointer-events:none; }
+.rating-hero.launch { border-left-color: var(--green); }
+.rating-hero.modify { border-left-color: var(--saffron); }
+.rating-hero.stop   { border-left-color: var(--red); }
+.rating-big { text-align: center; flex-shrink: 0; min-width: 92px; }
+.rating-num { font-family: 'DM Serif Display',serif; font-size: 52px; line-height: 1; }
 .rating-hero.launch .rating-num { color: var(--green); }
 .rating-hero.modify .rating-num { color: var(--saffron); }
 .rating-hero.stop   .rating-num { color: var(--red); }
-.rating-denom { font-size: 12px; color: var(--ink-lt); margin-top: 6px; font-weight: 500; }
-.rating-bar-wrap { margin-top: 10px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; width: 100%; max-width: 200px; margin-left: auto; margin-right: auto; }
-.rating-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+.rating-denom { font-size: 11.5px; color: var(--ink-lt); margin-top: 2px; font-weight: 500; }
+.rating-bar-wrap { margin-top: 7px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.rating-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(.4,0,.2,1); }
 .launch .rating-bar-fill { background: linear-gradient(90deg,#1B5247,#2D8B6B); }
 .modify .rating-bar-fill { background: linear-gradient(90deg,#9E7A1A,#C4962A); }
 .stop   .rating-bar-fill { background: linear-gradient(90deg,#8B2020,#C44040); }
-.rating-text { width: 100%; }
-.rating-decision-label { font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; }
+.rating-text { flex: 1; min-width: 0; }
+.rating-decision-label { font-size: 9.5px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 4px; }
 .launch .rating-decision-label { color: var(--green); }
 .modify .rating-decision-label { color: var(--saffron); }
 .stop   .rating-decision-label { color: var(--red); }
-.rating-verdict { font-family: 'DM Serif Display',serif; font-size: 22px; color: var(--ink); margin-bottom: 8px; font-weight: 400; }
-.rating-sub { font-size: 12px; color: var(--ink-mid); line-height: 1.6; max-width: 280px; margin: 0 auto; }
+.rating-verdict { font-family: 'DM Serif Display',serif; font-size: 21px; color: var(--ink); margin-bottom: 5px; }
+.rating-sub { font-size: 12.5px; color: var(--ink-mid); line-height: 1.55; }
 
 /* Result cards */
 .res-card {
@@ -825,11 +987,11 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* Legend rows with context labels */
+/* Legend rows */
 .score-legend { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 7px; }
 .sl-row {
   display: grid; grid-template-columns: 9px 1fr 48px;
-  grid-template-rows: auto auto 4px;
+  grid-template-rows: auto 4px;
   column-gap: 8px; row-gap: 4px; align-items: center;
   padding: 8px 10px; border-radius: 7px;
   background: var(--cream); border: 1px solid var(--border);
@@ -839,16 +1001,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .sl-dot  { width: 9px; height: 9px; border-radius: 50%; }
 .sl-name { font-size: 11.5px; font-weight: 600; color: var(--ink-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sl-val  { font-size: 11.5px; font-weight: 700; color: var(--ink); text-align: right; }
-.sl-context { 
-  grid-column: 2 / 4; 
-  font-size: 9px; 
-  color: var(--ink-lt); 
-  font-weight: 500;
-  margin-top: -2px;
-}
-.sl-context.good { color: var(--green); }
-.sl-context.average { color: var(--saffron); }
-.sl-context.poor { color: var(--red); }
 .sl-bar-wrap { grid-column: 1 / -1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .sl-bar-fill { height: 100%; border-radius: 2px; transition: width .85s cubic-bezier(.4,0,.2,1); }
 
@@ -958,36 +1110,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .sentiment-chip.neg { background: #8B2020; border-color: #6A1818; }
 .sentiment-pct { font-family: 'DM Serif Display', serif; font-size: 24px; color: #fff; }
 .sentiment-label { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 4px; }
-.opportunity-card { 
-  background: linear-gradient(135deg, #9E7A1A, #C4962A); 
-  border-radius: var(--radius-lg); 
-  padding: 24px; 
-  margin-bottom: 12px; 
-  display: flex; 
-  gap: 16px; 
-  align-items: flex-start; 
-  transition: transform .25s, box-shadow .25s;
-  border: 2px solid rgba(255,255,255,0.2);
-  box-shadow: 0 8px 32px rgba(158,122,26,0.4);
-}
-.opportunity-card:hover { 
-  transform: translateX(8px) scale(1.02); 
-  box-shadow: 0 12px 48px rgba(158,122,26,0.5); 
-}
-.opp-icon { 
-  width: 48px; 
-  height: 48px; 
-  border-radius: 50%; 
-  background: rgba(255,255,255,0.25); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-.opp-icon .material-icons-round { font-size: 24px; color: white; }
-.opp-text h6 { font-size: 15px; font-weight: 700; color: white; margin-bottom: 8px; }
-.opp-text p { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.6; margin: 0; }
+.opportunity-card { background: linear-gradient(135deg, #0D2E22, #1B5247); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; transition: transform .25s, box-shadow .25s; }
+.opportunity-card:hover { transform: translateX(6px); box-shadow: 0 8px 32px rgba(10,31,23,0.3); }
+.opp-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.opp-icon .material-icons-round { font-size: 18px; color: white; }
+.opp-text h6 { font-size: 13px; font-weight: 700; color: white; margin-bottom: 5px; }
+.opp-text p { font-size: 12px; color: rgba(255,255,255,0.72); line-height: 1.5; margin: 0; }
 .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
 .filter-bar-label { font-size: 12px; font-weight: 600; color: var(--ink-lt); }
 .filter-chip { padding: 7px 16px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 500; color: var(--ink-mid); background: var(--white); cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
@@ -1169,18 +1297,20 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .scroll-fab:hover { background: #113629; transform: scale(1.1); }
 .scroll-fab .material-icons-round { font-size: 20px; }
 
-/* Simplified footer */
-.site-footer { background: #0A1F17; color: rgba(255,255,255,0.65); padding: 32px 40px; }
-.footer-simple { max-width: 1060px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 32px; }
-.footer-brand { display: flex; align-items: center; gap: 12px; }
-.footer-brand-name { font-family: 'DM Serif Display', serif; font-size: 16px; color: #ECE6D0; }
-.footer-brand-tag { font-size: 12px; color: rgba(255,255,255,0.4); }
-.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-.footer-contact { display: flex; flex-direction: column; gap: 6px; }
-.footer-contact-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
-.footer-link { font-size: 13px; color: rgba(255,255,255,0.6); cursor: pointer; text-decoration: none; transition: color .15s; }
+/* Footer */
+.site-footer { background: #0A1F17; color: rgba(255,255,255,0.65); padding: 24px 40px 16px; }
+.footer-inner { max-width: 1060px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 24px; margin-bottom: 16px; }
+.footer-brand-name { font-family: 'DM Serif Display', serif; font-size: 16px; color: #ECE6D0; margin-bottom: 4px; margin-top: 4px; }
+.footer-brand-tag  { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; max-width: 220px; }
+.footer-col-title  { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+.footer-link { display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 5px; cursor: pointer; text-decoration: none; transition: color .15s; }
 .footer-link:hover { color: #ECE6D0; text-decoration: none; }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,0.35); width: 100%; text-align: center; margin-top: 16px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.footer-bottom-left  { font-size: 12px; color: rgba(255,255,255,0.35); }
+.footer-bottom-right { display: flex; gap: 16px; }
+.footer-social { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s; }
+.footer-social:hover { background: rgba(255,255,255,0.18); }
+.footer-social .material-icons-round { font-size: 16px; color: rgba(255,255,255,0.6); }
 
 /* ══════════════════════════════════════
    RESPONSIVE
@@ -1212,13 +1342,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   .steps-grid { grid-template-columns: 1fr; }
   .scoring-grid-new { grid-template-columns: repeat(2, 1fr); }
   .outcome-strip { grid-template-columns: 1fr; }
+  /* input-grid removed — Bootstrap row/col handles this */
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
   .scroll-fab-group { display: none; }
   .score-donut-wrap { flex-direction: column; gap: 18px; align-items: center; }
   .score-donut-legend { width: 100%; }
   .home-cards-wrap { padding: 48px 20px 0; }
   .recent-section { padding: 0 20px 60px; }
   .market-wrap, .how-wrap, .account-wrap, .analyses-wrap { padding-left: 20px; padding-right: 20px; }
-  .footer-simple { flex-direction: column; align-items: flex-start; }
   
   /* Results navigation on mobile */
   .results-nav { right: 10px; max-width: 160px; padding: 10px 6px; }
@@ -1227,8 +1358,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   .results-nav-item span:last-child { display: none; }
 }
 @media (max-width: 480px) {
-  .site-footer { padding: 24px 20px; }
-  .footer-simple { gap: 16px; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .site-footer { padding: 18px 20px 12px; }
   .market-hero-banner { grid-template-columns: 1fr; }
   .market-hero-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px; }
   .market-hero-stat:last-child { border-bottom: none; }
@@ -1320,35 +1451,31 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   <!-- ══════ HOME ══════ -->
   <div class="page {% if active_page == 'home' or not active_page %}active{% endif %}" id="page-home">
     <div class="home-hero">
+      <!-- FIX 1: Single centered inner wrapper, no margin-left hack -->
       <div class="home-hero-inner">
-        <h1 class="home-hero-problem" data-en="She spent 3 weeks at her loom. Nobody bought a single one." data-te="ఆమె తన మగ్గం వద్ద 3 వారాలు గడిపింది. ఎవరూ ఒక్కటి కూడా కొనలేదు.">She spent 3 weeks at her loom.<br>Nobody bought a single one.</h1>
-        <p class="home-hero-solution" data-en="Rivet tells you before you start." data-te="మీరు ప్రారంభించే ముందు రివెట్ మీకు చెబుతుంది.">Rivet tells you before you start.</p>
-        <div class="hero-cta-row">
-          <a href="{{ url_for('ui.analyze') }}" class="btn-hero">
-            <span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>
-          </a>
-          <a href="{{ url_for('ui.how') }}" class="btn-hero-ghost">
-            <span data-en="How this works" data-te="ఇది ఎలా పని చేస్తుంది">How this works</span>
-          </a>
+        <div class="home-hero-left">
+          <div class="home-kicker" data-en="Product Intelligence Platform" data-te="ఉత్పత్తి మేధో వేదిక">Product Intelligence Platform</div>
+          <h1 data-en="Should you <em>make</em> this product?" data-te="ఈ ఉత్పత్తిని <em>తయారు చేయాలా?</em>">Should you <em>make</em> this product?</h1>
+          <p class="home-hero-desc" data-en="Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers." data-te="మీ డిజైన్ అప్లోడ్ చేయండి. స్పష్టమైన సమాధానం పొందండి — నిజమైన మార్కెట్ డేటాతో.">Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers.</p>
+          <div class="hero-cta-row">
+            <a href="{{ url_for('ui.analyze') }}" class="btn-hero ripple">
+              <span class="material-icons-round">analytics</span>
+              <span data-en="Analyse a Product" data-te="ఉత్పత్తిని విశ్లేషించండి">Analyse a Product</span>
+            </a>
+            <a href="{{ url_for('ui.how') }}" class="btn-hero-ghost ripple">
+              <span class="material-icons-round" style="font-size:16px;">play_circle</span>
+              <span data-en="How it works" data-te="ఇది ఎలా పని చేస్తుంది">How it works</span>
+            </a>
+          </div>
+          <div class="hero-trust">
+            <span data-en="Trusted by 1,200+ artisans across India" data-te="భారతదేశంలో 1,200+ చేతివృత్తుల కారులకు నమ్మకమైనది">Trusted by 1,200+ artisans across India</span>
+          </div>
+        </div>
+        <!-- Hero image shown on wider screens -->
+        <div class="home-hero-right">
+          <img src="https://c.stocksy.com/a/Oyc400/za/1103128.jpg" alt="Kanjivaram Silk Saree"/>
         </div>
       </div>
-    </div>
-
-    <!-- Emotional stat bar -->
-    <div class="emotional-stats">
-      <div class="emotional-stat">
-        <span class="emotional-stat-number" data-en="₹2.3 Cr" data-te="₹2.3 కోట్లు">₹2.3 Cr</span>
-        <span class="emotional-stat-label" data-en="Lost annually by artisans producing unsellable inventory" data-te="అమ్మలేని జాబితాను ఉత్పత్తి చేసే కళాకారులచే ఏటా కోల్పోయారు">Lost annually by artisans producing unsellable inventory</span>
-      </div>
-      <div class="emotional-stat">
-        <span class="emotional-stat-number" data-en="1 in 3" data-te="3లో 1">1 in 3</span>
-        <span class="emotional-stat-label" data-en="Handloom products never finds a buyer" data-te="చేతి మగ్గం ఉత్పత్తులు కొనుగోలుదారుని కనుగొనలేవు">Handloom products never finds a buyer</span>
-      </div>
-      <div class="emotional-stat">
-        <span class="emotional-stat-number" data-en="3 weeks" data-te="3 వారాలు">3 weeks</span>
-        <span class="emotional-stat-label" data-en="Average time to produce a product that may not sell" data-te="అమ్మకం కాకపోవచ్చు ఉత్పత్తిని ఉత్పత్తి చేయడానికి సగటు సమయం">Average time to produce a product that may not sell</span>
-      </div>
-      <div class="emotional-stats-scale" data-en="Across India, 70 lakh registered artisans make this decision blind every season." data-te="భారతదేశం అంతటా, 70 లక్షల నమోదిత కళాకారులు ప్రతి సీజన్‌లో ఈ నిర్ణయాన్ని గుడ్డిగా తీసుకుంటారు.">Across India, 70 lakh registered artisans make this decision blind every season.</div>
     </div>
 
     <!-- FIX 2: Cards wrapper with symmetric padding -->
@@ -1358,32 +1485,56 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         <p data-en="Three tools. One clear answer." data-te="మూడు సాధనాలు. ఒక స్పష్టమైన సమాధానం.">Three tools. One clear answer.</p>
       </div>
       <div class="home-cards">
-        <a href="{{ url_for('ui.analyze') }}" class="home-card">
+        <a href="{{ url_for('ui.analyze') }}" class="home-card animate-on-scroll scale-in ripple">
           <div class="card-icon-wrap"><span class="material-icons-round">image_search</span></div>
-          <h4 data-en="Know before you weave" data-te="మీరు నేయడానికి ముందు తెలుసుకోండి">Know before you weave</h4>
-          <p data-en="Get your answer in 30 seconds." data-te="30 సెకన్లలో మీ సమాధానం పొందండి.">Get your answer in 30 seconds.</p>
+          <h4 data-en="Analyse Your Design" data-te="మీ డిజైన్ విశ్లేషించండి">Analyse Your Design</h4>
+          <p data-en="Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds." data-te="మీ ఉత్పత్తిని వివరించండి లేదా అప్లోడ్ చేయండి. 30 సెకన్లలో నిర్ణయం పొందండి.">Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds.</p>
         </a>
-        <a href="{{ url_for('ui.market') }}" class="home-card">
+        <a href="{{ url_for('ui.market') }}" class="home-card animate-on-scroll scale-in delay-1 ripple">
           <div class="card-icon-wrap"><span class="material-icons-round">bar_chart</span></div>
-          <h4 data-en="See what sells" data-te="ఏమి అమ్ముతుందో చూడండి">See what sells</h4>
-          <p data-en="Real prices. Real demand. Real gaps." data-te="నిజమైన ధరలు. నిజమైన డిమాండ్. నిజమైన ఖాళీలు.">Real prices. Real demand. Real gaps.</p>
+          <h4 data-en="Market Intelligence" data-te="మార్కెట్ మేధస్సు">Market Intelligence</h4>
+          <p data-en="Explore pricing, competition, demand signals, and market gaps — all in one place." data-te="ధరలు, పోటీ, డిమాండ్ సంకేతాలు మరియు మార్కెట్ ఖాళీలను అన్వేషించండి.">Explore pricing, competition, demand signals, and market gaps — all in one place.</p>
         </a>
-        <a href="{{ url_for('ui.how') }}" class="home-card">
+        <a href="{{ url_for('ui.how') }}" class="home-card animate-on-scroll scale-in delay-2 ripple">
           <div class="card-icon-wrap"><span class="material-icons-round">help_outline</span></div>
-          <h4 data-en="Understand the system" data-te="వ్యవస్థను అర్థం చేసుకోండి">Understand the system</h4>
-          <p data-en="How your work gets scored." data-te="మీ పని ఎలా స్కోర్ చేయబడుతుంది.">How your work gets scored.</p>
+          <h4 data-en="How It Works" data-te="ఇది ఎలా పని చేస్తుంది">How It Works</h4>
+          <p data-en="Understand the rating system and how your product gets scored — in plain language." data-te="రేటింగ్ సిస్టమ్ మరియు మీ ఉత్పత్తి ఎలా స్కోర్ పొందుతుందో అర్థం చేసుకోండి.">Understand the rating system and how your product gets scored — in plain language.</p>
         </a>
       </div>
     </div>
 
     <div class="recent-section">
-      <div style="background:linear-gradient(135deg,#0D2E22,#1B5247);border-radius:var(--radius-xl);padding:56px 40px;text-align:center;color:white;">
-        <h3 style="font-family:'DM Serif Display',serif;font-size:32px;margin-bottom:16px;letter-spacing:-0.5px;" data-en="Ready to test your product idea?" data-te="మీ ఉత్పత్తి ఆలోచనను పరీక్షించడానికి సిద్ధంగా ఉన్నారా?">Ready to test your product idea?</h3>
-        <p style="font-size:16px;opacity:0.75;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6;" data-en="Get a clear decision in under 30 seconds. No guesswork, just data." data-te="30 సెకన్లలోపు స్పష్టమైన నిర్ణయం పొందండి. ఊహలు లేవు, కేవలం డేటా.">Get a clear decision in under 30 seconds. No guesswork, just data.</p>
-        <a href="{{ url_for('ui.analyze') }}" class="btn-hero" style="display:inline-flex;background:var(--cream);color:var(--indigo-dark);">
-          <span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>
+      <div class="section-head">
+        <h3 data-en="Recent Analyses" data-te="ఇటీవలి విశ్లేషణలు">Recent Analyses</h3>
+        <a href="{{ url_for('ui.analyses') }}" class="link-btn">
+          <span data-en="View all" data-te="అన్నీ చూడండి">View all</span>
+          <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
         </a>
       </div>
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row animate-on-scroll fade-in-left stagger-item">
+        <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
+        <div class="analysis-info">
+          <div class="analysis-title">Kanjivaram Silk Saree — Wedding Range</div>
+          <div class="analysis-meta">Analysed 2 days ago &nbsp;·&nbsp; Score: 82 / 100</div>
+        </div>
+        <span class="badge-decision badge-launch">Proceed</span>
+      </a>
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row animate-on-scroll fade-in-left stagger-item">
+        <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
+        <div class="analysis-info">
+          <div class="analysis-title">Bridal Lehenga Choli — Embroidered Silk</div>
+          <div class="analysis-meta">Analysed 5 days ago &nbsp;·&nbsp; Score: 61 / 100</div>
+        </div>
+        <span class="badge-decision badge-modify">Adjust</span>
+      </a>
+      <a href="{{ url_for('ui.analyze') }}" class="analysis-row animate-on-scroll fade-in-left stagger-item">
+        <div class="analysis-thumb"><span class="material-icons-round">checkroom</span></div>
+        <div class="analysis-info">
+          <div class="analysis-title">Anarkali Suit — Synthetic Georgette</div>
+          <div class="analysis-meta">Analysed 1 week ago &nbsp;·&nbsp; Score: 29 / 100</div>
+        </div>
+        <span class="badge-decision badge-stop">Stop</span>
+      </a>
     </div>
   </div>
 
@@ -1498,18 +1649,21 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
               </div>
               <div class="az-form-body">
 
-                <!-- Opening line -->
-                <p style="font-style:italic;font-size:16px;color:var(--ink-lt);text-align:center;margin-bottom:40px;" data-en="You're about to save yourself 3 weeks." data-te="మీరు 3 వారాలు ఆదా చేసుకోబోతున్నారు.">You're about to save yourself 3 weeks.</p>
-
                 <div class="mb-3">
-                  <label class="az-label" data-en="WHAT ARE YOU MAKING?" data-te="మీరు ఏమి తయారు చేస్తున్నారు?">WHAT ARE YOU MAKING?</label>
+                  <label class="az-label" data-en="PRODUCT DESCRIPTION" data-te="ఉత్పత్తి వివరణ">PRODUCT DESCRIPTION</label>
                   <textarea class="az-field" id="productDesc" placeholder="E.g. A red Kanjivaram silk saree with gold zari border, meant for wedding wear…" maxlength="500" oninput="updateCharCount(this)" required></textarea>
                   <div class="char-counter" id="descCharCounter">0 / 500 characters</div>
                 </div>
 
                 <div class="row g-3 mb-3">
                   <div class="col-sm-6">
-                    <label class="az-label" data-en="WHAT CATEGORY IS THIS?" data-te="ఇది ఏ వర్గం?">WHAT CATEGORY IS THIS?</label>
+                    <label class="az-label">
+                      CATEGORY
+                      <span class="tooltip-trigger">
+                        <span class="material-icons-round" style="font-size:12px;margin-left:4px;">help_outline</span>
+                        <span class="tooltip-content">Select the product category that best matches your item</span>
+                      </span>
+                    </label>
                     <div class="cat-wrap" id="categorySearchWrap" style="position:relative;">
                       <input type="text" class="az-field" id="categorySearchInput"
                         placeholder="Search or select category…"
@@ -1527,12 +1681,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     </div>
                   </div>
                   <div class="col-sm-6">
-                    <label class="az-label" data-en="WHAT DO YOU NEED TO CHARGE?" data-te="మీరు ఎంత వసూలు చేయాలి?">WHAT DO YOU NEED TO CHARGE?</label>
-                    <input type="text" class="az-field" id="productPrice" placeholder="e.g. ₹1499" inputmode="numeric" oninput="sanitizePriceInput(this)" required/>
+                    <label class="az-label" data-en="TARGET PRICE (₹)" data-te="లక్ష్య ధర (₹)">TARGET PRICE (₹)</label>
+                    <input type="text" class="az-field" id="productPrice" placeholder="e.g. 1499" inputmode="numeric" oninput="sanitizePriceInput(this)" required/>
                     <div id="priceError" style="font-size:10.5px;color:var(--red);margin-top:3px;display:none;">Please enter a valid price</div>
                   </div>
                   <div class="col-sm-6">
-                    <label class="az-label" data-en="WHO IS THIS FOR?" data-te="ఇది ఎవరికి?">WHO IS THIS FOR?</label>
+                    <label class="az-label" data-en="OCCASION" data-te="సందర్భం">OCCASION</label>
                     <select class="az-field" id="productOccasion" required>
                       <option value="">Select occasion…</option>
                       <option value="Wedding">Wedding</option>
@@ -1543,7 +1697,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     </select>
                   </div>
                   <div class="col-sm-6">
-                   <label class="az-label" data-en="WHAT IS IT MADE FROM?" data-te="ఇది దేనితో తయారు చేయబడింది?">WHAT IS IT MADE FROM?</label>
+                   <label class="az-label" data-en="PRIMARY MATERIAL" data-te="ప్రాథమిక వస్తువు">PRIMARY MATERIAL</label>
                    <input type="text" class="az-field" id="productMaterial" 
                      placeholder="e.g. Pure Silk, Cotton, Georgette…"
                     autocomplete="off"
@@ -1552,7 +1706,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
 
                 <div class="mb-3">
-                  <label class="az-label" data-en="DROP A PHOTO OF YOUR WORK" data-te="మీ పని ఫోటో వదలండి">DROP A PHOTO OF YOUR WORK</label>
                   <div class="az-upload" id="uploadZone">
                     <span class="material-icons-round">add_photo_alternate</span>
                     <div>
@@ -1581,14 +1734,15 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
 
                 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                  <button class="az-run-btn" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
-                    <span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>
+                  <button class="az-run-btn ripple" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
+                    <span class="material-icons-round">analytics</span>
+                    <span data-en="Run Analysis" data-te="విశ్లేషణ అమలు చేయండి">Run Analysis</span>
                   </button>
-                  <button class="az-run-btn" id="mockupBtn" onclick="runMockup()" style="flex:1;min-width:160px;background:var(--indigo);">
+                  <button class="az-run-btn ripple" id="mockupBtn" onclick="runMockup()" style="flex:1;min-width:160px;background:var(--indigo);">
                     <span class="material-icons-round">auto_fix_high</span>
                     <span>Generate Mockup</span>
                   </button>
-                  <button class="btn-clear" onclick="clearForm()" title="Clear all fields">
+                  <button class="btn-clear ripple" onclick="clearForm()" title="Clear all fields">
                     <span class="material-icons-round" style="font-size:16px;">refresh</span>
                     <span>Clear</span>
                   </button>
@@ -1645,95 +1799,29 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
             <!-- Results -->
             <div class="results-block" id="resultsBlock">
-              
-              <div class="results-container">
-                <!-- LEFT: Sticky Score Panel -->
-                <div class="results-left">
-                  <!-- Decision hero -->
-                  <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
+
+              <!-- Decision hero (always visible) -->
+              <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
                 <div class="rating-big">
-                  <div class="rating-num count-up" id="ratingNum">—</div>
+                  <div class="rating-num" id="ratingNum">—</div>
                   <div class="rating-denom" id="ratingDenom">out of 100</div>
-                  <div class="rating-bar-wrap"><div class="rating-bar-fill" id="ratingBarFill" style="width:0%"></div></div>
+                  <div class="rating-bar-wrap" style="width:84px;"><div class="rating-bar-fill" id="ratingBarFill" style="width:0%"></div></div>
                 </div>
-                <div class="rating-text">
+                <div class="rating-text" style="flex:1;">
                   <div class="rating-decision-label" id="ratingLabel">DECISION</div>
                   <div class="rating-verdict" id="ratingVerdict">—</div>
                   <div class="rating-sub" id="ratingSub"></div>
-                  
-                  <!-- Action strip -->
-                  <div class="action-strip" id="actionStrip" style="display:none;">
-                    <a href="#content-insights" class="action-strip-btn" id="actionBtn1" onclick="switchResultsTab('insights')">
-                      <span class="material-icons-round">insights</span>
-                      <span>View Market</span>
-                    </a>
-                    <a href="#content-improvements" class="action-strip-btn" id="actionBtn2" onclick="switchResultsTab('improvements')"></a>
-                      <span class="material-icons-round">auto_fix_high</span>
-                      <span>See Changes</span>
-                    </a>
+                  <div class="comparison-badge" id="comparisonBadge" style="display:none;">
+                    <span class="material-icons-round">trending_up</span>
+                    <span id="comparisonText"></span>
                   </div>
                 </div>
+                <button class="btn-export ripple" onclick="exportResults()" id="exportBtn" style="display:none;">
+                  <span class="material-icons-round" style="font-size:18px;">download</span>
+                  <span>Export PDF</span>
+                </button>
               </div>
-              
-              <!-- Score Breakdown Pie (in left sticky panel) -->
-              <div class="res-card" id="section-breakdown" style="margin-top:0;">
-                <div class="res-card-head">
-                  <span class="material-icons-round">pie_chart</span>
-                  <div style="flex:1;">
-                    <div class="res-card-title" style="font-size:12px;">Score Breakdown</div>
-                  </div>
-                </div>
-                <div class="res-card-body" style="padding:12px;">
-                  <div class="score-pie-wrap" style="flex-direction:column;gap:16px;">
-                    <div class="score-pie-chart" id="scorePieWrap" style="width:100%;">
-                      <svg id="scorePieChart" viewBox="0 0 280 280" width="240" height="240" style="overflow:visible;display:block;margin:0 auto;">
-                        <g id="scorePieSectors" transform="translate(140,140)"></g>
-                      </svg>
-                      <div id="scorePieTip" class="score-pie-tip"></div>
-                      <div class="score-pie-centre">
-                        <span class="score-pie-num" id="pieTotalNum">—</span>
-                        <span class="score-pie-sub">/ 100</span>
-                      </div>
-                    </div>
-                    <div class="score-legend" style="width:100%;">
-                      <div class="sl-row" data-key="demand">
-                        <span class="sl-dot" style="background:#1B5247;"></span>
-                        <span class="sl-name" style="font-size:10px;">Market Demand</span>
-                        <span class="sl-val" id="val-demand">—</span>
-                        <span class="sl-context" id="ctx-demand"></span>
-                      </div>
-                      <div class="sl-row" data-key="unique">
-                        <span class="sl-dot" style="background:#2D8B6B;"></span>
-                        <span class="sl-name" style="font-size:10px;">Design Uniqueness</span>
-                        <span class="sl-val" id="val-unique">—</span>
-                        <span class="sl-context" id="ctx-unique"></span>
-                      </div>
-                      <div class="sl-row" data-key="price">
-                        <span class="sl-dot" style="background:#9E7A1A;"></span>
-                        <span class="sl-name" style="font-size:10px;">Price Fit</span>
-                        <span class="sl-val" id="val-price">—</span>
-                        <span class="sl-context" id="ctx-price"></span>
-                      </div>
-                      <div class="sl-row" data-key="material">
-                        <span class="sl-dot" style="background:#C4962A;"></span>
-                        <span class="sl-name" style="font-size:10px;">Material Appeal</span>
-                        <span class="sl-val" id="val-material">—</span>
-                        <span class="sl-context" id="ctx-material"></span>
-                      </div>
-                      <div class="sl-row" data-key="trend">
-                        <span class="sl-dot" style="background:#5B3B8C;"></span>
-                        <span class="sl-name" style="font-size:10px;">Trend Alignment</span>
-                        <span class="sl-val" id="val-trend">—</span>
-                        <span class="sl-context" id="ctx-trend"></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              </div><!-- /results-left -->
 
-              <!-- RIGHT: Scrollable Details -->
-              <div class="results-right">
               <!-- Results Tabs -->
               <div class="results-tabs">
                 <button class="results-tab active" onclick="switchResultsTab('overview')" id="tab-overview">
@@ -1859,14 +1947,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
               <!-- Tab: Score Details -->
               <div class="results-tab-content" id="content-breakdown">
-              
-              <div style="background:var(--indigo-light);padding:16px;border-radius:var(--radius);margin-bottom:16px;text-align:center;">
-                <div style="font-size:13px;color:var(--indigo);margin-bottom:8px;">Your score is visible in the left panel</div>
-                <div style="font-size:11px;color:var(--ink-lt);">Scroll through the details below while keeping your score in view</div>
-              </div>
-              
-              <!-- Product Analysis -->
-              <div class="res-card animate-on-scroll fade-in-right" id="section-product">
+              <!-- Score Breakdown — interactive pie -->
+              <div class="res-card animate-on-scroll fade-in-left" id="section-breakdown">
                 <div class="res-card-head">
                   <span class="material-icons-round">pie_chart</span>
                   <div style="flex:1;">
@@ -1979,8 +2061,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
               </div>
               </div><!-- /content-insights -->
-              </div><!-- /results-right -->
-              </div><!-- /results-container -->
 
             </div><!-- /results-block -->
 
@@ -2284,27 +2364,41 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
       <!-- FOOTER -->
       <footer class="site-footer">
-        <div class="footer-simple">
-          <div class="footer-brand">
-            <svg width="28" height="28" viewBox="0 0 38 38" fill="none"><rect width="38" height="38" rx="8" fill="#ECE6D0" fill-opacity="0.15"/><circle cx="20" cy="17" r="10" fill="#ECE6D0"/><rect x="11" y="9" width="4" height="20" rx="1" fill="#1B5247"/><circle cx="20" cy="17" r="6" fill="#1B5247"/><polygon points="20,20 26,29 22,29 16,20" fill="#ECE6D0"/></svg>
-            <div>
-              <div class="footer-brand-name">Rivet</div>
-              <div class="footer-brand-tag">Product intelligence for artisans</div>
+        <div class="footer-inner">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;">
+        <svg width="32" height="32" viewBox="0 0 38 38" fill="none"><rect width="38" height="38" rx="8" fill="#ECE6D0" fill-opacity="0.15"/><circle cx="20" cy="17" r="10" fill="#ECE6D0"/><rect x="11" y="9" width="4" height="20" rx="1" fill="#1B5247"/><circle cx="20" cy="17" r="6" fill="#1B5247"/><polygon points="20,20 26,29 22,29 16,20" fill="#ECE6D0"/></svg>
+        <div class="footer-brand-name">Rivet</div>
             </div>
+            <div class="footer-brand-tag" style="margin-top:10px;">Product intelligence for Indian artisans and small manufacturers. Make better products, faster.</div>
           </div>
-          <div class="footer-links">
-            <a href="{{ url_for('ui.analyze') }}" class="footer-link">Analyse</a>
-            <a href="{{ url_for('ui.market') }}" class="footer-link">Market</a>
+          <div>
+            <div class="footer-col-title">Platform</div>
+            <a href="{{ url_for('ui.analyze') }}" class="footer-link">Analyse Product</a>
+            <a href="{{ url_for('ui.market') }}" class="footer-link">Market Data</a>
             <a href="{{ url_for('ui.how') }}" class="footer-link">How It Works</a>
-            <a href="{{ url_for('ui.account') }}" class="footer-link">Account</a>
+            <a href="{{ url_for('ui.analyses') }}" class="footer-link">My Analyses</a>
           </div>
-          <div class="footer-contact">
-            <div class="footer-contact-label">Contact</div>
-            <a href="mailto:sandeepreddy.ade@external.stellantis.com" class="footer-link">sandeepreddy.ade@external.stellantis.com</a>
-            <a href="mailto:mourya.gudipudi@external.stellantis.com" class="footer-link">mourya.gudipudi@external.stellantis.com</a>
-            <a href="mailto:vijaykumar.jatam@stellantis.com" class="footer-link">vijaykumar.jatam@stellantis.com</a>
+          <div>
+            <div class="footer-col-title">Support</div>
+            <a class="footer-link">Help Centre</a>
+            <a class="footer-link">Contact Us</a>
+            <a class="footer-link">Privacy Policy</a>
+            <a class="footer-link">Terms of Use</a>
           </div>
-          <div class="footer-copy">© 2025 Rivet</div>
+          <div>
+            <div class="footer-col-title">Language</div>
+            <a class="footer-link" onclick="setLang('en')">English</a>
+            <a class="footer-link" onclick="setLang('te')">తెలుగు</a>
+            <div class="footer-col-title" style="margin-top:20px;">Contact</div>
+            <a class="footer-link">sandeepreddy.ade@external.stellantis.com</a>
+            <a class="footer-link">mourya.gudipudi@external.stellantis.com</a>
+            <a class="footer-link">vijaykumar.jatam@stellantis.com</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="footer-bottom-left">© 2025 Rivet. Built for artisans across India.</div>
+          <div class="footer-bottom-right"><div class="footer-social"><span class="material-icons-round">language</span></div><div class="footer-social"><span class="material-icons-round">mail_outline</span></div></div>
         </div>
       </footer>
 
@@ -2540,21 +2634,21 @@ var T = {
   decision:        { en: 'DECISION',                    te: 'నిర్ణయం' },
   outOf100:        { en: 'out of 100',                  te: '100కి' },
   finalScore:      { en: 'Total Score',                 te: 'మొత్తం స్కోర్' },
-  launch_verdict:  { en: 'This product has a place in the market. Make it.', te: 'ఈ ఉత్పత్తికి మార్కెట్‌లో స్థానం ఉంది. దీన్ని తయారు చేయండి.' },
+  launch_verdict:  { en: 'PROCEED — Ready for Production', te: 'కొనసాగించండి — ఉత్పత్తికి సిద్ధం' },
   launch_sub:      { en: 'Strong market fit. This product is ready to make.', te: 'బలమైన మార్కెట్ అనుకూలత.' },
   launch_recs:     { en: 'Product Strengths',           te: 'ఉత్పత్తి బలాలు' },
   launch_sub2:     { en: "What's working well for your product", te: 'మీ ఉత్పత్తి కోసం బాగా పనిచేస్తున్నది' },
-  modify_verdict:  { en: "You're close. Here's what to change.", te: 'మీరు దగ్గరగా ఉన్నారు. ఏమి మార్చాలో ఇక్కడ ఉంది.' },
+  modify_verdict:  { en: 'MODIFY — Adjust Before Producing', te: 'మార్చుకోండి — తయారు చేయడానికి ముందు' },
   modify_sub:      { en: 'This product has potential — with a few changes it can succeed.', te: 'ఈ ఉత్పత్తికి సామర్థ్యం ఉంది.' },
   modify_recs:     { en: 'What to Improve',             te: 'మెరుగుపర్చవలసినవి' },
   modify_sub2:     { en: 'Changes that could significantly improve your outcome', te: 'ఫలితాన్ని మెరుగుపరచగల మార్పులు' },
-  stop_verdict:    { en: "This one isn't ready for this market. Here's what the data says.", te: 'ఇది ఈ మార్కెట్‌కు సిద్ధంగా లేదు. డేటా ఏమి చెబుతుందో ఇక్కడ ఉంది.' },
+  stop_verdict:    { en: 'RECONSIDER — Production Not Advised', te: 'పునఃపరిశీలించండి — ఉత్పత్తి సిఫార్సు చేయబడలేదు' },
   stop_sub:        { en: 'Too much risk right now. Producing this could lead to financial loss.', te: 'ఇప్పుడు చాలా ప్రమాదం.' },
   stop_recs:       { en: 'Key Risk Factors',            te: 'ముఖ్య ప్రమాద కారకాలు' },
   stop_sub2:       { en: 'The main reasons why this product is high-risk', te: 'ఈ ఉత్పత్తి అధిక-ప్రమాదకరమైన ప్రధాన కారణాలు' },
   noInput:         { en: 'Please describe your product or upload an image before running analysis.', te: 'విశ్లేషణ అమలు చేయడానికి ముందు మీ ఉత్పత్తిని వివరించండి.' },
   analysing:       { en: 'Analysing…',                  te: 'విశ్లేషిస్తున్నారు…' },
-  runAnalysis:     { en: 'Get my answer',                te: 'నా సమాధానం పొందండి' },
+  runAnalysis:     { en: 'Run Analysis',                te: 'విశ్లేషణ అమలు చేయండి' },
   checkingMarket:  { en: 'Checking against market data…', te: 'మార్కెట్ డేటాతో తనిఖీ చేస్తున్నారు…' },
 };
 function t(key) { return T[key] ? (T[key][currentLang] || T[key].en) : key; }
@@ -2865,7 +2959,7 @@ function runAnalysis() {
     })
     .finally(function() {
       btn.disabled = false;
-      btn.innerHTML = '<span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>';
+      btn.innerHTML = '<span class="material-icons-round">analytics</span> ' + t('runAnalysis');
       document.getElementById('progressArea').classList.remove('show');
       
       // Hide sidebar progress bar after a delay
@@ -2922,10 +3016,8 @@ function renderResults(data) {
   document.getElementById('ratingLabel').textContent  = t('decision');
   document.getElementById('ratingDenom').textContent  = t('outOf100');
   document.getElementById('avgDisplay').textContent   = total + ' / 100';
-  
-  // Animate score counting up from 0
-  animateScoreCounter('ratingNum', total, 1200);
-  animateScoreCounter('pieTotalNum', total, 1200);
+  document.getElementById('ratingNum').textContent    = total;
+  document.getElementById('pieTotalNum').textContent  = total;
   
   // Show export button
   document.getElementById('exportBtn').style.display = 'inline-flex';
@@ -2951,36 +3043,6 @@ function renderResults(data) {
     setDim('price',    p,  20);
     setDim('material', m,  20);
     setDim('trend',    tr, 20);
-    
-    // Add context labels to score dimensions
-    addContextLabel('demand', d, 20);
-    addContextLabel('unique', u, 20);
-    addContextLabel('price', p, 20);
-    addContextLabel('material', m, 20);
-    addContextLabel('trend', tr, 20);
-    
-    // Show action strip with appropriate buttons
-    var actionStrip = document.getElementById('actionStrip');
-    var actionBtn1 = document.getElementById('actionBtn1');
-    var actionBtn2 = document.getElementById('actionBtn2');
-    
-    if (cls === 'PROCEED') {
-      actionBtn1.innerHTML = '<span class="material-icons-round">insights</span><span>View Market</span>';
-      actionBtn1.onclick = function() { switchResultsTab('insights'); };
-      actionBtn2.innerHTML = '<span class="material-icons-round">bar_chart</span><span>Similar Products</span>';
-      actionBtn2.onclick = function() { window.location.href = '/market'; };
-    } else if (cls === 'MODIFY') {
-      actionBtn1.innerHTML = '<span class="material-icons-round">auto_fix_high</span><span>See Changes</span>';
-      actionBtn1.onclick = function() { switchResultsTab('improvements'); };
-      actionBtn2.innerHTML = '<span class="material-icons-round">insights</span><span>Market Data</span>';
-      actionBtn2.onclick = function() { switchResultsTab('insights'); };
-    } else {
-      actionBtn1.innerHTML = '<span class="material-icons-round">explore</span><span>Explore Categories</span>';
-      actionBtn1.onclick = function() { window.location.href = '/market'; };
-      actionBtn2.innerHTML = '<span class="material-icons-round">insights</span><span>Why Stop?</span>';
-      actionBtn2.onclick = function() { switchResultsTab('insights'); };
-    }
-    actionStrip.style.display = 'flex';
     
     // Render demand prediction if available
     if (data.demand_prediction) {
@@ -3217,57 +3279,6 @@ function setDim(key, val, maxVal) {
   var lbl = document.getElementById('val-' + key);
   if (bar) setTimeout(function() { bar.style.width = (val / maxVal * 100) + '%'; }, 80);
   if (lbl) lbl.textContent = val + ' / ' + maxVal;
-}
-
-function addContextLabel(key, val, maxVal) {
-  var ctx = document.getElementById('ctx-' + key);
-  if (!ctx) return;
-  
-  var percentage = (val / maxVal) * 100;
-  var label = '';
-  var className = '';
-  
-  if (percentage >= 75) {
-    label = 'Above average';
-    className = 'good';
-  } else if (percentage >= 50) {
-    label = 'Average';
-    className = 'average';
-  } else {
-    label = 'Room to improve';
-    className = 'poor';
-  }
-  
-  ctx.textContent = label;
-  ctx.className = 'sl-context ' + className;
-}
-
-function animateScoreCounter(elementId, targetValue, duration) {
-  var element = document.getElementById(elementId);
-  if (!element) return;
-  
-  var startTime = null;
-  var startValue = 0;
-  
-  function animate(currentTime) {
-    if (!startTime) startTime = currentTime;
-    var elapsed = currentTime - startTime;
-    var progress = Math.min(elapsed / duration, 1);
-    
-    // Easing function for smooth animation
-    var easeOutCubic = 1 - Math.pow(1 - progress, 3);
-    var currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutCubic);
-    
-    element.textContent = currentValue;
-    
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      element.textContent = targetValue;
-    }
-  }
-  
-  requestAnimationFrame(animate);
 }
 
 function renderDemandPrediction(prediction) {
@@ -3998,3 +4009,4 @@ function openImageModal(imgId) {
 </style>
 </body>
 </html>
+
