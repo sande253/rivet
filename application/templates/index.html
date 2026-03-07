@@ -3080,11 +3080,7 @@ function renderResults(data) {
   document.getElementById('resultsEmpty').style.display = 'none';
   document.getElementById('resultsBlock').classList.add('show');
   
-  // Show results navigation
-  setTimeout(function() {
-    var nav = document.getElementById('resultsNav');
-    if (nav) nav.classList.add('show');
-  }, 500);
+  // Don't show results navigation by default - only when user clicks Market Insights tab
 }
 
 function renderGenaiTips(data) {
@@ -3442,6 +3438,16 @@ function switchResultsTab(tabName) {
   // Activate selected tab
   var tab = document.getElementById('tab-' + tabName);
   if (tab) tab.classList.add('active');
+  
+  // Show/hide results navigation based on tab
+  var nav = document.getElementById('resultsNav');
+  if (nav) {
+    if (tabName === 'insights') {
+      nav.classList.add('show');
+    } else {
+      nav.classList.remove('show');
+    }
+  }
 }
 
 function fillInsightList(id, items) {
