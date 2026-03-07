@@ -103,122 +103,128 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 }
 
 /* ══════════════════════════════════════
-   FIX 1 — HOME HERO: TRUE CENTERED
+   EMOTIONAL HERO: THE HUMAN PROBLEM
 ══════════════════════════════════════ */
 .home-hero {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0A1F17 0%, #1B5247 50%, #256B56 100%);
+  background: var(--cream);
   position: relative;
   overflow: hidden;
-  padding: 80px 40px;
-  min-height: 600px;
+  padding: 120px 40px 80px;
+  min-height: 70vh;
 }
 
-/* Static background - no animation */
-.home-hero::before {
-  content: '';
-  position: absolute; 
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 80%, rgba(236,230,208,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(45,139,107,0.3) 0%, transparent 60%);
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-/* Parallax layers - removed for cleaner look */
-
-/* Inner wrapper: max-width container, no manual left margin */
 .home-hero-inner {
   position: relative; z-index: 2;
   width: 100%;
-  max-width: 1100px;
-  display: flex;
-  align-items: center;
-  gap: 64px;
+  max-width: 900px;
+  text-align: center;
 }
 
-.home-hero-left {
-  flex: 1;
-  max-width: 580px;
-  display: flex;
-  flex-direction: column;
-}
-
-.home-kicker {
-  display: inline-flex; align-items: center;
-  background: rgba(236,230,208,0.15); border: 1px solid rgba(236,230,208,0.35);
-  color: #ECE6D0; font-size: 11px; font-weight: 700; letter-spacing: 2px;
-  text-transform: uppercase; padding: 6px 14px; border-radius: 20px;
-  margin-bottom: 24px; width: fit-content;
-  box-shadow: 0 4px 15px rgba(236,230,208,0.2);
-}
-.home-hero h1 {
+.home-hero-problem {
   font-family: 'DM Serif Display', serif;
-  font-size: clamp(36px, 5vw, 56px);
-  font-weight: 400; color: #FFFFFF;
-  line-height: 1.1; margin-bottom: 20px; letter-spacing: -1.5px;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.3), 0 4px 40px rgba(10,31,23,0.4);
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 400; 
+  color: var(--ink);
+  line-height: 1.15; 
+  margin-bottom: 48px; 
+  letter-spacing: -2px;
 }
-.home-hero h1 em { 
-  font-style: italic; 
-  color: #ECE6D0; 
-  text-shadow: 0 0 30px rgba(236,230,208,0.4), 0 2px 20px rgba(0,0,0,0.3);
+
+.home-hero-solution {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(24px, 3.5vw, 38px);
+  font-weight: 400;
+  color: var(--indigo);
+  line-height: 1.3;
+  margin-bottom: 56px;
+  letter-spacing: -0.5px;
 }
-.home-hero-desc {
-  font-size: 17px; color: rgba(255,255,255,0.75);
-  line-height: 1.75; margin-bottom: 40px; max-width: 480px;
-  text-shadow: 0 1px 10px rgba(0,0,0,0.2);
+
+.hero-cta-row { 
+  display: flex; 
+  gap: 16px; 
+  align-items: center; 
+  justify-content: center;
+  flex-wrap: wrap; 
 }
-.hero-cta-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
 .btn-hero {
   display: inline-flex; align-items: center; gap: 10px;
-  background: linear-gradient(135deg, #ECE6D0, #F5F2EA); 
-  color: #0D2E22; font-size: 16px; font-weight: 700;
-  padding: 18px 36px; border-radius: 10px; border: none; cursor: pointer;
-  box-shadow: 0 8px 32px rgba(236,230,208,0.5), 0 4px 16px rgba(0,0,0,0.25); 
+  background: var(--indigo);
+  color: white; font-size: 16px; font-weight: 600;
+  padding: 20px 40px; border-radius: 10px; border: none; cursor: pointer;
+  box-shadow: 0 8px 32px rgba(27,82,71,0.3); 
   transition: all .25s;
   font-family: 'DM Sans', sans-serif;
   text-decoration: none;
 }
 .btn-hero:hover { 
-  background: linear-gradient(135deg, #F5F2EA, #FFFFFF); 
+  background: var(--indigo-dark);
   transform: translateY(-3px); 
-  box-shadow: 0 12px 40px rgba(236,230,208,0.6), 0 6px 20px rgba(0,0,0,0.3); 
-  color: #0D2E22; 
+  box-shadow: 0 12px 40px rgba(27,82,71,0.4); 
+  color: white; 
   text-decoration: none; 
 }
-.btn-hero .material-icons-round { font-size: 22px; }
+
 .btn-hero-ghost {
   display: inline-flex; align-items: center; gap: 8px;
-  background: transparent; color: rgba(236,230,208,0.85); font-size: 14px; font-weight: 600;
-  padding: 16px 28px; border-radius: 10px; border: 1.5px solid rgba(236,230,208,0.35); cursor: pointer;
+  background: transparent; color: var(--ink-mid); font-size: 15px; font-weight: 600;
+  padding: 18px 32px; border-radius: 10px; border: 2px solid var(--border); cursor: pointer;
   transition: all .25s; font-family: 'DM Sans', sans-serif;
   text-decoration: none;
 }
-.btn-hero-ghost:hover { border-color: #ECE6D0; color: #ECE6D0; background: rgba(236,230,208,0.08); transform: translateY(-2px); text-decoration: none; }
-.hero-trust { margin-top: 36px; font-size: 12px; color: rgba(236,230,208,0.4); letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
-.hero-trust::before { content: ''; width: 32px; height: 1px; background: rgba(236,230,208,0.2); }
-
-/* Hero right image panel - simplified */
-.home-hero-right {
-  flex-shrink: 0;
-  width: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+.btn-hero-ghost:hover { 
+  border-color: var(--indigo); 
+  color: var(--indigo); 
+  background: var(--indigo-light); 
+  text-decoration: none; 
 }
 
-.home-hero-right img {
-  width: 100%;
-  max-width: 500px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 60px rgba(10,31,23,0.3), 0 8px 30px rgba(10,31,23,0.2);
-  object-fit: cover;
-  filter: brightness(0.85) contrast(1.05) saturate(1.1);
+/* Emotional stat bar */
+.emotional-stats {
+  background: linear-gradient(135deg, #0A1F17 0%, #1B5247 100%);
+  padding: 48px 40px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.emotional-stat {
+  text-align: center;
+  padding: 0 20px;
+}
+
+.emotional-stat-number {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px;
+  color: #ECE6D0;
+  line-height: 1;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.emotional-stat-label {
+  font-size: 15px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.emotional-stats-scale {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 24px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-weight: 400;
+  letter-spacing: 0.2px;
 }
 
 /* ══════════════════════════════════════
@@ -1165,14 +1171,16 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
 /* Simplified footer */
 .site-footer { background: #0A1F17; color: rgba(255,255,255,0.65); padding: 32px 40px; }
-.footer-simple { max-width: 1060px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+.footer-simple { max-width: 1060px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 32px; }
 .footer-brand { display: flex; align-items: center; gap: 12px; }
 .footer-brand-name { font-family: 'DM Serif Display', serif; font-size: 16px; color: #ECE6D0; }
 .footer-brand-tag { font-size: 12px; color: rgba(255,255,255,0.4); }
 .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-contact { display: flex; flex-direction: column; gap: 6px; }
+.footer-contact-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
 .footer-link { font-size: 13px; color: rgba(255,255,255,0.6); cursor: pointer; text-decoration: none; transition: color .15s; }
 .footer-link:hover { color: #ECE6D0; text-decoration: none; }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,0.35); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.35); width: 100%; text-align: center; margin-top: 16px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
 
 /* ══════════════════════════════════════
    RESPONSIVE
@@ -1312,31 +1320,35 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   <!-- ══════ HOME ══════ -->
   <div class="page {% if active_page == 'home' or not active_page %}active{% endif %}" id="page-home">
     <div class="home-hero">
-      <!-- FIX 1: Single centered inner wrapper, no margin-left hack -->
       <div class="home-hero-inner">
-        <div class="home-hero-left">
-          <div class="home-kicker" data-en="Product Intelligence Platform" data-te="ఉత్పత్తి మేధో వేదిక">Product Intelligence Platform</div>
-          <h1 data-en="Should you <em>make</em> this product?" data-te="ఈ ఉత్పత్తిని <em>తయారు చేయాలా?</em>">Should you <em>make</em> this product?</h1>
-          <p class="home-hero-desc" data-en="Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers." data-te="మీ డిజైన్ అప్లోడ్ చేయండి. స్పష్టమైన సమాధానం పొందండి — నిజమైన మార్కెట్ డేటాతో.">Upload your design. Get a clear answer — backed by real market data. Built for local artisans and small manufacturers.</p>
-          <div class="hero-cta-row">
-            <a href="{{ url_for('ui.analyze') }}" class="btn-hero ripple">
-              <span class="material-icons-round">analytics</span>
-              <span data-en="Analyse a Product" data-te="ఉత్పత్తిని విశ్లేషించండి">Analyse a Product</span>
-            </a>
-            <a href="{{ url_for('ui.how') }}" class="btn-hero-ghost ripple">
-              <span class="material-icons-round" style="font-size:16px;">play_circle</span>
-              <span data-en="How it works" data-te="ఇది ఎలా పని చేస్తుంది">How it works</span>
-            </a>
-          </div>
-          <div class="hero-trust">
-            <span data-en="Trusted by 1,200+ artisans across India" data-te="భారతదేశంలో 1,200+ చేతివృత్తుల కారులకు నమ్మకమైనది">Trusted by 1,200+ artisans across India</span>
-          </div>
-        </div>
-        <!-- Hero image shown on wider screens -->
-        <div class="home-hero-right">
-          <img src="https://c.stocksy.com/a/Oyc400/za/1103128.jpg" alt="Kanjivaram Silk Saree"/>
+        <h1 class="home-hero-problem" data-en="She spent 3 weeks at her loom. Nobody bought a single one." data-te="ఆమె తన మగ్గం వద్ద 3 వారాలు గడిపింది. ఎవరూ ఒక్కటి కూడా కొనలేదు.">She spent 3 weeks at her loom.<br>Nobody bought a single one.</h1>
+        <p class="home-hero-solution" data-en="Rivet tells you before you start." data-te="మీరు ప్రారంభించే ముందు రివెట్ మీకు చెబుతుంది.">Rivet tells you before you start.</p>
+        <div class="hero-cta-row">
+          <a href="{{ url_for('ui.analyze') }}" class="btn-hero">
+            <span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>
+          </a>
+          <a href="{{ url_for('ui.how') }}" class="btn-hero-ghost">
+            <span data-en="How this works" data-te="ఇది ఎలా పని చేస్తుంది">How this works</span>
+          </a>
         </div>
       </div>
+    </div>
+
+    <!-- Emotional stat bar -->
+    <div class="emotional-stats">
+      <div class="emotional-stat">
+        <span class="emotional-stat-number" data-en="₹2.3 Cr" data-te="₹2.3 కోట్లు">₹2.3 Cr</span>
+        <span class="emotional-stat-label" data-en="Lost annually by artisans producing unsellable inventory" data-te="అమ్మలేని జాబితాను ఉత్పత్తి చేసే కళాకారులచే ఏటా కోల్పోయారు">Lost annually by artisans producing unsellable inventory</span>
+      </div>
+      <div class="emotional-stat">
+        <span class="emotional-stat-number" data-en="1 in 3" data-te="3లో 1">1 in 3</span>
+        <span class="emotional-stat-label" data-en="Handloom products never finds a buyer" data-te="చేతి మగ్గం ఉత్పత్తులు కొనుగోలుదారుని కనుగొనలేవు">Handloom products never finds a buyer</span>
+      </div>
+      <div class="emotional-stat">
+        <span class="emotional-stat-number" data-en="3 weeks" data-te="3 వారాలు">3 weeks</span>
+        <span class="emotional-stat-label" data-en="Average time to produce a product that may not sell" data-te="అమ్మకం కాకపోవచ్చు ఉత్పత్తిని ఉత్పత్తి చేయడానికి సగటు సమయం">Average time to produce a product that may not sell</span>
+      </div>
+      <div class="emotional-stats-scale" data-en="Across India, 70 lakh registered artisans make this decision blind every season." data-te="భారతదేశం అంతటా, 70 లక్షల నమోదిత కళాకారులు ప్రతి సీజన్‌లో ఈ నిర్ణయాన్ని గుడ్డిగా తీసుకుంటారు.">Across India, 70 lakh registered artisans make this decision blind every season.</div>
     </div>
 
     <!-- FIX 2: Cards wrapper with symmetric padding -->
@@ -1346,31 +1358,30 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         <p data-en="Three tools. One clear answer." data-te="మూడు సాధనాలు. ఒక స్పష్టమైన సమాధానం.">Three tools. One clear answer.</p>
       </div>
       <div class="home-cards">
-        <a href="{{ url_for('ui.analyze') }}" class="home-card animate-on-scroll scale-in ripple">
+        <a href="{{ url_for('ui.analyze') }}" class="home-card">
           <div class="card-icon-wrap"><span class="material-icons-round">image_search</span></div>
-          <h4 data-en="Analyse Your Design" data-te="మీ డిజైన్ విశ్లేషించండి">Analyse Your Design</h4>
-          <p data-en="Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds." data-te="మీ ఉత్పత్తిని వివరించండి లేదా అప్లోడ్ చేయండి. 30 సెకన్లలో నిర్ణయం పొందండి.">Describe or upload your product. Get a Proceed, Adjust, or Stop decision in under 30 seconds.</p>
+          <h4 data-en="Know before you weave" data-te="మీరు నేయడానికి ముందు తెలుసుకోండి">Know before you weave</h4>
+          <p data-en="Get your answer in 30 seconds." data-te="30 సెకన్లలో మీ సమాధానం పొందండి.">Get your answer in 30 seconds.</p>
         </a>
-        <a href="{{ url_for('ui.market') }}" class="home-card animate-on-scroll scale-in delay-1 ripple">
+        <a href="{{ url_for('ui.market') }}" class="home-card">
           <div class="card-icon-wrap"><span class="material-icons-round">bar_chart</span></div>
-          <h4 data-en="Market Intelligence" data-te="మార్కెట్ మేధస్సు">Market Intelligence</h4>
-          <p data-en="Explore pricing, competition, demand signals, and market gaps — all in one place." data-te="ధరలు, పోటీ, డిమాండ్ సంకేతాలు మరియు మార్కెట్ ఖాళీలను అన్వేషించండి.">Explore pricing, competition, demand signals, and market gaps — all in one place.</p>
+          <h4 data-en="See what sells" data-te="ఏమి అమ్ముతుందో చూడండి">See what sells</h4>
+          <p data-en="Real prices. Real demand. Real gaps." data-te="నిజమైన ధరలు. నిజమైన డిమాండ్. నిజమైన ఖాళీలు.">Real prices. Real demand. Real gaps.</p>
         </a>
-        <a href="{{ url_for('ui.how') }}" class="home-card animate-on-scroll scale-in delay-2 ripple">
+        <a href="{{ url_for('ui.how') }}" class="home-card">
           <div class="card-icon-wrap"><span class="material-icons-round">help_outline</span></div>
-          <h4 data-en="How It Works" data-te="ఇది ఎలా పని చేస్తుంది">How It Works</h4>
-          <p data-en="Understand the rating system and how your product gets scored — in plain language." data-te="రేటింగ్ సిస్టమ్ మరియు మీ ఉత్పత్తి ఎలా స్కోర్ పొందుతుందో అర్థం చేసుకోండి.">Understand the rating system and how your product gets scored — in plain language.</p>
+          <h4 data-en="Understand the system" data-te="వ్యవస్థను అర్థం చేసుకోండి">Understand the system</h4>
+          <p data-en="How your work gets scored." data-te="మీ పని ఎలా స్కోర్ చేయబడుతుంది.">How your work gets scored.</p>
         </a>
       </div>
     </div>
 
     <div class="recent-section">
-      <div style="background:linear-gradient(135deg,#0D2E22,#1B5247);border-radius:var(--radius-xl);padding:48px 40px;text-align:center;color:white;">
-        <h3 style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:12px;">Ready to test your product idea?</h3>
-        <p style="font-size:15px;opacity:0.8;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto;">Get a clear decision in under 30 seconds. No guesswork, just data.</p>
-        <a href="{{ url_for('ui.analyze') }}" class="btn-hero" style="display:inline-flex;">
-          <span class="material-icons-round">analytics</span>
-          <span data-en="Analyse Your Product" data-te="మీ ఉత్పత్తిని విశ్లేషించండి">Analyse Your Product</span>
+      <div style="background:linear-gradient(135deg,#0D2E22,#1B5247);border-radius:var(--radius-xl);padding:56px 40px;text-align:center;color:white;">
+        <h3 style="font-family:'DM Serif Display',serif;font-size:32px;margin-bottom:16px;letter-spacing:-0.5px;" data-en="Ready to test your product idea?" data-te="మీ ఉత్పత్తి ఆలోచనను పరీక్షించడానికి సిద్ధంగా ఉన్నారా?">Ready to test your product idea?</h3>
+        <p style="font-size:16px;opacity:0.75;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6;" data-en="Get a clear decision in under 30 seconds. No guesswork, just data." data-te="30 సెకన్లలోపు స్పష్టమైన నిర్ణయం పొందండి. ఊహలు లేవు, కేవలం డేటా.">Get a clear decision in under 30 seconds. No guesswork, just data.</p>
+        <a href="{{ url_for('ui.analyze') }}" class="btn-hero" style="display:inline-flex;background:var(--cream);color:var(--indigo-dark);">
+          <span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>
         </a>
       </div>
     </div>
@@ -1487,21 +1498,18 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
               </div>
               <div class="az-form-body">
 
+                <!-- Opening line -->
+                <p style="font-style:italic;font-size:16px;color:var(--ink-lt);text-align:center;margin-bottom:40px;" data-en="You're about to save yourself 3 weeks." data-te="మీరు 3 వారాలు ఆదా చేసుకోబోతున్నారు.">You're about to save yourself 3 weeks.</p>
+
                 <div class="mb-3">
-                  <label class="az-label" data-en="PRODUCT DESCRIPTION" data-te="ఉత్పత్తి వివరణ">PRODUCT DESCRIPTION</label>
+                  <label class="az-label" data-en="WHAT ARE YOU MAKING?" data-te="మీరు ఏమి తయారు చేస్తున్నారు?">WHAT ARE YOU MAKING?</label>
                   <textarea class="az-field" id="productDesc" placeholder="E.g. A red Kanjivaram silk saree with gold zari border, meant for wedding wear…" maxlength="500" oninput="updateCharCount(this)" required></textarea>
                   <div class="char-counter" id="descCharCounter">0 / 500 characters</div>
                 </div>
 
                 <div class="row g-3 mb-3">
                   <div class="col-sm-6">
-                    <label class="az-label">
-                      CATEGORY
-                      <span class="tooltip-trigger">
-                        <span class="material-icons-round" style="font-size:12px;margin-left:4px;">help_outline</span>
-                        <span class="tooltip-content">Select the product category that best matches your item</span>
-                      </span>
-                    </label>
+                    <label class="az-label" data-en="WHAT CATEGORY IS THIS?" data-te="ఇది ఏ వర్గం?">WHAT CATEGORY IS THIS?</label>
                     <div class="cat-wrap" id="categorySearchWrap" style="position:relative;">
                       <input type="text" class="az-field" id="categorySearchInput"
                         placeholder="Search or select category…"
@@ -1519,12 +1527,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     </div>
                   </div>
                   <div class="col-sm-6">
-                    <label class="az-label" data-en="TARGET PRICE (₹)" data-te="లక్ష్య ధర (₹)">TARGET PRICE (₹)</label>
-                    <input type="text" class="az-field" id="productPrice" placeholder="e.g. 1499" inputmode="numeric" oninput="sanitizePriceInput(this)" required/>
+                    <label class="az-label" data-en="WHAT DO YOU NEED TO CHARGE?" data-te="మీరు ఎంత వసూలు చేయాలి?">WHAT DO YOU NEED TO CHARGE?</label>
+                    <input type="text" class="az-field" id="productPrice" placeholder="e.g. ₹1499" inputmode="numeric" oninput="sanitizePriceInput(this)" required/>
                     <div id="priceError" style="font-size:10.5px;color:var(--red);margin-top:3px;display:none;">Please enter a valid price</div>
                   </div>
                   <div class="col-sm-6">
-                    <label class="az-label" data-en="OCCASION" data-te="సందర్భం">OCCASION</label>
+                    <label class="az-label" data-en="WHO IS THIS FOR?" data-te="ఇది ఎవరికి?">WHO IS THIS FOR?</label>
                     <select class="az-field" id="productOccasion" required>
                       <option value="">Select occasion…</option>
                       <option value="Wedding">Wedding</option>
@@ -1535,7 +1543,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     </select>
                   </div>
                   <div class="col-sm-6">
-                   <label class="az-label" data-en="PRIMARY MATERIAL" data-te="ప్రాథమిక వస్తువు">PRIMARY MATERIAL</label>
+                   <label class="az-label" data-en="WHAT IS IT MADE FROM?" data-te="ఇది దేనితో తయారు చేయబడింది?">WHAT IS IT MADE FROM?</label>
                    <input type="text" class="az-field" id="productMaterial" 
                      placeholder="e.g. Pure Silk, Cotton, Georgette…"
                     autocomplete="off"
@@ -1544,6 +1552,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
 
                 <div class="mb-3">
+                  <label class="az-label" data-en="DROP A PHOTO OF YOUR WORK" data-te="మీ పని ఫోటో వదలండి">DROP A PHOTO OF YOUR WORK</label>
                   <div class="az-upload" id="uploadZone">
                     <span class="material-icons-round">add_photo_alternate</span>
                     <div>
@@ -1572,15 +1581,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </div>
 
                 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                  <button class="az-run-btn ripple" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
-                    <span class="material-icons-round">analytics</span>
-                    <span data-en="Run Analysis" data-te="విశ్లేషణ అమలు చేయండి">Run Analysis</span>
+                  <button class="az-run-btn" id="analyzeBtn" onclick="runAnalysis()" style="flex:1;min-width:160px;">
+                    <span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>
                   </button>
-                  <button class="az-run-btn ripple" id="mockupBtn" onclick="runMockup()" style="flex:1;min-width:160px;background:var(--indigo);">
+                  <button class="az-run-btn" id="mockupBtn" onclick="runMockup()" style="flex:1;min-width:160px;background:var(--indigo);">
                     <span class="material-icons-round">auto_fix_high</span>
                     <span>Generate Mockup</span>
                   </button>
-                  <button class="btn-clear ripple" onclick="clearForm()" title="Clear all fields">
+                  <button class="btn-clear" onclick="clearForm()" title="Clear all fields">
                     <span class="material-icons-round" style="font-size:16px;">refresh</span>
                     <span>Clear</span>
                   </button>
@@ -2290,6 +2298,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             <a href="{{ url_for('ui.how') }}" class="footer-link">How It Works</a>
             <a href="{{ url_for('ui.account') }}" class="footer-link">Account</a>
           </div>
+          <div class="footer-contact">
+            <div class="footer-contact-label">Contact</div>
+            <a href="mailto:sandeepreddy.ade@external.stellantis.com" class="footer-link">sandeepreddy.ade@external.stellantis.com</a>
+            <a href="mailto:mourya.gudipudi@external.stellantis.com" class="footer-link">mourya.gudipudi@external.stellantis.com</a>
+            <a href="mailto:vijaykumar.jatam@stellantis.com" class="footer-link">vijaykumar.jatam@stellantis.com</a>
+          </div>
           <div class="footer-copy">© 2025 Rivet</div>
         </div>
       </footer>
@@ -2526,21 +2540,21 @@ var T = {
   decision:        { en: 'DECISION',                    te: 'నిర్ణయం' },
   outOf100:        { en: 'out of 100',                  te: '100కి' },
   finalScore:      { en: 'Total Score',                 te: 'మొత్తం స్కోర్' },
-  launch_verdict:  { en: 'PROCEED — Ready for Production', te: 'కొనసాగించండి — ఉత్పత్తికి సిద్ధం' },
+  launch_verdict:  { en: 'This product has a place in the market. Make it.', te: 'ఈ ఉత్పత్తికి మార్కెట్‌లో స్థానం ఉంది. దీన్ని తయారు చేయండి.' },
   launch_sub:      { en: 'Strong market fit. This product is ready to make.', te: 'బలమైన మార్కెట్ అనుకూలత.' },
   launch_recs:     { en: 'Product Strengths',           te: 'ఉత్పత్తి బలాలు' },
   launch_sub2:     { en: "What's working well for your product", te: 'మీ ఉత్పత్తి కోసం బాగా పనిచేస్తున్నది' },
-  modify_verdict:  { en: 'MODIFY — Adjust Before Producing', te: 'మార్చుకోండి — తయారు చేయడానికి ముందు' },
+  modify_verdict:  { en: "You're close. Here's what to change.", te: 'మీరు దగ్గరగా ఉన్నారు. ఏమి మార్చాలో ఇక్కడ ఉంది.' },
   modify_sub:      { en: 'This product has potential — with a few changes it can succeed.', te: 'ఈ ఉత్పత్తికి సామర్థ్యం ఉంది.' },
   modify_recs:     { en: 'What to Improve',             te: 'మెరుగుపర్చవలసినవి' },
   modify_sub2:     { en: 'Changes that could significantly improve your outcome', te: 'ఫలితాన్ని మెరుగుపరచగల మార్పులు' },
-  stop_verdict:    { en: 'RECONSIDER — Production Not Advised', te: 'పునఃపరిశీలించండి — ఉత్పత్తి సిఫార్సు చేయబడలేదు' },
+  stop_verdict:    { en: "This one isn't ready for this market. Here's what the data says.", te: 'ఇది ఈ మార్కెట్‌కు సిద్ధంగా లేదు. డేటా ఏమి చెబుతుందో ఇక్కడ ఉంది.' },
   stop_sub:        { en: 'Too much risk right now. Producing this could lead to financial loss.', te: 'ఇప్పుడు చాలా ప్రమాదం.' },
   stop_recs:       { en: 'Key Risk Factors',            te: 'ముఖ్య ప్రమాద కారకాలు' },
   stop_sub2:       { en: 'The main reasons why this product is high-risk', te: 'ఈ ఉత్పత్తి అధిక-ప్రమాదకరమైన ప్రధాన కారణాలు' },
   noInput:         { en: 'Please describe your product or upload an image before running analysis.', te: 'విశ్లేషణ అమలు చేయడానికి ముందు మీ ఉత్పత్తిని వివరించండి.' },
   analysing:       { en: 'Analysing…',                  te: 'విశ్లేషిస్తున్నారు…' },
-  runAnalysis:     { en: 'Run Analysis',                te: 'విశ్లేషణ అమలు చేయండి' },
+  runAnalysis:     { en: 'Get my answer',                te: 'నా సమాధానం పొందండి' },
   checkingMarket:  { en: 'Checking against market data…', te: 'మార్కెట్ డేటాతో తనిఖీ చేస్తున్నారు…' },
 };
 function t(key) { return T[key] ? (T[key][currentLang] || T[key].en) : key; }
@@ -2851,7 +2865,7 @@ function runAnalysis() {
     })
     .finally(function() {
       btn.disabled = false;
-      btn.innerHTML = '<span class="material-icons-round">analytics</span> ' + t('runAnalysis');
+      btn.innerHTML = '<span data-en="Get my answer" data-te="నా సమాధానం పొందండి">Get my answer</span>';
       document.getElementById('progressArea').classList.remove('show');
       
       // Hide sidebar progress bar after a delay
