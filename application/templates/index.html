@@ -3126,10 +3126,7 @@ function buildCategoryDropdown() {
   var dd = document.getElementById('categoryDropdown');
   dd.innerHTML = '';
   CATEGORY_GROUPS.forEach(function(group) {
-    var header = document.createElement('div');
-    header.className = 'cat-group-head';
-    header.textContent = group.group;
-    dd.appendChild(header);
+    // No group header needed since we only have one item per group
     group.items.forEach(function(item) {
       var opt = document.createElement('div');
       opt.className = 'cat-option';
