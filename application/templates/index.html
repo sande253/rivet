@@ -711,10 +711,11 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 
 .pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
 
-/* Number counter animation */
+/* Number counter animation with scale */
 @keyframes countUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+  60% { transform: translateY(-5px) scale(1.05); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .count-up { animation: countUp 0.6s ease-out; }
@@ -827,11 +828,45 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .results-nav-close:hover { background: var(--red); color: white; }
 .results-nav-close .material-icons-round { font-size: 14px; }
 
-/* Comparison badge */
-.comparison-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 8px; }
-.comparison-badge.better { background: var(--green-bg); color: var(--green); }
-.comparison-badge.worse { background: var(--red-bg); color: var(--red); }
-.comparison-badge .material-icons-round { font-size: 14px; }
+/* Action strip below decision hero */
+.action-strip {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  width: 100%;
+}
+.action-strip-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--ink-mid);
+  text-decoration: none;
+}
+.action-strip-btn:hover {
+  background: var(--indigo);
+  color: white;
+  border-color: var(--indigo);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+.action-strip-btn .material-icons-round {
+  font-size: 16px;
+}
+
+/* Comparison badge - hidden by default */
+.comparison-badge { display: none; }
 
 /* ── Empty state ─────────────────────── */
 .results-empty-new {
@@ -850,8 +885,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 /* Two-column results layout */
 .results-container {
   display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 24px;
+  grid-template-columns: 340px 1fr;
+  gap: 28px;
   align-items: start;
 }
 
@@ -860,7 +895,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   top: calc(var(--nav-h) + 20px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .results-right {
@@ -922,36 +957,42 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   display: block;
 }
 
-/* Decision hero */
+/* Decision hero - cleaner centered layout */
 .rating-hero {
   background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 20px 22px;
-  display: flex; align-items: center; gap: 20px;
-  box-shadow: var(--shadow-md); border-left: 5px solid transparent;
+  border-radius: var(--radius-lg); padding: 24px;
+  display: flex; flex-direction: column; align-items: center;
+  box-shadow: var(--shadow-md); border-top: 4px solid transparent;
   margin-bottom: 14px; overflow: hidden; position: relative;
+  text-align: center;
 }
-.rating-hero::before { content:''; position:absolute; top:0; right:0; width:160px; height:100%; background:linear-gradient(90deg,transparent,rgba(228,239,235,.3)); pointer-events:none; }
-.rating-hero.launch { border-left-color: var(--green); }
-.rating-hero.modify { border-left-color: var(--saffron); }
-.rating-hero.stop   { border-left-color: var(--red); }
-.rating-big { text-align: center; flex-shrink: 0; min-width: 92px; }
-.rating-num { font-family: 'DM Serif Display',serif; font-size: 52px; line-height: 1; }
+.rating-hero.launch { border-top-color: var(--green); background: linear-gradient(180deg, rgba(27,82,71,0.03), var(--white)); }
+.rating-hero.modify { border-top-color: var(--saffron); background: linear-gradient(180deg, rgba(158,122,26,0.03), var(--white)); }
+.rating-hero.stop   { border-top-color: var(--red); background: linear-gradient(180deg, rgba(139,32,32,0.03), var(--white)); }
+.rating-big { text-align: center; margin-bottom: 16px; }
+.rating-num { 
+  font-family: 'DM Serif Display',serif; 
+  font-size: 64px; 
+  line-height: 1; 
+  font-weight: 400;
+  animation: countUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .rating-hero.launch .rating-num { color: var(--green); }
 .rating-hero.modify .rating-num { color: var(--saffron); }
 .rating-hero.stop   .rating-num { color: var(--red); }
-.rating-denom { font-size: 11.5px; color: var(--ink-lt); margin-top: 2px; font-weight: 500; }
-.rating-bar-wrap { margin-top: 7px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.rating-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.rating-denom { font-size: 12px; color: var(--ink-lt); margin-top: 6px; font-weight: 500; }
+.rating-bar-wrap { margin-top: 10px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; width: 100%; max-width: 200px; margin-left: auto; margin-right: auto; }
+.rating-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
 .launch .rating-bar-fill { background: linear-gradient(90deg,#1B5247,#2D8B6B); }
 .modify .rating-bar-fill { background: linear-gradient(90deg,#9E7A1A,#C4962A); }
 .stop   .rating-bar-fill { background: linear-gradient(90deg,#8B2020,#C44040); }
-.rating-text { flex: 1; min-width: 0; }
-.rating-decision-label { font-size: 9.5px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 4px; }
+.rating-text { width: 100%; }
+.rating-decision-label { font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; }
 .launch .rating-decision-label { color: var(--green); }
 .modify .rating-decision-label { color: var(--saffron); }
 .stop   .rating-decision-label { color: var(--red); }
-.rating-verdict { font-family: 'DM Serif Display',serif; font-size: 21px; color: var(--ink); margin-bottom: 5px; }
-.rating-sub { font-size: 12.5px; color: var(--ink-mid); line-height: 1.55; }
+.rating-verdict { font-family: 'DM Serif Display',serif; font-size: 22px; color: var(--ink); margin-bottom: 8px; font-weight: 400; }
+.rating-sub { font-size: 12px; color: var(--ink-mid); line-height: 1.6; max-width: 280px; margin: 0 auto; }
 
 /* Result cards */
 .res-card {
@@ -1017,11 +1058,11 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* Legend rows */
+/* Legend rows with context labels */
 .score-legend { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 7px; }
 .sl-row {
   display: grid; grid-template-columns: 9px 1fr 48px;
-  grid-template-rows: auto 4px;
+  grid-template-rows: auto auto 4px;
   column-gap: 8px; row-gap: 4px; align-items: center;
   padding: 8px 10px; border-radius: 7px;
   background: var(--cream); border: 1px solid var(--border);
@@ -1031,6 +1072,16 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .sl-dot  { width: 9px; height: 9px; border-radius: 50%; }
 .sl-name { font-size: 11.5px; font-weight: 600; color: var(--ink-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sl-val  { font-size: 11.5px; font-weight: 700; color: var(--ink); text-align: right; }
+.sl-context { 
+  grid-column: 2 / 4; 
+  font-size: 9px; 
+  color: var(--ink-lt); 
+  font-weight: 500;
+  margin-top: -2px;
+}
+.sl-context.good { color: var(--green); }
+.sl-context.average { color: var(--saffron); }
+.sl-context.poor { color: var(--red); }
 .sl-bar-wrap { grid-column: 1 / -1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .sl-bar-fill { height: 100%; border-radius: 2px; transition: width .85s cubic-bezier(.4,0,.2,1); }
 
@@ -1836,23 +1887,27 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   <!-- Decision hero -->
                   <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
                 <div class="rating-big">
-                  <div class="rating-num" id="ratingNum">—</div>
+                  <div class="rating-num count-up" id="ratingNum">—</div>
                   <div class="rating-denom" id="ratingDenom">out of 100</div>
-                  <div class="rating-bar-wrap" style="width:84px;"><div class="rating-bar-fill" id="ratingBarFill" style="width:0%"></div></div>
+                  <div class="rating-bar-wrap"><div class="rating-bar-fill" id="ratingBarFill" style="width:0%"></div></div>
                 </div>
-                <div class="rating-text" style="flex:1;">
+                <div class="rating-text">
                   <div class="rating-decision-label" id="ratingLabel">DECISION</div>
                   <div class="rating-verdict" id="ratingVerdict">—</div>
                   <div class="rating-sub" id="ratingSub"></div>
-                  <div class="comparison-badge" id="comparisonBadge" style="display:none;">
-                    <span class="material-icons-round">trending_up</span>
-                    <span id="comparisonText"></span>
+                  
+                  <!-- Action strip -->
+                  <div class="action-strip" id="actionStrip" style="display:none;">
+                    <a href="#content-insights" class="action-strip-btn" id="actionBtn1" onclick="switchResultsTab('insights')">
+                      <span class="material-icons-round">insights</span>
+                      <span>View Market</span>
+                    </a>
+                    <a href="#content-improvements" class="action-strip-btn" id="actionBtn2" onclick="switchResultsTab('improvements')"></a>
+                      <span class="material-icons-round">auto_fix_high</span>
+                      <span>See Changes</span>
+                    </a>
                   </div>
                 </div>
-                <button class="btn-export ripple" onclick="exportResults()" id="exportBtn" style="display:none;">
-                  <span class="material-icons-round" style="font-size:18px;">download</span>
-                  <span>Export PDF</span>
-                </button>
               </div>
               
               <!-- Score Breakdown Pie (in left sticky panel) -->
@@ -1880,26 +1935,31 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                         <span class="sl-dot" style="background:#1B5247;"></span>
                         <span class="sl-name" style="font-size:10px;">Market Demand</span>
                         <span class="sl-val" id="val-demand">—</span>
+                        <span class="sl-context" id="ctx-demand"></span>
                       </div>
                       <div class="sl-row" data-key="unique">
                         <span class="sl-dot" style="background:#2D8B6B;"></span>
                         <span class="sl-name" style="font-size:10px;">Design Uniqueness</span>
                         <span class="sl-val" id="val-unique">—</span>
+                        <span class="sl-context" id="ctx-unique"></span>
                       </div>
                       <div class="sl-row" data-key="price">
                         <span class="sl-dot" style="background:#9E7A1A;"></span>
                         <span class="sl-name" style="font-size:10px;">Price Fit</span>
                         <span class="sl-val" id="val-price">—</span>
+                        <span class="sl-context" id="ctx-price"></span>
                       </div>
                       <div class="sl-row" data-key="material">
                         <span class="sl-dot" style="background:#C4962A;"></span>
                         <span class="sl-name" style="font-size:10px;">Material Appeal</span>
                         <span class="sl-val" id="val-material">—</span>
+                        <span class="sl-context" id="ctx-material"></span>
                       </div>
                       <div class="sl-row" data-key="trend">
                         <span class="sl-dot" style="background:#5B3B8C;"></span>
                         <span class="sl-name" style="font-size:10px;">Trend Alignment</span>
                         <span class="sl-val" id="val-trend">—</span>
+                        <span class="sl-context" id="ctx-trend"></span>
                       </div>
                     </div>
                   </div>
@@ -3111,8 +3171,10 @@ function renderResults(data) {
   document.getElementById('ratingLabel').textContent  = t('decision');
   document.getElementById('ratingDenom').textContent  = t('outOf100');
   document.getElementById('avgDisplay').textContent   = total + ' / 100';
-  document.getElementById('ratingNum').textContent    = total;
-  document.getElementById('pieTotalNum').textContent  = total;
+  
+  // Animate score counting up from 0
+  animateScoreCounter('ratingNum', total, 1200);
+  animateScoreCounter('pieTotalNum', total, 1200);
   
   // Show export button
   document.getElementById('exportBtn').style.display = 'inline-flex';
@@ -3138,6 +3200,36 @@ function renderResults(data) {
     setDim('price',    p,  20);
     setDim('material', m,  20);
     setDim('trend',    tr, 20);
+    
+    // Add context labels to score dimensions
+    addContextLabel('demand', d, 20);
+    addContextLabel('unique', u, 20);
+    addContextLabel('price', p, 20);
+    addContextLabel('material', m, 20);
+    addContextLabel('trend', tr, 20);
+    
+    // Show action strip with appropriate buttons
+    var actionStrip = document.getElementById('actionStrip');
+    var actionBtn1 = document.getElementById('actionBtn1');
+    var actionBtn2 = document.getElementById('actionBtn2');
+    
+    if (cls === 'PROCEED') {
+      actionBtn1.innerHTML = '<span class="material-icons-round">insights</span><span>View Market</span>';
+      actionBtn1.onclick = function() { switchResultsTab('insights'); };
+      actionBtn2.innerHTML = '<span class="material-icons-round">bar_chart</span><span>Similar Products</span>';
+      actionBtn2.onclick = function() { window.location.href = '/market'; };
+    } else if (cls === 'MODIFY') {
+      actionBtn1.innerHTML = '<span class="material-icons-round">auto_fix_high</span><span>See Changes</span>';
+      actionBtn1.onclick = function() { switchResultsTab('improvements'); };
+      actionBtn2.innerHTML = '<span class="material-icons-round">insights</span><span>Market Data</span>';
+      actionBtn2.onclick = function() { switchResultsTab('insights'); };
+    } else {
+      actionBtn1.innerHTML = '<span class="material-icons-round">explore</span><span>Explore Categories</span>';
+      actionBtn1.onclick = function() { window.location.href = '/market'; };
+      actionBtn2.innerHTML = '<span class="material-icons-round">insights</span><span>Why Stop?</span>';
+      actionBtn2.onclick = function() { switchResultsTab('insights'); };
+    }
+    actionStrip.style.display = 'flex';
     
     // Render demand prediction if available
     if (data.demand_prediction) {
@@ -3374,6 +3466,57 @@ function setDim(key, val, maxVal) {
   var lbl = document.getElementById('val-' + key);
   if (bar) setTimeout(function() { bar.style.width = (val / maxVal * 100) + '%'; }, 80);
   if (lbl) lbl.textContent = val + ' / ' + maxVal;
+}
+
+function addContextLabel(key, val, maxVal) {
+  var ctx = document.getElementById('ctx-' + key);
+  if (!ctx) return;
+  
+  var percentage = (val / maxVal) * 100;
+  var label = '';
+  var className = '';
+  
+  if (percentage >= 75) {
+    label = 'Above average';
+    className = 'good';
+  } else if (percentage >= 50) {
+    label = 'Average';
+    className = 'average';
+  } else {
+    label = 'Room to improve';
+    className = 'poor';
+  }
+  
+  ctx.textContent = label;
+  ctx.className = 'sl-context ' + className;
+}
+
+function animateScoreCounter(elementId, targetValue, duration) {
+  var element = document.getElementById(elementId);
+  if (!element) return;
+  
+  var startTime = null;
+  var startValue = 0;
+  
+  function animate(currentTime) {
+    if (!startTime) startTime = currentTime;
+    var elapsed = currentTime - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    
+    // Easing function for smooth animation
+    var easeOutCubic = 1 - Math.pow(1 - progress, 3);
+    var currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutCubic);
+    
+    element.textContent = currentValue;
+    
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      element.textContent = targetValue;
+    }
+  }
+  
+  requestAnimationFrame(animate);
 }
 
 function renderDemandPrediction(prediction) {
