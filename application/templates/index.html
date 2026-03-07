@@ -2473,7 +2473,14 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         
         // Update table count
         var tableCount = document.getElementById('tableCount');
-        if (tableCount) tableCount.textContent = data.length + ' products';
+        if (tableCount) {
+          if (data.length === 0) {
+            tableCount.style.display = 'none';
+          } else {
+            tableCount.style.display = 'inline';
+            tableCount.textContent = data.length + ' products';
+          }
+        }
         
         // Generate page numbers
         var pageNumbers = document.getElementById('pageNumbers');
@@ -2509,8 +2516,16 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           var emptyRow = document.createElement('tr');
           emptyRow.innerHTML = '<td colspan="6" style="text-align:center;padding:40px;color:var(--ink-lt);font-size:14px;">No products match your filters.</td>';
           tbody.appendChild(emptyRow);
-          document.getElementById('tableCount').textContent = '0 products';
+          var tableCount = document.getElementById('tableCount');
+          if (tableCount) tableCount.style.display = 'none';
           return;
+        }
+        
+        // Show count when there are products
+        var tableCount = document.getElementById('tableCount');
+        if (tableCount) {
+          tableCount.style.display = 'inline';
+          tableCount.textContent = data.length + ' products';
         }
         
         // Pagination logic
@@ -2537,7 +2552,15 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         });
         
         // Update count
-        document.getElementById('tableCount').textContent = data.length + ' products';
+        var tableCount = document.getElementById('tableCount');
+        if (tableCount) {
+          if (data.length === 0) {
+            tableCount.style.display = 'none';
+          } else {
+            tableCount.style.display = 'inline';
+            tableCount.textContent = data.length + ' products';
+          }
+        }
         updatePaginationControls();
       }
       
