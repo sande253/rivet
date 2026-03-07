@@ -1516,6 +1516,16 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   <li data-en="Upload a photo or sketch" data-te="ఫోటో అప్లోడ్ చేయండి">Upload a photo or sketch</li>
                   <li data-en="Click Run Analysis for your decision" data-te="విశ్లేషణ అమలు చేయండి">Click Run Analysis for your decision</li>
                 </ol>
+                <!-- Analysis Progress Bar -->
+                <div id="analysisProgressWrap" style="display:none;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                    <span style="font-size:11px;font-weight:600;color:var(--indigo);" id="progressLabel">Analyzing...</span>
+                    <span style="font-size:10px;color:var(--ink-lt);" id="progressPercent">0%</span>
+                  </div>
+                  <div style="width:100%;height:6px;background:var(--cream);border-radius:3px;overflow:hidden;">
+                    <div id="progressBar" style="width:0%;height:100%;background:linear-gradient(90deg,var(--indigo),var(--indigo-mid));transition:width 0.3s ease;border-radius:3px;"></div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2061,6 +2071,28 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           </table>
         </div>
         <div class="loading-spinner" id="marketSpinner"><div class="spinner-border spinner-border-sm" role="status" style="color:var(--indigo);"></div>&nbsp;<span>Loading…</span></div>
+        
+        <!-- Pagination Controls -->
+        <div id="paginationControls" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-top:1px solid var(--border);background:var(--cream);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:13px;color:var(--ink-mid);">Rows per page:</span>
+            <select id="rowsPerPageSelect" onchange="changeItemsPerPage(this.value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--ink);background:var(--white);font-family:'DM Sans',sans-serif;cursor:pointer;">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="goToPage(marketPage - 1)" id="btnPrevPage" style="padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:var(--ink);font-size:13px;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;">
+              <span class="material-icons-round" style="font-size:16px;vertical-align:middle;">chevron_left</span>
+            </button>
+            <span id="pageInfo" style="font-size:13px;color:var(--ink-mid);min-width:100px;text-align:center;">Page 1 of 1</span>
+            <button onclick="goToPage(marketPage + 1)" id="btnNextPage" style="padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:var(--ink);font-size:13px;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;">
+              <span class="material-icons-round" style="font-size:16px;vertical-align:middle;">chevron_right</span>
+            </button>
+          </div>
+        </div>
             </div>
           </div>
         </div>
@@ -2291,11 +2323,20 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
           var emptyRow = document.createElement('tr');
           emptyRow.innerHTML = '<td colspan="6" style="text-align:center;padding:40px;color:var(--ink-lt);font-size:14px;">No products match your filters.</td>';
           tbody.appendChild(emptyRow);
+          document.getElementById('tableCount').textContent = '0 products';
           return;
         }
         
-        // Show all products without pagination
-        data.forEach(function(item) {
+        // Pagination logic
+        var totalPages = Math.ceil(data.length / mPageSize);
+        if (marketPage > totalPages) marketPage = totalPages;
+        if (marketPage < 1) marketPage = 1;
+        
+        var startIdx = (marketPage - 1) * mPageSize;
+        var endIdx = Math.min(startIdx + mPageSize, data.length);
+        var pageData = data.slice(startIdx, endIdx);
+        
+        pageData.forEach(function(item) {
           var discount = item.mrp > item.price ? Math.round((1 - item.price / item.mrp) * 100) : 0;
           var tr = document.createElement('tr');
           tr.innerHTML =
@@ -2311,6 +2352,34 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         
         // Update count
         document.getElementById('tableCount').textContent = data.length + ' products';
+        updatePaginationControls();
+      }
+      
+      function updatePaginationControls() {
+        var data = getFilteredMarket();
+        var totalPages = Math.ceil(data.length / mPageSize);
+        if (totalPages < 1) totalPages = 1;
+        
+        var pageInfo = document.getElementById('pageInfo');
+        var btnPrev = document.getElementById('btnPrevPage');
+        var btnNext = document.getElementById('btnNextPage');
+        
+        if (pageInfo) pageInfo.textContent = 'Page ' + marketPage + ' of ' + totalPages;
+        if (btnPrev) btnPrev.disabled = marketPage <= 1;
+        if (btnNext) btnNext.disabled = marketPage >= totalPages;
+        
+        if (btnPrev) btnPrev.style.opacity = marketPage <= 1 ? '0.4' : '1';
+        if (btnNext) btnNext.style.opacity = marketPage >= totalPages ? '0.4' : '1';
+        if (btnPrev) btnPrev.style.cursor = marketPage <= 1 ? 'not-allowed' : 'pointer';
+        if (btnNext) btnNext.style.cursor = marketPage >= totalPages ? 'not-allowed' : 'pointer';
+      }
+      
+      function goToPage(pageNum) {
+        var data = getFilteredMarket();
+        var totalPages = Math.ceil(data.length / mPageSize);
+        if (pageNum < 1 || pageNum > totalPages) return;
+        marketPage = pageNum;
+        renderMarketPage();
       }
 
       function filterMarket(el, filter) {
@@ -2319,35 +2388,21 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         activeFilter = filter;
         marketPage = 1;
         renderMarketPage();
-        updatePaginationControls();
       }
 
       function changeItemsPerPage(value) {
         var numValue = parseInt(value);
-        
-        if (isNaN(numValue) || numValue < 1) {
-          alert('Please enter a valid number (1-1000)');
-          document.getElementById('customRowsInput').value = mPageSize;
-          return;
-        }
-        
-        if (numValue > 1000) {
-          alert('Maximum 1000 rows allowed');
-          numValue = 1000;
-          document.getElementById('customRowsInput').value = 1000;
-        }
-        
+        if (isNaN(numValue) || numValue < 1) numValue = 25;
         mPageSize = numValue;
         marketPage = 1;
         renderMarketPage();
-        updatePaginationControls();
       }
 
       function initMarket() {
         marketLoaded = true;
         marketPage = 1;
+        mPageSize = 25;
         renderMarketPage();
-        updatePaginationControls();
       }
 var lastResultData = null;
 var selectedFile = null;
@@ -2636,6 +2691,15 @@ function runAnalysis() {
   document.getElementById('resultsEmpty').style.display = 'none';
   document.getElementById('resultsBlock').classList.remove('show');
   
+  // Show sidebar progress bar
+  var progressWrap = document.getElementById('analysisProgressWrap');
+  var progressBar = document.getElementById('progressBar');
+  var progressLabel = document.getElementById('progressLabel');
+  var progressPercent = document.getElementById('progressPercent');
+  if (progressWrap) progressWrap.style.display = 'block';
+  if (progressBar) progressBar.style.width = '0%';
+  if (progressPercent) progressPercent.textContent = '0%';
+  
   var fd = new FormData();
   if (selectedFile) fd.append('sketch', selectedFile);
   fd.append('description', desc);
@@ -2644,13 +2708,27 @@ function runAnalysis() {
   fd.append('occasion', occasion);
   fd.append('material', material);
   
-  setTimeout(function() { updateProgressStep(2); document.getElementById('progressLabel').textContent = 'Analyzing product...'; }, 500);
-  setTimeout(function() { updateProgressStep(3); document.getElementById('progressLabel').textContent = 'Calculating scores...'; }, 1500);
+  // Animate progress bar
+  setTimeout(function() { 
+    updateProgressStep(2); 
+    document.getElementById('progressLabel').textContent = 'Analyzing product...';
+    if (progressBar) progressBar.style.width = '30%';
+    if (progressPercent) progressPercent.textContent = '30%';
+  }, 500);
+  setTimeout(function() { 
+    updateProgressStep(3); 
+    document.getElementById('progressLabel').textContent = 'Calculating scores...';
+    if (progressBar) progressBar.style.width = '60%';
+    if (progressPercent) progressPercent.textContent = '60%';
+  }, 1500);
   
   fetch('/analyze', { method: 'POST', body: fd })
     .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(r) {
       updateProgressStep(4);
+      if (progressBar) progressBar.style.width = '100%';
+      if (progressPercent) progressPercent.textContent = '100%';
+      
       if (!r.ok || r.data.error) throw new Error(r.data.error || 'Analysis failed. Please try again.');
       if (r.data.classification === 'INVALID' || r.data.invalid_image) {
         document.getElementById('invalidImgAlert').classList.add('show');
@@ -2672,6 +2750,11 @@ function runAnalysis() {
       btn.disabled = false;
       btn.innerHTML = '<span class="material-icons-round">analytics</span> ' + t('runAnalysis');
       document.getElementById('progressArea').classList.remove('show');
+      
+      // Hide sidebar progress bar after a delay
+      setTimeout(function() {
+        if (progressWrap) progressWrap.style.display = 'none';
+      }, 1000);
     });
 }
 
