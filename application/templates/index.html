@@ -2073,15 +2073,20 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
         <div class="loading-spinner" id="marketSpinner"><div class="spinner-border spinner-border-sm" role="status" style="color:var(--indigo);"></div>&nbsp;<span>Loading…</span></div>
         
         <!-- Pagination Controls -->
-        <div id="paginationControls" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-top:1px solid var(--border);background:var(--cream);">
-          <div style="display:flex;align-items:center;gap:12px;">
+        <div id="paginationControls" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-top:1px solid var(--border);background:var(--cream);flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <span style="font-size:13px;color:var(--ink-mid);">Rows per page:</span>
             <select id="rowsPerPageSelect" onchange="changeItemsPerPage(this.value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--ink);background:var(--white);font-family:'DM Sans',sans-serif;cursor:pointer;">
               <option value="10">10</option>
               <option value="25" selected>25</option>
               <option value="50">50</option>
               <option value="100">100</option>
+              <option value="custom">Custom</option>
             </select>
+            <div id="customRowsWrap" style="display:none;align-items:center;gap:6px;">
+              <input type="number" id="customRowsInput" min="1" max="1000" placeholder="Enter rows" style="width:90px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--ink);background:var(--white);font-family:'DM Sans',sans-serif;" onkeypress="if(event.key==='Enter') applyCustomRows()"/>
+              <button onclick="applyCustomRows()" style="padding:6px 12px;border:1px solid var(--indigo);border-radius:6px;background:var(--indigo);color:white;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;">Apply</button>
+            </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <button onclick="goToPage(marketPage - 1)" id="btnPrevPage" style="padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:var(--ink);font-size:13px;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;">
@@ -2391,11 +2396,43 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
       }
 
       function changeItemsPerPage(value) {
+        var customWrap = document.getElementById('customRowsWrap');
+        var customInput = document.getElementById('customRowsInput');
+        
+        if (value === 'custom') {
+          customWrap.style.display = 'flex';
+          customInput.focus();
+          return;
+        }
+        
+        customWrap.style.display = 'none';
         var numValue = parseInt(value);
         if (isNaN(numValue) || numValue < 1) numValue = 25;
         mPageSize = numValue;
         marketPage = 1;
         renderMarketPage();
+      }
+      
+      function applyCustomRows() {
+        var input = document.getElementById('customRowsInput');
+        var numValue = parseInt(input.value);
+        
+        if (isNaN(numValue) || numValue < 1) {
+          showToast('Please enter a valid number (1-1000)', 'error');
+          input.focus();
+          return;
+        }
+        
+        if (numValue > 1000) {
+          showToast('Maximum 1000 rows allowed', 'error');
+          numValue = 1000;
+          input.value = 1000;
+        }
+        
+        mPageSize = numValue;
+        marketPage = 1;
+        renderMarketPage();
+        showToast('Showing ' + numValue + ' rows per page', 'success');
       }
 
       function initMarket() {
