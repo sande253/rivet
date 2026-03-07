@@ -34,51 +34,57 @@ _BEDROCK_DEFAULT_MODEL: Final = "amazon.titan-image-generator-v2:0"
 _IMAGE_SIZE: Final = 512          # Titan v2 constraint: 256–2048, multiples of 64
 _PRESIGNED_URL_TTL: Final = 3600  # seconds
 
-# Per-category base prompts — tightly scoped to avoid garment confusion
 _CATEGORY_CONTEXT: Final[dict[str, str]] = {
     "saree": (
-        "Professional fashion photography of an Indian woman wearing an elegant silk saree: "
-        "6-yard draped fabric with precise pleats at waist, pallu gracefully draped over left shoulder, "
-        "fitted matching blouse with visible design, petticoat visible at hem, intricate border work, "
-        "traditional jewelry, confident pose"
+        "Professional Indian fashion photography, woman in elegant silk saree: "
+        "6-yard fabric with crisp waist pleats, pallu draped over left shoulder, "
+        "fitted embroidered blouse, petticoat visible at hem, intricate zari border, "
+        "gold jewelry, temple or studio backdrop, soft diffused lighting, "
+        "confident full-body pose, ultra-detailed fabric texture, 4K editorial quality"
     ),
     "lehenga": (
-        "Professional fashion photography of an Indian woman wearing a stunning lehenga choli: "
-        "heavily embroidered full-length circular flared skirt with volume, fitted cropped choli blouse "
-        "showing midriff, sheer embroidered dupatta elegantly draped, bridal or festive styling, "
-        "statement jewelry, regal pose"
+        "Professional Indian fashion photography, woman in bridal lehenga choli: "
+        "voluminous circular flared embroidered skirt, fitted cropped choli showing midriff, "
+        "sheer embroidered dupatta draped elegantly, heavy zardozi embellishments, "
+        "kundan jewelry, warm bokeh background, golden hour lighting, "
+        "regal upright pose, ultra-detailed embroidery, 4K editorial quality"
     ),
     "salwar_suit": (
-        "Professional fashion photography of an Indian woman wearing a salwar kameez suit: "
-        "fitted churidar pants with gathering at ankles, knee-length straight-cut kameez tunic, "
-        "matching dupatta draped over one shoulder, elegant embroidery, traditional yet modern look"
+        "Professional Indian fashion photography, woman in salwar kameez: "
+        "fitted churidar pants with ankle gathers, knee-length straight kameez tunic, "
+        "matching dupatta over one shoulder, delicate embroidery on neckline and cuffs, "
+        "minimal gold jewelry, clean studio background, soft natural lighting, "
+        "elegant standing pose, ultra-sharp fabric detail, 4K editorial quality"
     ),
     "kurti": (
-        "Professional fashion photography of an Indian woman wearing a kurti tunic: "
-        "straight knee-length tunic top with side slits, worn over churidar pants or leggings, "
-        "NO saree draping, NO pallu, simple standalone tunic garment, contemporary ethnic wear, "
-        "minimal jewelry, casual elegant pose"
+        "Professional Indian fashion photography, woman in kurti tunic: "
+        "straight knee-length printed tunic with side slits, worn over slim churidar leggings, "
+        "NO saree, NO dupatta, NO pallu, standalone ethnic top, "
+        "block print or embroidery detail, minimal jewelry, bright studio lighting, "
+        "casual confident pose, contemporary ethnic fashion, 4K editorial quality"
     ),
     "kurta": (
-        "Professional fashion photography of an Indian man wearing traditional kurta: "
-        "long straight-cut kurta tunic reaching below knees, embroidered collar and cuffs, "
-        "worn with traditional dhoti or churidar pants, formal ethnic menswear, "
-        "confident masculine pose, full body shot"
+        "Professional Indian fashion photography, man in traditional kurta: "
+        "long straight-cut kurta reaching mid-calf, embroidered collar and placket, "
+        "paired with white churidar pants, nehru or mandarin collar, "
+        "minimal accessories, clean neutral studio background, dramatic side lighting, "
+        "confident masculine full-body stance, sharp fabric detail, 4K editorial quality"
     ),
     "kurta_pyjama": (
-        "Professional fashion photography of an Indian man wearing kurta pyjama set: "
-        "long straight-cut kurta tunic paired with matching straight-leg pyjama pants, "
-        "coordinated ethnic outfit, traditional menswear, comfortable yet formal, "
-        "standing pose showing full outfit"
+        "Professional Indian fashion photography, man in kurta pyjama set: "
+        "long straight-cut kurta with matching straight-leg pyjama pants, "
+        "coordinated fabric and embroidery, tonal or contrast set, ethnic menswear, "
+        "mojari footwear visible, neutral warm studio background, soft diffused lighting, "
+        "relaxed formal standing pose, full outfit shown, 4K editorial quality"
     ),
     "sherwani": (
-        "Professional fashion photography of an Indian man wearing an ornate sherwani: "
-        "long embroidered coat-style jacket with mandarin collar reaching below knees, "
-        "intricate embroidery and embellishments, worn with fitted churidar pants, "
-        "groom or formal occasion wear, regal masculine pose, wedding attire"
+        "Professional Indian fashion photography, man in ornate sherwani: "
+        "long embroidered coat-jacket with mandarin collar reaching below knees, "
+        "heavy zardozi and sequin embellishments, fitted churidar pants, "
+        "groom or wedding occasion styling, turban or safa optional, "
+        "rich jewel-tone background, dramatic lighting, regal formal pose, 4K editorial quality"
     ),
 }
-
 _NEGATIVE_PROMPT_BASE: Final = (
     "sketch, cartoon, blurry, watermark, deformed, extra limbs, "
     "mannequin, plastic skin, dark background, cluttered background, "

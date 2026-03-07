@@ -2978,7 +2978,15 @@ function runAnalysis() {
   }, 1500);
   
   fetch('/analyze', { method: 'POST', body: fd })
-    .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+    .then(function(res) { 
+      // Check if we got HTML instead of JSON (redirect to login)
+      var contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        window.location.href = '/auth/login';
+        throw new Error('Session expired. Please log in again.');
+      }
+      return res.json().then(function(data) { return { ok: res.ok, data: data }; }); 
+    })
     .then(function(r) {
       updateProgressStep(4);
       document.getElementById('progressPercentage').textContent = '100%';
