@@ -3151,7 +3151,14 @@ function renderResults(data) {
   document.getElementById('resultsEmpty').style.display = 'none';
   document.getElementById('resultsBlock').classList.add('show');
   
-  // Don't show results navigation by default - only when user clicks Market Insights tab
+  // Hide results navigation by default - only show when user clicks Market Insights tab
+  var nav = document.getElementById('resultsNav');
+  if (nav) {
+    nav.classList.remove('show');
+  }
+  
+  // Ensure Overview tab is active by default
+  switchResultsTab('overview');
 }
 
 function renderGenaiTips(data) {
