@@ -1069,7 +1069,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .summary-sub { font-size: 11px; color: var(--ink-lt); margin-top: 3px; }
 .market-insights-row { 
   position: relative;
-  margin-bottom: 28px; 
+  margin-bottom: 28px;
+  padding-bottom: 400px; /* Add space for stacked cards */
 }
 
 /* Stacked card scroll effect - overlapping deck */
@@ -1078,21 +1079,37 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   border: 1px solid var(--border); 
   border-radius: var(--radius-lg); 
   overflow: hidden; 
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 24px rgba(27,82,71,0.12), 0 2px 8px rgba(27,82,71,0.08);
   position: sticky;
-  margin-bottom: -280px; /* Negative margin creates overlap */
-  transition: all .3s cubic-bezier(.4,0,.2,1); 
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  min-height: 300px;
 }
 
-/* Stack cards at same position with decreasing z-index */
-.insight-panel:nth-child(1) { top: 100px; z-index: 4; }
-.insight-panel:nth-child(2) { top: 100px; z-index: 3; }
-.insight-panel:nth-child(3) { top: 100px; z-index: 2; }
-.insight-panel:nth-child(4) { top: 100px; z-index: 1; margin-bottom: 20px; } /* Last card normal margin */
+/* Stack cards at same position with decreasing z-index and slight offset */
+.insight-panel:nth-child(1) { 
+  top: 80px; 
+  z-index: 4;
+  margin-bottom: 20px;
+}
+.insight-panel:nth-child(2) { 
+  top: 80px; 
+  z-index: 3;
+  margin-bottom: 20px;
+}
+.insight-panel:nth-child(3) { 
+  top: 80px; 
+  z-index: 2;
+  margin-bottom: 20px;
+}
+.insight-panel:nth-child(4) { 
+  top: 80px; 
+  z-index: 1;
+  margin-bottom: 0;
+}
 
 .insight-panel:hover { 
-  box-shadow: 0 15px 40px rgba(27,82,71,0.15), 0 5px 15px rgba(27,82,71,0.1); 
-  transform: scale(1.02);
+  box-shadow: 0 20px 50px rgba(27,82,71,0.18), 0 8px 20px rgba(27,82,71,0.12); 
+  transform: translateY(-4px) scale(1.01);
   border-color: rgba(27,82,71,0.3);
   z-index: 10 !important;
 }
@@ -1341,10 +1358,13 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   .home-hero-right { width: 100%; max-width: 480px; align-self: center; }
   /* analyze page responsive handled by Bootstrap grid */
   .scoring-grid-new { grid-template-columns: repeat(3, 1fr); }
+  .market-insights-row { 
+    padding-bottom: 0 !important; /* Remove extra padding on mobile */
+  }
   .market-insights-row .insight-panel { 
-    position: relative; 
+    position: relative !important; 
     top: 0 !important;
-    margin-bottom: 20px !important; /* Reset overlap on mobile */
+    margin-bottom: 20px !important;
   }
   .market-hero-banner { grid-template-columns: 1fr 1fr 1fr; }
 }
