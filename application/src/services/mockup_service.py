@@ -82,7 +82,7 @@ _CATEGORY_CONTEXT: Final[dict[str, str]] = {
         "long embroidered coat-jacket with mandarin collar reaching below knees, "
         "heavy zardozi and sequin embellishments, fitted churidar pants, "
         "groom or wedding occasion styling, turban or safa optional, "
-        "rich jewel-tone background, dramatic lighting, regal formal pose, 4K editorial quality"
+        "white background, professional lighting, regal formal pose, 4K editorial quality"
     ),
 }
 _NEGATIVE_PROMPT_BASE: Final = (
