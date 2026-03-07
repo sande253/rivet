@@ -929,6 +929,28 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   border-radius: var(--radius-lg); margin-bottom: 14px;
   overflow: hidden; box-shadow: var(--shadow);
 }
+
+/* Stacked scroll effect for Market Insights tab cards */
+#content-insights {
+  position: relative;
+  padding-bottom: 400px;
+}
+
+#content-insights .res-card {
+  position: sticky;
+  margin-bottom: 20px;
+}
+
+#content-insights .res-card:nth-child(1) { top: 80px; z-index: 4; }
+#content-insights .res-card:nth-child(2) { top: 80px; z-index: 3; }
+#content-insights .res-card:nth-child(3) { top: 80px; z-index: 2; }
+#content-insights .res-card:nth-child(4) { top: 80px; z-index: 1; }
+
+#content-insights .res-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 50px rgba(27,82,71,0.18), 0 8px 20px rgba(27,82,71,0.12);
+  z-index: 10 !important;
+}
 .res-card-head {
   padding: 13px 18px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 10px;
@@ -1356,6 +1378,16 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
   .home-cards-wrap { padding: 48px 20px 0; }
   .recent-section { padding: 0 20px 60px; }
   .market-wrap, .how-wrap, .account-wrap, .analyses-wrap { padding-left: 20px; padding-right: 20px; }
+  
+  /* Disable stacked cards on mobile */
+  #content-insights {
+    padding-bottom: 0 !important;
+  }
+  #content-insights .res-card {
+    position: relative !important;
+    top: 0 !important;
+    margin-bottom: 14px !important;
+  }
   
   /* Results navigation on mobile */
   .results-nav { right: 10px; max-width: 160px; padding: 10px 6px; }
