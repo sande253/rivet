@@ -847,6 +847,51 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
 .results-block { display: none; }
 .results-block.show { display: block; }
 
+/* Results tabs */
+.results-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--cream);
+  padding: 8px 20px 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+.results-tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.results-tab:hover {
+  color: var(--indigo);
+  background: rgba(27,82,71,0.05);
+}
+.results-tab.active {
+  color: var(--indigo);
+  border-bottom-color: var(--indigo);
+  background: var(--white);
+}
+.results-tab .material-icons-round {
+  font-size: 18px;
+}
+.results-tab-content {
+  display: none;
+}
+.results-tab-content.active {
+  display: block;
+}
+
 /* Decision hero */
 .rating-hero {
   background: var(--white); border: 1px solid var(--border);
@@ -1755,7 +1800,8 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             <!-- Results -->
             <div class="results-block" id="resultsBlock">
 
-              <!-- Decision hero -->
+              <!-- Decision hero (always visible) -->
+              <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
               <div class="rating-hero animate-on-scroll scale-in" id="ratingHero">
                 <div class="rating-big">
                   <div class="rating-num" id="ratingNum">—</div>
@@ -1777,7 +1823,29 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 </button>
               </div>
 
-              <!-- Demand Prediction Card -->
+              <!-- Results Tabs -->
+              <div class="results-tabs">
+                <button class="results-tab active" onclick="switchResultsTab('overview')" id="tab-overview">
+                  <span class="material-icons-round">dashboard</span>
+                  Overview
+                </button>
+                <button class="results-tab" onclick="switchResultsTab('improvements')" id="tab-improvements">
+                  <span class="material-icons-round">auto_fix_high</span>
+                  Improvements
+                </button>
+                <button class="results-tab" onclick="switchResultsTab('breakdown')" id="tab-breakdown">
+                  <span class="material-icons-round">pie_chart</span>
+                  Score Details
+                </button>
+                <button class="results-tab" onclick="switchResultsTab('insights')" id="tab-insights">
+                  <span class="material-icons-round">insights</span>
+                  Market Insights
+                </button>
+              </div>
+
+              <!-- Tab: Overview -->
+              <div class="results-tab-content active" id="content-overview">
+                <!-- Demand Prediction Card -->
               <div class="res-card animate-on-scroll scale-in" id="demandPredictionCard" style="display:none;border-left:3px solid var(--indigo);">
                 <div class="res-card-head">
                   <span class="material-icons-round">trending_up</span>
@@ -1827,7 +1895,10 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </div>
                 </div>
               </div>
+              </div><!-- /content-overview -->
 
+              <!-- Tab: Improvements -->
+              <div class="results-tab-content" id="content-improvements">
               <!-- AI Design Optimizer Card -->
               <div class="res-card animate-on-scroll scale-in" id="designOptimizerCard" style="display:none;border-left:3px solid var(--saffron);">
                 <div class="res-card-head">
@@ -1873,7 +1944,10 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </div>
                 </div>
               </div>
+              </div><!-- /content-improvements -->
 
+              <!-- Tab: Score Details -->
+              <div class="results-tab-content" id="content-breakdown">
               <!-- Score Breakdown — interactive pie -->
               <div class="res-card animate-on-scroll fade-in-left" id="section-breakdown">
                 <div class="res-card-head">
@@ -1940,7 +2014,10 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                 <div class="res-card-head"><span class="material-icons-round">style</span><div><div class="res-card-title">Product Analysis</div><div class="res-card-subtitle">What we identified from your description</div></div></div>
                 <div class="res-card-body"><p style="font-size:12.5px;color:var(--ink-mid);line-height:1.7;margin-bottom:10px;" id="designDesc"></p><div class="feat-tags" id="featTags"></div></div>
               </div>
+              </div><!-- /content-breakdown -->
 
+              <!-- Tab: Market Insights -->
+              <div class="results-tab-content" id="content-insights">
               <!-- Market Insights -->
               <div class="res-card animate-on-scroll fade-in-left" id="section-market">
                 <div class="res-card-head"><span class="material-icons-round">insights</span><div><div class="res-card-title">Market Insights</div><div class="res-card-subtitle">What the data says about your category</div></div></div>
@@ -1984,6 +2061,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </details>
                 </div>
               </div>
+              </div><!-- /content-insights -->
 
             </div><!-- /results-block -->
 
@@ -3341,6 +3419,26 @@ function renderDesignOptimizer(optimizations) {
     document.getElementById('bestComboImpact').textContent = '+' + optimizations.best_combination.total_impact + ' points';
     document.getElementById('bestComboDemand').textContent = optimizations.best_combination.total_demand_impact;
   }
+}
+
+function switchResultsTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.results-tab-content').forEach(function(content) {
+    content.classList.remove('active');
+  });
+  
+  // Remove active from all tabs
+  document.querySelectorAll('.results-tab').forEach(function(tab) {
+    tab.classList.remove('active');
+  });
+  
+  // Show selected tab content
+  var content = document.getElementById('content-' + tabName);
+  if (content) content.classList.add('active');
+  
+  // Activate selected tab
+  var tab = document.getElementById('tab-' + tabName);
+  if (tab) tab.classList.add('active');
 }
 
 function fillInsightList(id, items) {
