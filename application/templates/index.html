@@ -1767,9 +1767,12 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                       <div class="progress-step-label">Complete</div>
                     </div>
                   </div>
-                  <div class="progress-label" id="progressLabel">Checking against market data…</div>
-                  <div class="progress" style="height:5px;border-radius:3px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;background:var(--indigo);"></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                    <div class="progress-label" id="progressLabel">Checking against market data…</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--indigo);" id="progressPercentage">0%</div>
+                  </div>
+                  <div class="progress" style="height:5px;border-radius:3px;background:var(--border);">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBarFill" style="width:0%;background:var(--indigo);transition:width 0.3s ease;"></div>
                   </div>
                 </div>
                 <div class="progress-area mt-3" id="mockupProgressArea">
@@ -2901,6 +2904,8 @@ function runAnalysis() {
   document.getElementById('progressArea').classList.add('show');
   updateProgressStep(1);
   document.getElementById('progressLabel').textContent = 'Uploading data...';
+  document.getElementById('progressPercentage').textContent = '0%';
+  document.getElementById('progressBarFill').style.width = '0%';
   document.getElementById('errorArea').classList.remove('show');
   document.getElementById('invalidImgAlert').classList.remove('show');
   document.getElementById('resultsEmpty').style.display = 'none';
@@ -2909,7 +2914,7 @@ function runAnalysis() {
   // Show sidebar progress bar
   var progressWrap = document.getElementById('analysisProgressWrap');
   var progressBar = document.getElementById('progressBar');
-  var progressLabel = document.getElementById('progressLabel');
+  var sidebarProgressLabel = document.getElementById('progressLabel');
   var progressPercent = document.getElementById('progressPercent');
   if (progressWrap) progressWrap.style.display = 'block';
   if (progressBar) progressBar.style.width = '0%';
@@ -2927,12 +2932,16 @@ function runAnalysis() {
   setTimeout(function() { 
     updateProgressStep(2); 
     document.getElementById('progressLabel').textContent = 'Analyzing product...';
+    document.getElementById('progressPercentage').textContent = '30%';
+    document.getElementById('progressBarFill').style.width = '30%';
     if (progressBar) progressBar.style.width = '30%';
     if (progressPercent) progressPercent.textContent = '30%';
   }, 500);
   setTimeout(function() { 
     updateProgressStep(3); 
     document.getElementById('progressLabel').textContent = 'Calculating scores...';
+    document.getElementById('progressPercentage').textContent = '60%';
+    document.getElementById('progressBarFill').style.width = '60%';
     if (progressBar) progressBar.style.width = '60%';
     if (progressPercent) progressPercent.textContent = '60%';
   }, 1500);
@@ -2941,6 +2950,8 @@ function runAnalysis() {
     .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(r) {
       updateProgressStep(4);
+      document.getElementById('progressPercentage').textContent = '100%';
+      document.getElementById('progressBarFill').style.width = '100%';
       if (progressBar) progressBar.style.width = '100%';
       if (progressPercent) progressPercent.textContent = '100%';
       
