@@ -119,6 +119,29 @@ def analyze():
 
         context = build_context(enriched_desc, price, category, category_label, df)
         result["grounding_context"] = context
+        
+        # ── Demand Prediction ──────────────────────────────────────────────
+        try:
+            from ..services.demand_predictor import predict_demand
+            
+            # Convert market data from DataFrame to list of dicts
+            market_data = df.to_dict('records') if df is not None and not df.empty else []
+            price_float = float(price) if price and price.replace('.', '').isdigit() else 0
+            
+            if price_float > 0:
+                demand_prediction = predict_demand(
+                    category=category,
+                    price=price_float,
+                    total_score=result.get("total_score", 50),
+                    scores=result.get("scores", {}),
+                    market_data=market_data,
+                )
+                result["demand_prediction"] = demand_prediction
+                log.info("Demand prediction: %d-%d units", 
+                        demand_prediction["units_min"], 
+                        demand_prediction["units_max"])
+        except Exception as exc:
+            log.warning("Demand prediction failed: %s", exc)
 
         # ── GenAI Draft → Critic loop ─────────────────────────────────────
         if current_app.config.get("GENAI_ENABLED", True):
