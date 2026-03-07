@@ -37,67 +37,76 @@ _PRESIGNED_URL_TTL: Final = 3600  # seconds
 # Per-category base prompts — tightly scoped to avoid garment confusion
 _CATEGORY_CONTEXT: Final[dict[str, str]] = {
     "saree": (
-        "Indian woman wearing a traditional silk saree: 6-yard draped fabric, "
-        "pleated front pallu draped over left shoulder, matching silk blouse, "
-        "visible petticoat hem, intricate zari border"
+        "Professional fashion photography of an Indian woman wearing an elegant silk saree: "
+        "6-yard draped fabric with precise pleats at waist, pallu gracefully draped over left shoulder, "
+        "fitted matching blouse with visible design, petticoat visible at hem, intricate border work, "
+        "traditional jewelry, confident pose"
     ),
     "lehenga": (
-        "Indian woman wearing a bridal lehenga choli: heavily embroidered "
-        "full-length flared skirt, cropped choli blouse, sheer dupatta scarf "
-        "draped over head or shoulders"
+        "Professional fashion photography of an Indian woman wearing a stunning lehenga choli: "
+        "heavily embroidered full-length circular flared skirt with volume, fitted cropped choli blouse "
+        "showing midriff, sheer embroidered dupatta elegantly draped, bridal or festive styling, "
+        "statement jewelry, regal pose"
     ),
     "salwar_suit": (
-        "Indian woman wearing salwar kameez: fitted churidar pants, "
-        "knee-length straight-cut kameez tunic, matching dupatta"
+        "Professional fashion photography of an Indian woman wearing a salwar kameez suit: "
+        "fitted churidar pants with gathering at ankles, knee-length straight-cut kameez tunic, "
+        "matching dupatta draped over one shoulder, elegant embroidery, traditional yet modern look"
     ),
     "kurti": (
-        "Indian woman wearing ONLY a kurti tunic top with pants: "
-        "straight knee-length tunic top, NO saree, NO draping, NO pallu over shoulder, "
-        "simple embroidered tunic worn with churidar pants or leggings, "
+        "Professional fashion photography of an Indian woman wearing a kurti tunic: "
+        "straight knee-length tunic top with side slits, worn over churidar pants or leggings, "
+        "NO saree draping, NO pallu, simple standalone tunic garment, contemporary ethnic wear, "
+        "minimal jewelry, casual elegant pose"
     ),
     "kurta": (
-        "Indian man wearing a traditional kurta with dhoti pants: "
-        "long straight-cut kurta tunic with embroidery at collar and cuffs, "
-        "loose pleated dhoti-style pants, formal shoes, male model, full body"
+        "Professional fashion photography of an Indian man wearing traditional kurta: "
+        "long straight-cut kurta tunic reaching below knees, embroidered collar and cuffs, "
+        "worn with traditional dhoti or churidar pants, formal ethnic menswear, "
+        "confident masculine pose, full body shot"
     ),
     "kurta_pyjama": (
-        "Indian man wearing kurta pyjama: long straight-cut kurta, "
-        "matching straight-leg pyjama pants, male model, full body"
+        "Professional fashion photography of an Indian man wearing kurta pyjama set: "
+        "long straight-cut kurta tunic paired with matching straight-leg pyjama pants, "
+        "coordinated ethnic outfit, traditional menswear, comfortable yet formal, "
+        "standing pose showing full outfit"
     ),
     "sherwani": (
-        "Indian man wearing a sherwani: long embroidered coat-style jacket "
-        "with mandarin collar, churidar pants, groom or formal wear, male model, full body"
+        "Professional fashion photography of an Indian man wearing an ornate sherwani: "
+        "long embroidered coat-style jacket with mandarin collar reaching below knees, "
+        "intricate embroidery and embellishments, worn with fitted churidar pants, "
+        "groom or formal occasion wear, regal masculine pose, wedding attire"
     ),
 }
 
 _NEGATIVE_PROMPT_BASE: Final = (
-    "sketch, line drawing, cartoon, illustration, watercolor, anime, "
-    "low quality, blurry, out of focus, grainy, noisy, artifacts, "
-    "watermark, text, logo, signature, deformed body, extra limbs, "
-    "missing limbs, disfigured, ugly face, bad anatomy, "
-    "mannequin, doll, plastic skin, "
-    "dark background, patterned background, gradient background, "
-    "garment confusion, wrong clothing type"
+    "sketch, line drawing, cartoon, illustration, anime, painting, "
+    "low quality, blurry, out of focus, grainy, noisy, pixelated, "
+    "watermark, text, logo, signature, copyright, "
+    "deformed body, extra limbs, missing limbs, disfigured, bad anatomy, "
+    "mannequin, doll, plastic skin, artificial, "
+    "dark background, busy background, cluttered background, "
+    "wrong clothing type, garment confusion, mixed styles"
 )
 
 _NEGATIVE_PROMPT_MENSWEAR: Final = (
     _NEGATIVE_PROMPT_BASE + ", "
-    "woman, female, saree, lehenga, dupatta, pallu, blouse, skirt, "
-    "women's clothing, feminine garment"
+    "woman, female, feminine features, saree, lehenga, dupatta draped over shoulder, "
+    "pallu, blouse, skirt, women's clothing, feminine garment, jewelry"
 )
 
 _NEGATIVE_PROMPT_WOMENSWEAR: Final = (
     _NEGATIVE_PROMPT_BASE + ", "
-    "man, male, kurta, dhoti, sherwani, men's clothing"
+    "man, male, masculine features, beard, mustache, "
+    "kurta, dhoti, sherwani, men's clothing, masculine garment"
 )
 
 # Anti-saree negative prompt for kurti (most confused category)
 _NEGATIVE_PROMPT_KURTI: Final = (
-    "sketch, cartoon, blurry, watermark, deformed, mannequin, "
-    "dark background, "
-    "saree, sari, draped fabric, pallu, pleated saree, 6-yard drape, "
-    "petticoat, saree blouse, saree border, wrapped fabric, "
-    "man, male, dhoti, sherwani"
+    "sketch, cartoon, blurry, watermark, deformed, mannequin, dark background, "
+    "saree, sari, draped fabric, pallu over shoulder, pleated saree, 6-yard drape, "
+    "petticoat visible, saree blouse, saree border, wrapped draping, traditional saree style, "
+    "man, male, masculine, dhoti, sherwani, beard"
 )
 
 # Menswear categories — used to select the right negative prompt
@@ -175,9 +184,10 @@ def _build_prompt(category: str, description: str) -> str:
 
     prompt = (
         f"{base}{extra}. "
-        "Fashion editorial photography, full body shot, "
-        "even studio lighting, pure white seamless background, "
-        "hyper-realistic fabric texture, 8K detail"
+        "High-end fashion editorial photography, full body portrait, "
+        "professional studio lighting with soft shadows, pure white seamless backdrop, "
+        "photorealistic fabric texture and draping, sharp focus, 8K quality, "
+        "natural skin tones, authentic ethnic wear styling"
     )
     # Hard cap — Titan v2 rejects prompts > 512 chars
     return prompt[:512]
