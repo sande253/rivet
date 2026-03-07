@@ -244,7 +244,13 @@ def analytics():
         competition = []
         for cat_id, count in category_counts.items():
             level_pct = int((count / max_count) * 100)
-            if level_pct >= 70:
+            
+            # Override for Lehenga Choli - set to Med competition
+            if cat_id == "lehenga":
+                level = "Med competition"
+                css_class = "comp-med"
+                level_pct = 60  # Medium level percentage
+            elif level_pct >= 70:
                 level = "High competition"
                 css_class = "comp-high"
             elif level_pct >= 40:
