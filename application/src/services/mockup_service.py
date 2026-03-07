@@ -80,33 +80,26 @@ _CATEGORY_CONTEXT: Final[dict[str, str]] = {
 }
 
 _NEGATIVE_PROMPT_BASE: Final = (
-    "sketch, line drawing, cartoon, illustration, anime, painting, "
-    "low quality, blurry, out of focus, grainy, noisy, pixelated, "
-    "watermark, text, logo, signature, copyright, "
-    "deformed body, extra limbs, missing limbs, disfigured, bad anatomy, "
-    "mannequin, doll, plastic skin, artificial, "
-    "dark background, busy background, cluttered background, "
-    "wrong clothing type, garment confusion, mixed styles"
+    "sketch, cartoon, blurry, watermark, deformed, extra limbs, "
+    "mannequin, plastic skin, dark background, cluttered background, "
+    "wrong clothing type, low quality, noisy"
 )
 
 _NEGATIVE_PROMPT_MENSWEAR: Final = (
     _NEGATIVE_PROMPT_BASE + ", "
-    "woman, female, feminine features, saree, lehenga, dupatta draped over shoulder, "
-    "pallu, blouse, skirt, women's clothing, feminine garment, jewelry"
+    "woman, female, saree, lehenga, dupatta, pallu, blouse, skirt, feminine garment"
 )
 
 _NEGATIVE_PROMPT_WOMENSWEAR: Final = (
     _NEGATIVE_PROMPT_BASE + ", "
-    "man, male, masculine features, beard, mustache, "
-    "kurta, dhoti, sherwani, men's clothing, masculine garment"
+    "man, male, beard, kurta, dhoti, sherwani, masculine garment"
 )
 
 # Anti-saree negative prompt for kurti (most confused category)
 _NEGATIVE_PROMPT_KURTI: Final = (
     "sketch, cartoon, blurry, watermark, deformed, mannequin, dark background, "
-    "saree, sari, draped fabric, pallu over shoulder, pleated saree, 6-yard drape, "
-    "petticoat visible, saree blouse, saree border, wrapped draping, traditional saree style, "
-    "man, male, masculine, dhoti, sherwani, beard"
+    "saree, sari, draped fabric, pallu, pleated saree, 6-yard drape, petticoat, "
+    "saree blouse, wrapped draping, man, male, dhoti, sherwani"
 )
 
 # Menswear categories — used to select the right negative prompt
