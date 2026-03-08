@@ -1805,7 +1805,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                       <ul id="missingFieldsList" style="margin:0;padding-left:20px;color:#800;font-size:13px;line-height:1.8;">
                       </ul>
                     </div>
-                    <button onclick="document.getElementById('missingFieldsAlert').style.display='none'" style="background:none;border:none;color:#C00;cursor:pointer;font-size:20px;padding:0;line-height:1;">×</button>
+                    <button onclick="var el=document.getElementById('missingFieldsAlert');if(el)el.style.display='none'" style="background:none;border:none;color:#C00;cursor:pointer;font-size:20px;padding:0;line-height:1;">×</button>
                   </div>
                 </div>
                 <style>
