@@ -1796,6 +1796,26 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </button>
                 </div>
 
+                <!-- Red Alert Banner for Missing Fields -->
+                <div id="missingFieldsAlert" style="display:none;margin-top:16px;padding:16px 20px;background:#FEE;border:2px solid #C00;border-radius:8px;animation:shake 0.5s;">
+                  <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <span class="material-icons-round" style="color:#C00;font-size:24px;flex-shrink:0;">error</span>
+                    <div style="flex:1;">
+                      <h6 style="color:#C00;font-size:14px;font-weight:700;margin:0 0 8px 0;">⚠️ Please Fill All Required Fields</h6>
+                      <ul id="missingFieldsList" style="margin:0;padding-left:20px;color:#800;font-size:13px;line-height:1.8;">
+                      </ul>
+                    </div>
+                    <button onclick="document.getElementById('missingFieldsAlert').style.display='none'" style="background:none;border:none;color:#C00;cursor:pointer;font-size:20px;padding:0;line-height:1;">×</button>
+                  </div>
+                </div>
+                <style>
+                  @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                  }
+                </style>
+
                 <div class="progress-area mt-3" id="progressArea">
                   <div class="progress-steps" id="progressSteps">
                     <div class="progress-step" id="step1">
@@ -2988,10 +3008,16 @@ function runAnalysis() {
   if (!material) missingFields.push('Primary Material');
   if (!selectedFile) missingFields.push('Photo/Sketch');
   
-  // Show alert if any fields are missing
+  // Show red alert banner if any fields are missing
   if (missingFields.length > 0) {
-    var message = 'Please fill in the following required fields:\n\n• ' + missingFields.join('\n• ');
-    alert(message);
+    var alertBanner = document.getElementById('missingFieldsAlert');
+    var fieldsList = document.getElementById('missingFieldsList');
+    fieldsList.innerHTML = missingFields.map(function(field) {
+      return '<li>' + field + '</li>';
+    }).join('');
+    alertBanner.style.display = 'block';
+    alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
     showToast('Please complete all required fields', 'error');
     
     // Focus on first missing field
@@ -3006,6 +3032,9 @@ function runAnalysis() {
     }
     return;
   }
+  
+  // Hide alert banner if validation passes
+  document.getElementById('missingFieldsAlert').style.display = 'none';
   
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
@@ -3281,10 +3310,16 @@ function runMockup() {
   if (!material) missingFields.push('Primary Material');
   if (!selectedFile) missingFields.push('Photo/Sketch');
   
-  // Show alert if any fields are missing
+  // Show red alert banner if any fields are missing
   if (missingFields.length > 0) {
-    var message = 'Please fill in the following required fields:\n\n• ' + missingFields.join('\n• ');
-    alert(message);
+    var alertBanner = document.getElementById('missingFieldsAlert');
+    var fieldsList = document.getElementById('missingFieldsList');
+    fieldsList.innerHTML = missingFields.map(function(field) {
+      return '<li>' + field + '</li>';
+    }).join('');
+    alertBanner.style.display = 'block';
+    alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
     showToast('Please complete all required fields', 'error');
     
     // Focus on first missing field
@@ -3299,6 +3334,9 @@ function runMockup() {
     }
     return;
   }
+  
+  // Hide alert banner if validation passes
+  document.getElementById('missingFieldsAlert').style.display = 'none';
   
   var btn = document.getElementById('mockupBtn');
   btn.disabled = true;
