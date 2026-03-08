@@ -3008,11 +3008,13 @@ function runAnalysis() {
   if (missingFields.length > 0) {
     var alertBanner = document.getElementById('missingFieldsAlert');
     var fieldsList = document.getElementById('missingFieldsList');
-    fieldsList.innerHTML = missingFields.map(function(field) {
-      return '<li>' + field + '</li>';
-    }).join('');
-    alertBanner.style.display = 'block';
-    alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (alertBanner && fieldsList) {
+      fieldsList.innerHTML = missingFields.map(function(field) {
+        return '<li>' + field + '</li>';
+      }).join('');
+      alertBanner.style.display = 'block';
+      alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     
     showToast('Please complete all required fields', 'error');
     
@@ -3030,7 +3032,8 @@ function runAnalysis() {
   }
   
   // Hide alert banner if validation passes
-  document.getElementById('missingFieldsAlert').style.display = 'none';
+  var alertBanner = document.getElementById('missingFieldsAlert');
+  if (alertBanner) alertBanner.style.display = 'none';
   
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
@@ -3310,11 +3313,13 @@ function runMockup() {
   if (missingFields.length > 0) {
     var alertBanner = document.getElementById('missingFieldsAlert');
     var fieldsList = document.getElementById('missingFieldsList');
-    fieldsList.innerHTML = missingFields.map(function(field) {
-      return '<li>' + field + '</li>';
-    }).join('');
-    alertBanner.style.display = 'block';
-    alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (alertBanner && fieldsList) {
+      fieldsList.innerHTML = missingFields.map(function(field) {
+        return '<li>' + field + '</li>';
+      }).join('');
+      alertBanner.style.display = 'block';
+      alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     
     showToast('Please complete all required fields', 'error');
     
@@ -3332,7 +3337,8 @@ function runMockup() {
   }
   
   // Hide alert banner if validation passes
-  document.getElementById('missingFieldsAlert').style.display = 'none';
+  var alertBanner = document.getElementById('missingFieldsAlert');
+  if (alertBanner) alertBanner.style.display = 'none';
   
   var btn = document.getElementById('mockupBtn');
   btn.disabled = true;
