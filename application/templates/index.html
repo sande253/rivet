@@ -1715,44 +1715,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </div>
                 </div>
 
-                <!-- Sample Images for Testing -->
-                <div class="mb-3">
-                  <label class="az-label">SAMPLE IMAGES (Click to use)</label>
-                  <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                    <div class="sample-image-box" data-image="/static/sample_1.png" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;background:var(--cream);">
-                      <img src="/static/sample_1.png" alt="Sample 1" style="width:100%;height:140px;object-fit:contain;display:block;pointer-events:none;"/>
-                      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-                        <span class="material-icons-round" style="color:white;font-size:32px;opacity:0;transition:opacity .2s;">check_circle</span>
-                      </div>
-                    </div>
-                    <div class="sample-image-box" data-image="/static/sample_2.png" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;background:var(--cream);">
-                      <img src="/static/sample_2.png" alt="Sample 2" style="width:100%;height:140px;object-fit:contain;display:block;pointer-events:none;"/>
-                      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-                        <span class="material-icons-round" style="color:white;font-size:32px;opacity:0;transition:opacity .2s;">check_circle</span>
-                      </div>
-                    </div>
-                    <div class="sample-image-box" data-image="/static/sample_3.png" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;background:var(--cream);">
-                      <img src="/static/sample_3.png" alt="Sample 3" style="width:100%;height:140px;object-fit:contain;display:block;pointer-events:none;"/>
-                      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-                        <span class="material-icons-round" style="color:white;font-size:32px;opacity:0;transition:opacity .2s;">check_circle</span>
-                      </div>
-                    </div>
-                  </div>
-                  <style>
-                    .sample-image-box:hover {
-                      border-color: var(--indigo) !important;
-                      transform: translateY(-2px);
-                      box-shadow: 0 4px 12px rgba(27,82,71,0.15);
-                    }
-                    .sample-image-box:hover > div {
-                      background: rgba(27,82,71,0.3) !important;
-                    }
-                    .sample-image-box:hover span {
-                      opacity: 1 !important;
-                    }
-                  </style>
-                </div>
-
                 <div class="mb-3">
                   <div class="az-upload" id="uploadZone">
                     <span class="material-icons-round">add_photo_alternate</span>
@@ -1795,26 +1757,6 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     <span>Clear</span>
                   </button>
                 </div>
-
-                <!-- Red Alert Banner for Missing Fields -->
-                <div id="missingFieldsAlert" style="display:none;margin-top:16px;padding:16px 20px;background:#FEE;border:2px solid #C00;border-radius:8px;animation:shake 0.5s;">
-                  <div style="display:flex;align-items:flex-start;gap:12px;">
-                    <span class="material-icons-round" style="color:#C00;font-size:24px;flex-shrink:0;">error</span>
-                    <div style="flex:1;">
-                      <h6 style="color:#C00;font-size:14px;font-weight:700;margin:0 0 8px 0;">⚠️ Please Fill All Required Fields</h6>
-                      <ul id="missingFieldsList" style="margin:0;padding-left:20px;color:#800;font-size:13px;line-height:1.8;">
-                      </ul>
-                    </div>
-                    <button onclick="var el=document.getElementById('missingFieldsAlert');if(el)el.style.display='none'" style="background:none;border:none;color:#C00;cursor:pointer;font-size:20px;padding:0;line-height:1;">×</button>
-                  </div>
-                </div>
-                <style>
-                  @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                    20%, 40%, 60%, 80% { transform: translateX(5px); }
-                  }
-                </style>
 
                 <div class="progress-area mt-3" id="progressArea">
                   <div class="progress-steps" id="progressSteps">
@@ -1887,6 +1829,10 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                     <span id="comparisonText"></span>
                   </div>
                 </div>
+                <button class="btn-export ripple" onclick="exportResults()" id="exportBtn" style="display:none;">
+                  <span class="material-icons-round" style="font-size:18px;">download</span>
+                  <span>Export PDF</span>
+                </button>
               </div>
 
               <!-- Results Tabs -->
@@ -2353,7 +2299,7 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
             </div>
             <div class="steps-grid">
         <div class="step-card animate-on-scroll scale-in"><div class="step-num-badge">1</div><div class="step-icon-wrap"><span class="material-icons-round">edit_note</span></div><div class="step-card-title">Describe Your Product</div><div class="step-card-line">Tell us what you want to make — fabric, style, occasion, and target price.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>Takes under 2 minutes</span></li><li><span class="material-icons-round">check_circle</span><span>No technical knowledge needed</span></li></ul></div>
-        <div class="step-card animate-on-scroll scale-in delay-1"><div class="step-num-badge">2</div><div class="step-icon-wrap"><span class="material-icons-round">manage_search</span></div><div class="step-card-title">We Check the Market</div><div class="step-card-line">Your product is compared against 1000+ real products across all 4 categories.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>How many similar products exist?</span></li><li><span class="material-icons-round">check_circle</span><span>What are buyers actually paying?</span></li></ul></div>
+        <div class="step-card animate-on-scroll scale-in delay-1"><div class="step-num-badge">2</div><div class="step-icon-wrap"><span class="material-icons-round">manage_search</span></div><div class="step-card-title">We Check the Market</div><div class="step-card-line">Your product is compared against 578 real products across all 4 categories.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>How many similar products exist?</span></li><li><span class="material-icons-round">check_circle</span><span>What are buyers actually paying?</span></li></ul></div>
         <div class="step-card animate-on-scroll scale-in delay-2"><div class="step-num-badge">3</div><div class="step-icon-wrap"><span class="material-icons-round">stars</span></div><div class="step-card-title">Your Product Gets Rated</div><div class="step-card-line">We score 5 dimensions out of 20 each. Your final score is the total out of 100.</div><ul class="step-points-new"><li><span class="material-icons-round">check_circle</span><span>Final score out of 100</span></li><li><span class="material-icons-round">check_circle</span><span>Clear breakdown per dimension</span></li></ul></div>
         <div class="step-card animate-on-scroll scale-in delay-3"><div class="step-num-badge">4</div><div class="step-icon-wrap"><span class="material-icons-round">task_alt</span></div><div class="step-card-title">You Get a Clear Decision</div><div class="step-card-line">One of three outcomes, with the reasons behind it and exactly what to do next.</div><ul class="step-points-new"><li><span class="material-icons-round" style="color:var(--green)">check_circle</span><span>LAUNCH — strong market fit (75–100)</span></li><li><span class="material-icons-round" style="color:var(--saffron)">warning</span><span>MODIFY — improvements needed (50–74)</span></li><li><span class="material-icons-round" style="color:var(--red)">cancel</span><span>DO NOT PRODUCE — too risky (0–49)</span></li></ul></div>
             </div>
@@ -2870,28 +2816,6 @@ function scrollToResults() {
   }
 }
 
-// Load sample image for testing
-function loadSampleImage(imageUrl) {
-  fetch(imageUrl)
-    .then(function(response) { return response.blob(); })
-    .then(function(blob) {
-      var file = new File([blob], imageUrl.split('/').pop(), { type: blob.type });
-      var dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      var fileInput = document.getElementById('fileInput');
-      fileInput.files = dataTransfer.files;
-      
-      // Trigger the file change event
-      var event = new Event('change', { bubbles: true });
-      fileInput.dispatchEvent(event);
-      
-      showToast('Sample image loaded successfully', 'success');
-    })
-    .catch(function(err) {
-      showToast('Failed to load sample image', 'error');
-    });
-}
-
 // Scroll to section
 function scrollToSection(sectionId) {
   var section = document.getElementById(sectionId);
@@ -2962,22 +2886,6 @@ document.getElementById('uploadZone').addEventListener('click', function() { doc
 });
 document.getElementById('uploadZone').addEventListener('drop', function(e) { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
 document.getElementById('fileInput').addEventListener('change', function() { if (this.files[0]) handleFile(this.files[0]); });
-
-// Sample image click handlers - wait for DOM to be ready
-setTimeout(function() {
-  var sampleBoxes = document.querySelectorAll('.sample-image-box');
-  console.log('Found sample boxes:', sampleBoxes.length);
-  sampleBoxes.forEach(function(box) {
-    box.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      var imageUrl = this.getAttribute('data-image');
-      console.log('Clicked sample image:', imageUrl);
-      loadSampleImage(imageUrl);
-    });
-  });
-}, 100);
-
 function handleFile(file) {
   selectedFile = file;
   var r = new FileReader();
@@ -2996,44 +2904,30 @@ function runAnalysis() {
   var material = document.getElementById('productMaterial').value.trim();
   var category = document.getElementById('productCategory').value || 'saree';
   
-  // Collect missing fields
-  var missingFields = [];
-  if (!desc) missingFields.push('Product Description');
-  if (!price) missingFields.push('Target Price');
-  if (!occasion) missingFields.push('Occasion');
-  if (!material) missingFields.push('Primary Material');
-  if (!selectedFile) missingFields.push('Photo/Sketch');
-  
-  // Show red alert banner if any fields are missing
-  if (missingFields.length > 0) {
-    var alertBanner = document.getElementById('missingFieldsAlert');
-    var fieldsList = document.getElementById('missingFieldsList');
-    if (alertBanner && fieldsList) {
-      fieldsList.innerHTML = missingFields.map(function(field) {
-        return '<li>' + field + '</li>';
-      }).join('');
-      alertBanner.style.display = 'block';
-      alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    showToast('Please complete all required fields', 'error');
-    
-    // Focus on first missing field
-    if (!desc) {
-      document.getElementById('productDesc').focus();
-    } else if (!price) {
-      document.getElementById('productPrice').focus();
-    } else if (!occasion) {
-      document.getElementById('productOccasion').focus();
-    } else if (!material) {
-      document.getElementById('productMaterial').focus();
-    }
+  if (!desc) {
+    showToast('Please enter a product description', 'error');
+    document.getElementById('productDesc').focus();
     return;
   }
-  
-  // Hide alert banner if validation passes
-  var alertBanner = document.getElementById('missingFieldsAlert');
-  if (alertBanner) alertBanner.style.display = 'none';
+  if (!price) {
+    showToast('Please enter a target price', 'error');
+    document.getElementById('productPrice').focus();
+    return;
+  }
+  if (!occasion) {
+    showToast('Please select an occasion', 'error');
+    document.getElementById('productOccasion').focus();
+    return;
+  }
+  if (!material) {
+    showToast('Please enter the primary material', 'error');
+    document.getElementById('productMaterial').focus();
+    return;
+  }
+  if (!selectedFile) {
+    showToast('Please upload a photo or sketch', 'error');
+    return;
+  }
   
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
@@ -3179,6 +3073,9 @@ function renderResults(data) {
   document.getElementById('ratingNum').textContent    = total;
   document.getElementById('pieTotalNum').textContent  = total;
   
+  // Show export button
+  document.getElementById('exportBtn').style.display = 'inline-flex';
+  
   // Show comparison with category average (simulated)
   var categoryAvg = 68; // TODO: Get real category average
   var compBadge = document.getElementById('comparisonBadge');
@@ -3298,45 +3195,32 @@ function runMockup() {
   var material = document.getElementById('productMaterial').value.trim();
   var category = document.getElementById('productCategory').value || 'saree';
   
-  // Collect missing fields
-  var missingFields = [];
-  if (!desc) missingFields.push('Product Description');
-  if (!price) missingFields.push('Target Price');
-  if (!occasion) missingFields.push('Occasion');
-  if (!material) missingFields.push('Primary Material');
-  if (!selectedFile) missingFields.push('Photo/Sketch');
-  
-  // Show red alert banner if any fields are missing
-  if (missingFields.length > 0) {
-    var alertBanner = document.getElementById('missingFieldsAlert');
-    var fieldsList = document.getElementById('missingFieldsList');
-    if (alertBanner && fieldsList) {
-      fieldsList.innerHTML = missingFields.map(function(field) {
-        return '<li>' + field + '</li>';
-      }).join('');
-      alertBanner.style.display = 'block';
-      alertBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    showToast('Please complete all required fields', 'error');
-    
-    // Focus on first missing field
-    if (!desc) {
-      document.getElementById('productDesc').focus();
-    } else if (!price) {
-      document.getElementById('productPrice').focus();
-    } else if (!occasion) {
-      document.getElementById('productOccasion').focus();
-    } else if (!material) {
-      document.getElementById('productMaterial').focus();
-    }
+  if (!desc) {
+    showToast('Please enter a product description', 'error');
+    document.getElementById('productDesc').focus();
     return;
   }
-  
-  // Hide alert banner if validation passes
-  var alertBanner = document.getElementById('missingFieldsAlert');
-  if (alertBanner) alertBanner.style.display = 'none';
-  
+  if (!price) {
+    showToast('Please enter a target price', 'error');
+    document.getElementById('productPrice').focus();
+    return;
+  }
+  if (!occasion) {
+    showToast('Please select an occasion', 'error');
+    document.getElementById('productOccasion').focus();
+    return;
+  }
+  if (!material) {
+    showToast('Please enter the primary material', 'error');
+    document.getElementById('productMaterial').focus();
+    return;
+  }
+  if (!selectedFile) {
+    showToast('Please upload a photo or sketch', 'error');
+    document.getElementById('mockupErrorText').textContent = 'Please upload a sketch image first.';
+    document.getElementById('mockupErrorArea').classList.add('show');
+    return;
+  }
   var btn = document.getElementById('mockupBtn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner-border spinner-border-sm" style="width:16px;height:16px;color:white;"></div>&nbsp;Generating\u2026';
