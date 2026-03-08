@@ -1715,6 +1715,44 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </div>
                 </div>
 
+                <!-- Sample Images for Testing -->
+                <div class="mb-3">
+                  <label class="az-label">SAMPLE IMAGES (Click to use)</label>
+                  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <div onclick="loadSampleImage('/static/sample_1.png')" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;">
+                      <img src="/static/sample_1.png" alt="Sample 1" style="width:100%;height:140px;object-fit:cover;"/>
+                      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;">
+                        <span class="material-icons-round" style="color:white;font-size:32px;opacity:0;transition:opacity .2s;">check_circle</span>
+                      </div>
+                    </div>
+                    <div onclick="loadSampleImage('/static/sample_2.png')" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;">
+                      <img src="/static/sample_2.png" alt="Sample 2" style="width:100%;height:140px;object-fit:cover;"/>
+                      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;">
+                        <span class="material-icons-round" style="color:white;font-size:32px;opacity:0;transition:opacity .2s;">check_circle</span>
+                      </div>
+                    </div>
+                    <div onclick="loadSampleImage('/static/sample_3.png')" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;">
+                      <img src="/static/sample_3.png" alt="Sample 3" style="width:100%;height:140px;object-fit:cover;"/>
+                      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;">
+                        <span class="material-icons-round" style="color:white;font-size:32px;opacity:0;transition:opacity .2s;">check_circle</span>
+                      </div>
+                    </div>
+                  </div>
+                  <style>
+                    div[onclick^="loadSampleImage"]:hover {
+                      border-color: var(--indigo) !important;
+                      transform: translateY(-2px);
+                      box-shadow: 0 4px 12px rgba(27,82,71,0.15);
+                    }
+                    div[onclick^="loadSampleImage"]:hover > div {
+                      background: rgba(27,82,71,0.3) !important;
+                    }
+                    div[onclick^="loadSampleImage"]:hover span {
+                      opacity: 1 !important;
+                    }
+                  </style>
+                </div>
+
                 <div class="mb-3">
                   <div class="az-upload" id="uploadZone">
                     <span class="material-icons-round">add_photo_alternate</span>
@@ -2814,6 +2852,27 @@ function scrollToResults() {
   if (resultsBlock) {
     resultsBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+}
+
+// Load sample image for testing
+function loadSampleImage(imageUrl) {
+  fetch(imageUrl)
+    .then(function(response) { return response.blob(); })
+    .then(function(blob) {
+      var file = new File([blob], imageUrl.split('/').pop(), { type: blob.type });
+      var dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      document.getElementById('sketchUpload').files = dataTransfer.files;
+      
+      // Trigger the file change event
+      var event = new Event('change', { bubbles: true });
+      document.getElementById('sketchUpload').dispatchEvent(event);
+      
+      showToast('Sample image loaded successfully', 'success');
+    })
+    .catch(function(err) {
+      showToast('Failed to load sample image', 'error');
+    });
 }
 
 // Scroll to section
