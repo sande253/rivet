@@ -2947,13 +2947,20 @@ document.getElementById('uploadZone').addEventListener('click', function() { doc
 document.getElementById('uploadZone').addEventListener('drop', function(e) { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
 document.getElementById('fileInput').addEventListener('change', function() { if (this.files[0]) handleFile(this.files[0]); });
 
-// Sample image click handlers
-document.querySelectorAll('.sample-image-box').forEach(function(box) {
-  box.addEventListener('click', function() {
-    var imageUrl = this.getAttribute('data-image');
-    loadSampleImage(imageUrl);
+// Sample image click handlers - wait for DOM to be ready
+setTimeout(function() {
+  var sampleBoxes = document.querySelectorAll('.sample-image-box');
+  console.log('Found sample boxes:', sampleBoxes.length);
+  sampleBoxes.forEach(function(box) {
+    box.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var imageUrl = this.getAttribute('data-image');
+      console.log('Clicked sample image:', imageUrl);
+      loadSampleImage(imageUrl);
+    });
   });
-});
+}, 100);
 
 function handleFile(file) {
   selectedFile = file;
@@ -2973,28 +2980,30 @@ function runAnalysis() {
   var material = document.getElementById('productMaterial').value.trim();
   var category = document.getElementById('productCategory').value || 'saree';
   
-  if (!desc) {
-    showToast('Please enter a product description', 'error');
-    document.getElementById('productDesc').focus();
-    return;
-  }
-  if (!price) {
-    showToast('Please enter a target price', 'error');
-    document.getElementById('productPrice').focus();
-    return;
-  }
-  if (!occasion) {
-    showToast('Please select an occasion', 'error');
-    document.getElementById('productOccasion').focus();
-    return;
-  }
-  if (!material) {
-    showToast('Please enter the primary material', 'error');
-    document.getElementById('productMaterial').focus();
-    return;
-  }
-  if (!selectedFile) {
-    showToast('Please upload a photo or sketch', 'error');
+  // Collect missing fields
+  var missingFields = [];
+  if (!desc) missingFields.push('Product Description');
+  if (!price) missingFields.push('Target Price');
+  if (!occasion) missingFields.push('Occasion');
+  if (!material) missingFields.push('Primary Material');
+  if (!selectedFile) missingFields.push('Photo/Sketch');
+  
+  // Show alert if any fields are missing
+  if (missingFields.length > 0) {
+    var message = 'Please fill in the following required fields:\n\n• ' + missingFields.join('\n• ');
+    alert(message);
+    showToast('Please complete all required fields', 'error');
+    
+    // Focus on first missing field
+    if (!desc) {
+      document.getElementById('productDesc').focus();
+    } else if (!price) {
+      document.getElementById('productPrice').focus();
+    } else if (!occasion) {
+      document.getElementById('productOccasion').focus();
+    } else if (!material) {
+      document.getElementById('productMaterial').focus();
+    }
     return;
   }
   
@@ -3264,32 +3273,33 @@ function runMockup() {
   var material = document.getElementById('productMaterial').value.trim();
   var category = document.getElementById('productCategory').value || 'saree';
   
-  if (!desc) {
-    showToast('Please enter a product description', 'error');
-    document.getElementById('productDesc').focus();
+  // Collect missing fields
+  var missingFields = [];
+  if (!desc) missingFields.push('Product Description');
+  if (!price) missingFields.push('Target Price');
+  if (!occasion) missingFields.push('Occasion');
+  if (!material) missingFields.push('Primary Material');
+  if (!selectedFile) missingFields.push('Photo/Sketch');
+  
+  // Show alert if any fields are missing
+  if (missingFields.length > 0) {
+    var message = 'Please fill in the following required fields:\n\n• ' + missingFields.join('\n• ');
+    alert(message);
+    showToast('Please complete all required fields', 'error');
+    
+    // Focus on first missing field
+    if (!desc) {
+      document.getElementById('productDesc').focus();
+    } else if (!price) {
+      document.getElementById('productPrice').focus();
+    } else if (!occasion) {
+      document.getElementById('productOccasion').focus();
+    } else if (!material) {
+      document.getElementById('productMaterial').focus();
+    }
     return;
   }
-  if (!price) {
-    showToast('Please enter a target price', 'error');
-    document.getElementById('productPrice').focus();
-    return;
-  }
-  if (!occasion) {
-    showToast('Please select an occasion', 'error');
-    document.getElementById('productOccasion').focus();
-    return;
-  }
-  if (!material) {
-    showToast('Please enter the primary material', 'error');
-    document.getElementById('productMaterial').focus();
-    return;
-  }
-  if (!selectedFile) {
-    showToast('Please upload a photo or sketch', 'error');
-    document.getElementById('mockupErrorText').textContent = 'Please upload a sketch image first.';
-    document.getElementById('mockupErrorArea').classList.add('show');
-    return;
-  }
+  
   var btn = document.getElementById('mockupBtn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner-border spinner-border-sm" style="width:16px;height:16px;color:white;"></div>&nbsp;Generating\u2026';
