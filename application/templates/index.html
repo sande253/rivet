@@ -1715,6 +1715,25 @@ textarea.az-field { min-height: 90px; max-height: 220px; resize: vertical; line-
                   </div>
                 </div>
 
+                <!-- Sample Images -->
+                <div class="mb-3">
+                  <label class="az-label">SAMPLE IMAGES (Click to use)</label>
+                  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <div class="sample-img-box" data-img="/static/sample_1.png" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;background:var(--cream);">
+                      <img src="/static/sample_1.png" alt="Sample 1" style="width:100%;height:140px;object-fit:contain;display:block;pointer-events:none;"/>
+                    </div>
+                    <div class="sample-img-box" data-img="/static/sample_2.png" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;background:var(--cream);">
+                      <img src="/static/sample_2.png" alt="Sample 2" style="width:100%;height:140px;object-fit:contain;display:block;pointer-events:none;"/>
+                    </div>
+                    <div class="sample-img-box" data-img="/static/sample_3.png" style="cursor:pointer;flex:1;min-width:120px;max-width:180px;border:2px solid var(--border);border-radius:8px;overflow:hidden;transition:all .2s;position:relative;background:var(--cream);">
+                      <img src="/static/sample_3.png" alt="Sample 3" style="width:100%;height:140px;object-fit:contain;display:block;pointer-events:none;"/>
+                    </div>
+                  </div>
+                  <style>
+                    .sample-img-box:hover { border-color: var(--indigo); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(27,82,71,0.15); }
+                  </style>
+                </div>
+
                 <div class="mb-3">
                   <div class="az-upload" id="uploadZone">
                     <span class="material-icons-round">add_photo_alternate</span>
@@ -2886,6 +2905,36 @@ document.getElementById('uploadZone').addEventListener('click', function() { doc
 });
 document.getElementById('uploadZone').addEventListener('drop', function(e) { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
 document.getElementById('fileInput').addEventListener('change', function() { if (this.files[0]) handleFile(this.files[0]); });
+
+// Sample image click handlers
+document.querySelectorAll('.sample-img-box').forEach(function(box) {
+  box.addEventListener('click', function() {
+    var imgUrl = this.getAttribute('data-img');
+    if (!imgUrl) return;
+    
+    fetch(imgUrl)
+      .then(function(res) { return res.blob(); })
+      .then(function(blob) {
+        var file = new File([blob], imgUrl.split('/').pop(), { type: blob.type });
+        var fileInput = document.getElementById('fileInput');
+        if (!fileInput) return;
+        
+        var dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        
+        var event = new Event('change', { bubbles: true });
+        fileInput.dispatchEvent(event);
+        
+        showToast('Sample image loaded', 'success');
+      })
+      .catch(function(err) {
+        console.error('Failed to load sample:', err);
+        showToast('Failed to load sample image', 'error');
+      });
+  });
+});
+
 function handleFile(file) {
   selectedFile = file;
   var r = new FileReader();
