@@ -3,8 +3,6 @@
 > **Transform design sketches into market-ready products with AI analysis, photorealistic mockups, and data-driven insights.**
 
 [![Production](https://img.shields.io/badge/status-live-success)](http://rivet-prod-alb-1684600916.us-east-1.elb.amazonaws.com/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
 ---
 
 ## The Problem
