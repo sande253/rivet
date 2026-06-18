@@ -7,7 +7,7 @@
 
 ---
 
-## 🎯 The Problem
+## The Problem
 
 Fashion brands and artisans launching ethnic wear face critical challenges:
 - **Inventory Risk**: ₹50K–₹500K lost per failed SKU due to guesswork
@@ -15,7 +15,7 @@ Fashion brands and artisans launching ethnic wear face critical challenges:
 - **Design Uncertainty**: No quick way to validate viability before production
 - **Visualization Gap**: Hard to communicate design vision to buyers/manufacturers
 
-## ✨ The Solution
+## The Solution
 
 **Rivet** combines AI vision analysis with real market data to predict product viability and generate photorealistic mockups—reducing inventory risk by 40%+ and accelerating time-to-market.
 
@@ -23,7 +23,7 @@ Fashion brands and artisans launching ethnic wear face critical challenges:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐
@@ -69,36 +69,36 @@ Fashion brands and artisans launching ethnic wear face critical challenges:
 
 ---
 
-## 🚀 Features
+##  Features
 
-### 🎨 AI-Powered Analysis
+###  AI-Powered Analysis
 - **Vision Classification**: Claude analyzes sketches against 1000+ real products
 - **5-Dimension Scoring**: Market demand, uniqueness, price fit, material, trends
 - **Instant Decision**: LAUNCH / MODIFY / DO NOT PRODUCE (2-3 seconds)
 - **Grounded Recommendations**: Tips anchored in actual market data
 
-### 🖼️ Photorealistic Mockup Generation
+###  Photorealistic Mockup Generation
 - **Bedrock Titan v2**: IMAGE_VARIATION for sketch-to-photo transformation
 - **Category-Specific**: Saree, Lehenga, Salwar Suit, Kurti, Kurta, Sherwani
 - **Gender-Aware**: Male/female models based on garment type
 - **Anti-Confusion**: Strong negative prompts prevent category mixing
 - **Fullscreen View**: Click to expand images in modal
 
-### 🛡️ Production-Grade Resilience
+###  Production-Grade Resilience
 - **Rate Limiting**: 10 analyses/hour, 5 mockups/hour per IP
 - **Circuit Breaker**: Auto-fallback if GenAI fails 5× in 60s
 - **Caching**: 5-min TTL on GenAI responses
 - **Safety Filters**: Profanity detection, PII removal, input validation
 - **Cost Control**: Rate limits prevent API abuse
 
-### 🌐 User Experience
+###  User Experience
 - **Bilingual UI**: English & Telugu (Hindi coming soon)
 - **Authentication**: Secure login/signup with bcrypt
 - **Admin Dashboard**: Proposal management + analytics
 - **Responsive Design**: Material Design, mobile-friendly
 - **Required Fields**: All form inputs validated
 
-### ☁️ AWS Infrastructure
+###  AWS Infrastructure
 - **Auto-Scaling**: EC2 instances with ALB
 - **RDS PostgreSQL**: User data with automated backups
 - **S3 Storage**: Mockup images with presigned URLs
@@ -108,7 +108,7 @@ Fashion brands and artisans launching ethnic wear face critical challenges:
 
 ---
 
-## 📋 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Python 3.11+
@@ -194,7 +194,7 @@ terraform apply
 
 ---
 
-## 📊 Sample Output
+## Sample Output
 
 ```json
 {
@@ -221,7 +221,7 @@ terraform apply
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 cd application
@@ -241,7 +241,7 @@ pytest -k "test_market" -v
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 rivet/
@@ -291,7 +291,7 @@ rivet/
 
 ---
 
-## 🎯 Key Achievements
+## Key Achievements
 
 ### Technical Excellence
 - **Multi-Stage GenAI**: Draft → Critic pipeline with quality gates
@@ -313,7 +313,7 @@ rivet/
 
 ---
 
-## 🚫 Known Limitations
+## Known Limitations
 
 - **Static Market Data**: CSVs updated manually (live integration planned)
 - **Rate Limits**: 10 analyses/hour may be restrictive for power users
@@ -321,8 +321,7 @@ rivet/
 - **Category Confusion**: Kurti sometimes generates as saree (improved with negative prompts)
 
 ---
-
-## 🔮 Roadmap
+##  Roadmap
 
 ### Q2 2026
 - [ ] Live market data integration (Shopify/Amazon scraping)
@@ -343,7 +342,7 @@ rivet/
 
 ---
 
-## 💰 Cost Breakdown
+## Cost Breakdown
 
 ### Current Production Costs (~$10/day)
 - **EC2**: $2.90/day (t3.medium)
@@ -359,13 +358,6 @@ rivet/
 - Released unused Elastic IPs (-$3.60/month)
 
 ---
-
-## 📄 License
-
-MIT License — See [LICENSE](LICENSE) for details.
-
----
-
 ## 👨‍💻 Author
 
 **Sandeep Reddy**
@@ -376,7 +368,7 @@ MIT License — See [LICENSE](LICENSE) for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Anthropic** for Claude API
 - **AWS** for Bedrock and infrastructure
